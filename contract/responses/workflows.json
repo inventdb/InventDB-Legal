@@ -1,0 +1,28 @@
+{
+  "workflows": [
+    {
+      "_id": "wf-001",
+      "active": true,
+      "name": "Weekly Invoice Renewals Due",
+      "pending_approval": false,
+      "plan": [
+        {
+          "idx": 0,
+          "kind": "sql_query",
+          "label": "Query renewals",
+          "narration": "Finds invoices ending in the next 30 days.",
+          "save_as": "expiring",
+          "sql": "SELECT * FROM legal.invoices"
+        }
+      ],
+      "sandbox": false,
+      "trigger_intent": "Every Monday at 9 AM",
+      "trigger_kind": "cron",
+      "trigger_spec": {
+        "expr": "0 9 * * 1",
+        "tz": "UTC"
+      },
+      "version": 2
+    }
+  ]
+}

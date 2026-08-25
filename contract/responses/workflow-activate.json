@@ -1,0 +1,7 @@
+{
+  "_id": "wf-001",
+  "active": true,
+  "name": "Weekly Invoice Renewals Due",
+  "pending_approval": false,
+  "sandbox": false
+}

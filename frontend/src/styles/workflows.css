@@ -1,0 +1,708 @@
+/* ============================================================================
+   Workflows — cards, the plan timeline, the builder and the detail view.
+
+   The plan timeline itself (`.wf-step*`) lives in global.css alongside the
+   other shared pieces; this file is the editing surface built on top of it.
+   Everything here references tokens only, so both themes and the responsive
+   rules at the foot come for free.
+   ============================================================================ */
+
+/* ---- Shared bits -------------------------------------------------------- */
+
+/* A `${variable}` a step binds, and the condition that can skip a step. Both
+   are code, so both take the mono face — they are read as literals, not prose. */
+.wf-var,
+.wf-when {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+.wf-var {
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+.wf-when {
+  color: var(--text-faint);
+  background: var(--surface-3);
+}
+.wf-ico-trigger {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+.wf-empty-note {
+  padding: 10px 0;
+}
+.input.mono,
+.textarea.mono {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+/* ---- Card --------------------------------------------------------------- */
+.wf-card {
+  display: flex;
+  flex-direction: column;
+}
+.wf-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.wf-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* The name is the way in, so it is a real button — but it has to look like the
+   heading it replaces, not like a control. */
+.wf-card-name {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.wf-card-name h3 {
+  font-size: 15px;
+  transition: color var(--dur-1) var(--ease);
+}
+.wf-card-name:hover h3 {
+  color: var(--brand);
+}
+.wf-card-name:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.wf-card-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+/* No margin of its own — `.wf-card-titles` is a grid and sets the rhythm, so a
+   margin here stacked on top of the gap and left this row spaced differently
+   from the two above it. */
+.wf-card-intent {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  margin: 0;
+}
+.wf-card-runs {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.wf-card-runs-head {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.wf-card-run-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wf-card-run {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.wf-card-run-status {
+  text-transform: capitalize;
+  min-width: 74px;
+}
+.wf-card-run-time {
+  color: var(--text-muted);
+}
+.wf-card-run-dur {
+  margin-left: auto;
+  color: var(--text-faint);
+}
+.wf-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  /* Pinned to the bottom so the action rows of side-by-side cards line up even
+     when their plans differ in length. */
+  margin-top: auto;
+  padding-top: 14px;
+}
+.wf-card-open {
+  margin-left: auto;
+}
+
+/* ---- Detail view -------------------------------------------------------- */
+.wf-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.wf-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wf-state-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.wf-state-next {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+.wf-intent {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.wf-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+/* Going live is the one irreversible-feeling action on the row: it stops the
+   mocking. Warn-toned rather than danger — it is intended, just not casual. */
+.wf-golive {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+.wf-golive:hover {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.wf-action-end {
+  margin-left: auto;
+}
+
+.wf-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.wf-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.wf-tab:hover {
+  color: var(--brand);
+}
+.wf-tab.active {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+}
+
+.wf-runs {
+  display: flex;
+  flex-direction: column;
+}
+.wf-run-item {
+  border-bottom: 1px solid var(--border);
+}
+.wf-run-item.is-open {
+  background: var(--surface-2);
+}
+/* The row is a button, so it has to un-inherit the button defaults rather
+   than look like one — it is a disclosure, not an action. */
+.wf-run {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 0;
+  font-size: 13px;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.wf-run:hover {
+  color: var(--brand);
+}
+.wf-run > svg {
+  flex: none;
+  color: var(--text-faint);
+}
+.wf-run-status {
+  text-transform: capitalize;
+  min-width: 78px;
+}
+.wf-run-time {
+  color: var(--text-muted);
+}
+.wf-run-tag {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.wf-run-error {
+  color: var(--danger);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 30ch;
+}
+.wf-run-dur {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+/* ---- A run's execution timeline ---------------------------------------- */
+/* Indented behind a brand rail so the steps read as belonging to the run above
+   them rather than as siblings of the next run in the list. */
+.wf-rsteps {
+  display: grid;
+  gap: 10px;
+  margin: 2px 0 12px 6px;
+  padding: 8px 0 4px 12px;
+  border-left: 2px solid var(--brand-line);
+}
+.wf-rsteps-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 12px 18px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.wf-rsteps-error {
+  margin-left: 4px;
+  font-size: 12.5px;
+  color: var(--danger);
+}
+.wf-rstep {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+}
+.wf-rstep-time {
+  flex: none;
+  min-width: 58px;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--text-faint);
+}
+.wf-rstep-ico {
+  flex: none;
+  margin-top: 1px;
+  color: var(--text-muted);
+  line-height: 0;
+}
+.wf-rstep-ico.is-done {
+  color: var(--success);
+}
+.wf-rstep-tool {
+  flex: none;
+  min-width: 92px;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wf-rstep-body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.wf-rstep-content {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.wf-rstep-empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.wf-rstep-result {
+  font-size: 12px;
+}
+.wf-rstep-result.is-ok {
+  color: var(--success);
+}
+.wf-rstep-result.is-warn {
+  color: var(--warn);
+}
+
+.wf-versions {
+  display: flex;
+  flex-direction: column;
+}
+.wf-version {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.wf-version-no {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--brand);
+  background: var(--brand-soft);
+  padding: 2px 7px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.wf-version-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.wf-version-intent {
+  color: var(--text-faint);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-version-meta {
+  color: var(--text-faint);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wf-issues {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+}
+.btn-icon.danger:hover {
+  color: var(--danger);
+}
+
+/* ---- Narrow screens ------------------------------------------------------
+   The action rows are the parts that break first: they assume room for four
+   buttons plus a right-aligned one. Below the tablet breakpoint they wrap, and
+   the `margin-left: auto` that pushes Delete and Open to the end is dropped so
+   they do not sit alone on a line of their own. */
+@media (max-width: 700px) {
+  .wf-card-actions,
+  .wf-actions {
+    flex-wrap: wrap;
+  }
+  .wf-action-end,
+  .wf-card-open {
+    margin-left: 0;
+  }
+  .wf-run-error {
+    max-width: 14ch;
+  }
+  .wf-version-meta {
+    display: none;
+  }
+}
+
+/* ---- List toolbar: search, state chips, bulk delete --------------------- */
+.wf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.wf-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
+}
+.wf-filter > svg {
+  position: absolute;
+  left: 10px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+.wf-filter .input {
+  padding-left: 30px;
+}
+.wf-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wf-chip {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.wf-chip:hover {
+  color: var(--brand);
+  border-color: var(--brand-line);
+}
+.wf-chip.active {
+  background: var(--brand-soft);
+  border-color: transparent;
+  color: var(--brand);
+  font-weight: 600;
+}
+.wf-bulk {
+  margin-left: auto;
+}
+
+/* The checkbox only earns its place once bulk delete is in play, so it stays
+   quiet until the card is hovered or actually selected. */
+.wf-card-pick {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding-top: 2px;
+  opacity: 0.35;
+  transition: opacity var(--dur-1) var(--ease);
+}
+.wf-card:hover .wf-card-pick,
+.wf-card.is-selected .wf-card-pick,
+.wf-card-pick:focus-within {
+  opacity: 1;
+}
+.wf-card-pick input {
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.wf-card.is-selected {
+  outline: 2px solid var(--brand);
+  outline-offset: -1px;
+}
+
+/* ---- Rename in place ---------------------------------------------------- */
+.wf-name-row {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+}
+.wf-rename {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 3px 8px 3px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-align: left;
+  cursor: text;
+  border-radius: var(--radius-sm);
+}
+.wf-rename > svg {
+  flex: none;
+  opacity: 0;
+  color: var(--text-faint);
+  transition: opacity var(--dur-1) var(--ease);
+}
+.wf-rename:hover > svg,
+.wf-rename:focus-visible > svg {
+  opacity: 1;
+}
+.wf-rename:disabled {
+  cursor: default;
+}
+.wf-rename-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.wf-rename-edit .input {
+  flex: 1;
+  min-width: 180px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.wf-rename-error {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--danger);
+}
+
+/* ---- Run row extras: cancel, fix with AI -------------------------------- */
+.wf-run-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wf-run-cancel {
+  flex: none;
+  color: var(--danger);
+}
+
+/* ---- Versions: open one and read its plan ------------------------------- */
+.wf-versions-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+}
+.wf-versions-head .report-note {
+  margin: 0;
+}
+.wf-versions-clear {
+  margin-left: auto;
+  color: var(--danger);
+}
+.wf-version-item {
+  border-bottom: 1px solid var(--border);
+}
+.wf-version-item.is-open {
+  background: var(--surface-2);
+}
+.wf-version-open {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wf-version-open > svg:first-child {
+  flex: none;
+  color: var(--text-faint);
+}
+.wf-version-open:hover .wf-version-name {
+  color: var(--brand);
+}
+.wf-version-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.wf-version-plan {
+  padding: 0 12px 14px 34px;
+}
+
+/* ---- Card header: one shape on every card ------------------------------- */
+/* Name, then state, then trigger — three rows regardless of how long the name
+   runs. Sharing a line with the badges made them wrap at a different point on
+   each card, so a grid read as ragged rather than as a set. */
+.wf-card-titles {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+.wf-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  /* The trigger is the long one; when it wraps it should sit under the badges
+     rather than push them apart. */
+  row-gap: 6px;
+}
+.wf-card-meta .wf-card-trigger {
+  margin-top: 0;
+}
+
+/* ---- "+N more steps" ---------------------------------------------------- */
+.wf-ico-more {
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  color: var(--text-faint);
+}
+.wf-step-more .wf-step-body {
+  display: flex;
+  align-items: center;
+  /* Matches the optical centre of a step row, whose title sits on the first
+     line of a two-line body. */
+  min-height: 26px;
+}
+.wf-more-link,
+.wf-more-note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.wf-more-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+}
+.wf-more-link:hover {
+  color: var(--brand);
+  text-decoration-color: var(--brand-line);
+}
+
+/* ---- Card grid ---------------------------------------------------------- */
+/* Cards size to their own content rather than stretching to the tallest in the
+   row. Pinning the action rows to a common baseline looked tidier in principle,
+   but a two-step workflow beside a twelve-step one then carried ~130px of empty
+   card — which reads as something that failed to load, not as alignment. */
+.wf-grid {
+  align-items: start;
+}
+
+/* ---- Toolbar: one control height ---------------------------------------- */
+/* The search box, the filter chips and the bulk button sat at 39/31/31px in a
+   single row. Centred, that reads as three unrelated controls. */
+.wf-toolbar {
+  --wf-control-h: 38px;
+}
+.wf-toolbar .wf-filter .input,
+.wf-toolbar .wf-chip,
+.wf-toolbar .btn {
+  height: var(--wf-control-h);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.wf-toolbar .wf-chip,
+.wf-toolbar .btn {
+  display: inline-flex;
+  align-items: center;
+}

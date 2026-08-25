@@ -1,0 +1,232 @@
+{
+  "entities": [
+    {
+      "key": "matter_id",
+      "label": "Matter",
+      "label_plural": "Matters",
+      "name": "matters",
+      "order_by": "date_opened",
+      "search_fields": [
+        "matter_id",
+        "matter_caption",
+        "client_name",
+        "client_id",
+        "practice_area",
+        "matter_type",
+        "case_number",
+        "status",
+        "stage",
+        "court_short",
+        "responsible_attorney_name",
+        "opposing_party",
+        "opposing_counsel"
+      ]
+    },
+    {
+      "key": "client_id",
+      "label": "Client",
+      "label_plural": "Clients",
+      "name": "clients",
+      "order_by": "client_name",
+      "search_fields": [
+        "client_id",
+        "client_name",
+        "primary_contact",
+        "email",
+        "phone",
+        "city",
+        "client_type",
+        "status",
+        "responsible_attorney_name",
+        "referral_source"
+      ]
+    },
+    {
+      "key": "timekeeper_id",
+      "label": "Timekeeper",
+      "label_plural": "Timekeepers",
+      "name": "timekeepers",
+      "order_by": "name",
+      "search_fields": [
+        "timekeeper_id",
+        "name",
+        "initials",
+        "role"
+      ]
+    },
+    {
+      "key": "time_entry_id",
+      "label": "Time Entry",
+      "label_plural": "Time Entries",
+      "name": "time_entries",
+      "order_by": "date",
+      "search_fields": [
+        "time_entry_id",
+        "matter_id",
+        "matter_caption",
+        "timekeeper",
+        "narrative",
+        "task_description",
+        "activity_description",
+        "practice_area",
+        "invoice_no",
+        "task_code"
+      ]
+    },
+    {
+      "key": "cost_id",
+      "label": "Cost",
+      "label_plural": "Costs & Disbursements",
+      "name": "costs_and_disbursements",
+      "order_by": "date",
+      "search_fields": [
+        "cost_id",
+        "matter_id",
+        "matter_caption",
+        "expense_category",
+        "expense_code",
+        "vendor_payee",
+        "description",
+        "invoice_no",
+        "practice_area"
+      ]
+    },
+    {
+      "key": "invoice_no",
+      "label": "Invoice",
+      "label_plural": "Invoices",
+      "name": "invoices",
+      "order_by": "issue_date",
+      "search_fields": [
+        "invoice_no",
+        "matter_id",
+        "client_id",
+        "client_name",
+        "matter_caption",
+        "status",
+        "aging_bucket",
+        "fee_model"
+      ]
+    },
+    {
+      "key": "payment_id",
+      "label": "Payment",
+      "label_plural": "Payments & Receipts",
+      "name": "payments_and_receipts",
+      "order_by": "date",
+      "search_fields": [
+        "payment_id",
+        "client_name",
+        "client_id",
+        "matter_id",
+        "payor",
+        "method",
+        "reference",
+        "invoice_no",
+        "deposited_to"
+      ]
+    },
+    {
+      "key": "transaction_id",
+      "label": "Trust Ledger Entry",
+      "label_plural": "Trust Ledger (CTA)",
+      "name": "trust_ledger_cta",
+      "order_by": "date",
+      "search_fields": [
+        "transaction_id",
+        "matter_id",
+        "client_id",
+        "client_name",
+        "transaction_type",
+        "description",
+        "payee_payor",
+        "reference"
+      ]
+    },
+    {
+      "key": "event_id",
+      "label": "Court Event",
+      "label_plural": "Court Calendar",
+      "name": "court_calendar",
+      "order_by": "date",
+      "search_fields": [
+        "event_id",
+        "matter_id",
+        "matter_caption",
+        "event_type",
+        "court_location",
+        "appearing_name",
+        "case_number",
+        "outcome",
+        "judicial_officer"
+      ]
+    },
+    {
+      "key": "deadline_id",
+      "label": "Deadline",
+      "label_plural": "Deadlines & SOL",
+      "name": "deadlines_and_sol",
+      "order_by": "due_date",
+      "search_fields": [
+        "deadline_id",
+        "matter_id",
+        "matter_caption",
+        "description",
+        "category",
+        "authority",
+        "trigger_event",
+        "owner_name",
+        "status",
+        "priority"
+      ]
+    },
+    {
+      "key": "lead_id",
+      "label": "Lead",
+      "label_plural": "Intake & Leads",
+      "name": "intake_and_leads",
+      "order_by": "date_received",
+      "search_fields": [
+        "lead_id",
+        "prospect_name",
+        "phone",
+        "referral_source",
+        "potential_claim_type",
+        "disposition",
+        "decline_reason"
+      ]
+    },
+    {
+      "key": "settlement_id",
+      "label": "Settlement",
+      "label_plural": "Settlements & Liens",
+      "name": "settlements_and_liens",
+      "order_by": "date_settled",
+      "search_fields": [
+        "settlement_id",
+        "matter_id",
+        "client_id",
+        "client_name",
+        "matter_type",
+        "fee_basis",
+        "insurance_carrier",
+        "claim_number",
+        "statutory_liens"
+      ]
+    },
+    {
+      "key": "value",
+      "label": "Lookup",
+      "label_plural": "Lookups",
+      "name": "lookups",
+      "order_by": "list",
+      "search_fields": [
+        "list",
+        "code",
+        "value",
+        "description",
+        "authority_notes"
+      ]
+    }
+  ]
+}

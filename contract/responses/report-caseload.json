@@ -1,0 +1,43 @@
+{
+  "by_practice_area": [
+    {
+      "name": "Personal Injury",
+      "value": 155
+    },
+    {
+      "name": "Immigration",
+      "value": 149
+    },
+    {
+      "name": "Estate Planning",
+      "value": 126
+    }
+  ],
+  "by_responsible_attorney": [
+    {
+      "name": "Priya Raghunathan",
+      "value": 239
+    },
+    {
+      "name": "Miguel Teran",
+      "value": 205
+    },
+    {
+      "name": "Marisol Alvarado",
+      "value": 111
+    }
+  ],
+  "by_status": [
+    {
+      "name": "Open",
+      "value": 730
+    },
+    {
+      "name": "Closed",
+      "value": 570
+    }
+  ],
+  "open": 730,
+  "open_rate": 56.2,
+  "total": 1300
+}

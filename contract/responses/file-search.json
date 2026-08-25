@@ -1,0 +1,42 @@
+{
+  "folders": [
+    {
+      "count": 3,
+      "namespace": "legal",
+      "path": "",
+      "type": "invoices"
+    },
+    {
+      "count": 2,
+      "namespace": "legal",
+      "path": "2026",
+      "type": "invoices"
+    },
+    {
+      "count": 4,
+      "namespace": "legal",
+      "path": "photos",
+      "type": "court_calendar"
+    }
+  ],
+  "results": [
+    {
+      "_id": "att-001",
+      "attachment_id": "att-001",
+      "content_type": "application/pdf",
+      "created_at": "2026-01-04T09:12:00Z",
+      "filename": "signed-invoice.pdf",
+      "folder_path": "2026",
+      "matched_sources": [
+        "keyword"
+      ],
+      "namespace": "legal",
+      "processing_state": "indexed",
+      "record_id": "lea-001",
+      "record_type": "invoices",
+      "size_bytes": 284113,
+      "version": 2
+    }
+  ],
+  "total_matches": 5
+}

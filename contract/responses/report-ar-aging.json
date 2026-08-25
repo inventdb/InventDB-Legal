@@ -1,0 +1,34 @@
+{
+  "buckets": [
+    {
+      "invoices": 144,
+      "name": "Current (Not Yet Due)",
+      "value": 326320.66
+    },
+    {
+      "invoices": 184,
+      "name": "Over 120 Days",
+      "value": 216788.18
+    },
+    {
+      "invoices": 55,
+      "name": "1-30 Days",
+      "value": 93851.3
+    }
+  ],
+  "by_status": [
+    {
+      "name": "Open",
+      "value": 326320.66
+    },
+    {
+      "name": "Partially Paid",
+      "value": 216871.81
+    },
+    {
+      "name": "Outstanding",
+      "value": 149309.53
+    }
+  ],
+  "outstanding_total": 778108.56
+}

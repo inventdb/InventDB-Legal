@@ -1,0 +1,21 @@
+{
+  "amount_in": 15562000.0,
+  "amount_out": 14293098.37,
+  "by_transaction_type": [
+    {
+      "name": "Transfer to Operating - Earned Fees",
+      "value": 2318
+    },
+    {
+      "name": "Deposit - Flat Fee (Unearned)",
+      "value": 1062
+    },
+    {
+      "name": "Transfer to Operating - Earned Flat Fee",
+      "value": 792
+    }
+  ],
+  "negative_count": 0,
+  "negative_ledgers": [],
+  "trust_balance": 1268901.63
+}

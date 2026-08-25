@@ -1,0 +1,40 @@
+{
+  "count": 3,
+  "rows": [
+    {
+      "client_name": null,
+      "entries": 15,
+      "hours": 28.5,
+      "matter_caption": "MT-2479",
+      "matter_id": "MT-2479",
+      "practice_area": null,
+      "responsible_attorney_name": null,
+      "status": null,
+      "value": 13356.5
+    },
+    {
+      "client_name": null,
+      "entries": 14,
+      "hours": 26.9,
+      "matter_caption": "MT-2074",
+      "matter_id": "MT-2074",
+      "practice_area": null,
+      "responsible_attorney_name": null,
+      "status": null,
+      "value": 11521.0
+    },
+    {
+      "client_name": null,
+      "entries": 16,
+      "hours": 24.0,
+      "matter_caption": "MT-2092",
+      "matter_id": "MT-2092",
+      "practice_area": null,
+      "responsible_attorney_name": null,
+      "status": null,
+      "value": 10257.5
+    }
+  ],
+  "total_hours": 79.4,
+  "total_value": 35135.0
+}

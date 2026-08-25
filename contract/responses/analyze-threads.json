@@ -1,0 +1,19 @@
+{
+  "threads": [
+    {
+      "_exchanges": [
+        {
+          "answer": "Business litigation carries $48,200 of unbilled work.",
+          "artifacts": [],
+          "question": "Unbilled time by practice area",
+          "steps": [],
+          "ts": "2026-08-01T09:00:04.000Z"
+        }
+      ],
+      "_id": "soar_thread-001",
+      "created": "2026-08-01T09:00:00.000Z",
+      "label": "Unbilled time by practice area",
+      "user_id": "user-001"
+    }
+  ]
+}

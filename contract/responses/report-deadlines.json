@@ -1,0 +1,47 @@
+{
+  "count": 3,
+  "critical": 2,
+  "days": 30,
+  "overdue": 3,
+  "rows": [
+    {
+      "authority": "CCP 412.20(a)(3); CCP 430.40(a)",
+      "category": "Pleading",
+      "days_remaining": 1,
+      "deadline_id": "DL-07952",
+      "description": "Response to complaint due",
+      "due_date": "2026-08-19",
+      "matter_caption": "Salgado v. Tolentino",
+      "matter_id": "MT-2792",
+      "owner_name": "Farid Nazarian",
+      "priority": "High",
+      "status": "Open"
+    },
+    {
+      "authority": "Cal. Rules of Court 8.121(a)",
+      "category": "Court Filing",
+      "days_remaining": 1,
+      "deadline_id": "DL-07947",
+      "description": "Designation of the record on appeal",
+      "due_date": "2026-08-19",
+      "matter_caption": "Barajas v. Bright Path (Appeal)",
+      "matter_id": "MT-2063",
+      "owner_name": "Devon Blackwood",
+      "priority": "Critical",
+      "status": "Open"
+    },
+    {
+      "authority": "11 U.S.C. 109(h)",
+      "category": "Court Filing",
+      "days_remaining": 1,
+      "deadline_id": "DL-07948",
+      "description": "Credit counselling certificate to be filed",
+      "due_date": "2026-08-19",
+      "matter_caption": "In re Stanfill",
+      "matter_id": "MT-2208",
+      "owner_name": "Wei-Lin Chen",
+      "priority": "Critical",
+      "status": "Open"
+    }
+  ]
+}

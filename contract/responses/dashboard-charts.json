@@ -1,0 +1,120 @@
+{
+  "ar_aging": [
+    {
+      "name": "Current (Not Yet Due)",
+      "value": 326320.66
+    },
+    {
+      "name": "Over 120 Days",
+      "value": 216788.18
+    },
+    {
+      "name": "1-30 Days",
+      "value": 93851.3
+    }
+  ],
+  "cashflow": [
+    {
+      "billed": 0.0,
+      "collected": 0.0,
+      "month": "2026-03",
+      "net": 0.0
+    },
+    {
+      "billed": 0.0,
+      "collected": 0.0,
+      "month": "2026-04",
+      "net": 0.0
+    },
+    {
+      "billed": 0.0,
+      "collected": 0.0,
+      "month": "2026-05",
+      "net": 0.0
+    },
+    {
+      "billed": 546006.34,
+      "collected": 0.0,
+      "month": "2026-06",
+      "net": -546006.34
+    },
+    {
+      "billed": 623533.22,
+      "collected": 0.0,
+      "month": "2026-07",
+      "net": -623533.22
+    },
+    {
+      "billed": 0.0,
+      "collected": 0.0,
+      "month": "2026-08",
+      "net": 0.0
+    }
+  ],
+  "cost_breakdown": [
+    {
+      "name": "Experts",
+      "value": 417021.86
+    },
+    {
+      "name": "Court Fees",
+      "value": 395514.32
+    },
+    {
+      "name": "Other",
+      "value": 252828.37
+    }
+  ],
+  "deadline_priority": [
+    {
+      "name": "High",
+      "value": 1954
+    },
+    {
+      "name": "Critical",
+      "value": 1148
+    },
+    {
+      "name": "Medium",
+      "value": 648
+    }
+  ],
+  "deadline_status": [
+    {
+      "name": "Completed",
+      "value": 2807
+    },
+    {
+      "name": "Open",
+      "value": 804
+    },
+    {
+      "name": "Completed Late",
+      "value": 139
+    }
+  ],
+  "matter_status": [
+    {
+      "name": "Open",
+      "value": 730
+    },
+    {
+      "name": "Closed",
+      "value": 570
+    }
+  ],
+  "practice_area": [
+    {
+      "name": "Personal Injury",
+      "value": 155
+    },
+    {
+      "name": "Immigration",
+      "value": 149
+    },
+    {
+      "name": "Estate Planning",
+      "value": 126
+    }
+  ]
+}

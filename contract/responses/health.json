@@ -1,0 +1,7 @@
+{
+  "frontend_bundled": false,
+  "inventdb_base_url": "https://inventdb.test",
+  "namespace": "legal",
+  "ok": true,
+  "version": "1.0.0"
+}

@@ -1,0 +1,10 @@
+{
+  "mode": "move",
+  "parents": [
+    {
+      "namespace": "legal",
+      "recordId": "lea-001",
+      "typeName": "invoices"
+    }
+  ]
+}

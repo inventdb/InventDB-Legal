@@ -1,0 +1,35 @@
+{
+  "billed_by_practice": [
+    {
+      "name": "Family Law",
+      "value": 1892821.9
+    },
+    {
+      "name": "Personal Injury",
+      "value": 1795581.6
+    },
+    {
+      "name": "Business Litigation",
+      "value": 1572019.8
+    }
+  ],
+  "billed_total": 7699677.71,
+  "collected_total": 10094497.46,
+  "costs_by_category": [
+    {
+      "name": "Experts",
+      "value": 417021.86
+    },
+    {
+      "name": "Court Fees",
+      "value": 395514.32
+    },
+    {
+      "name": "Other",
+      "value": 252828.37
+    }
+  ],
+  "costs_total": 2085052.7,
+  "realization": 131.1,
+  "write_downs_total": 271305.62
+}

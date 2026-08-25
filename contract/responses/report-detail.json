@@ -1,0 +1,35 @@
+{
+  "category": "Finance",
+  "description": "Monthly statement for a single client.",
+  "id": "tpl-001",
+  "mode": "sql",
+  "name": "Client Statement",
+  "parameters": [
+    {
+      "default": null,
+      "label": "Client",
+      "name": "client_id",
+      "options": [
+        {
+          "label": "Acme Holdings",
+          "value": "O-001"
+        },
+        {
+          "label": "Vista Trust",
+          "value": "O-002"
+        }
+      ],
+      "required": true,
+      "type": "select"
+    },
+    {
+      "default": null,
+      "label": "As of",
+      "name": "as_of",
+      "options": [],
+      "required": false,
+      "type": "date"
+    }
+  ],
+  "version": 3
+}

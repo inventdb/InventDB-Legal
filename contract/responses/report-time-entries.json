@@ -1,0 +1,45 @@
+{
+  "by_activity": [
+    {
+      "name": "Communicate (with Client)",
+      "value": 10076
+    },
+    {
+      "name": "Manage Data/Files",
+      "value": 5789
+    },
+    {
+      "name": "Communicate (in Firm)",
+      "value": 3866
+    }
+  ],
+  "by_task": [
+    {
+      "name": "Analysis/Strategy",
+      "value": 13178
+    },
+    {
+      "name": "Fact Investigation/Development",
+      "value": 7054
+    },
+    {
+      "name": "Document/File Management",
+      "value": 5789
+    }
+  ],
+  "by_timekeeper": [
+    {
+      "name": "Farid Nazarian",
+      "value": 3416.4
+    },
+    {
+      "name": "Anahit Petrosyan",
+      "value": 3077.3
+    },
+    {
+      "name": "Oscar Villagomez",
+      "value": 2927.3
+    }
+  ],
+  "unbilled_value": 300639.5
+}
