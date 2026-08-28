@@ -62,7 +62,12 @@ class Settings:
     # so this only catches a genuinely dead connection.
     inventdb_stream_timeout: float = float(_get("INVENTDB_STREAM_TIMEOUT", "600"))
     api_host: str = _get("API_HOST", "0.0.0.0")
-    api_port: int = int(_get("API_PORT", "8000"))
+    # 8010, not the conventional 8000. A sibling InventDB app defaults to
+    # 8000, and on Windows two dev servers can both bind the same port
+    # without either one erroring -- the frontend then proxies to whichever
+    # answers and every module 404s with `Unknown entity`. Same reasoning as
+    # the Vite dev server's 5174. See `_refuse_occupied_port` in main.py.
+    api_port: int = int(_get("API_PORT", "8010"))
     cors_origins: str = _get(
         "CORS_ORIGINS", "http://localhost:5174,http://127.0.0.1:5174"
     )

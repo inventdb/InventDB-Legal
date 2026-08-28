@@ -59,7 +59,7 @@ requests you did not mean to change (e.g. overriding only `POST`).
 ## Running against the real backend
 
 Set `liveApi` to skip mocking for a spec, then point Vite at a running Flask
-API (`VITE_PROXY_TARGET`, default `http://localhost:8000`):
+API (`VITE_PROXY_TARGET`, default `http://localhost:8010`):
 
 ```ts
 test.use({ liveApi: true });

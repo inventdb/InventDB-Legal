@@ -2,7 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // The dev server proxies /api to the Python backend so the SPA can always call
-// same-origin "/api" in both development and production.
+// same-origin "/api" in both development and production. The target is 8010,
+// matching this backend's default -- a sibling InventDB app defaults to 8000,
+// and proxying there silently served this UI the other app's entity registry.
 //
 // The port is 5174, not Vite's default 5173, so this app and a sibling InventDB
 // app can be run side by side. Sharing the default meant whichever started
@@ -20,7 +22,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api": {
-        target: process.env.VITE_PROXY_TARGET || "http://localhost:8000",
+        target: process.env.VITE_PROXY_TARGET || "http://localhost:8010",
         changeOrigin: true,
       },
     },

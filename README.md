@@ -169,7 +169,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # then set INVENTDB_BASE_URL
 
-python -m app.main            # http://localhost:8000
+python -m app.main            # http://localhost:8010
 ```
 
 ### 3. Front end
@@ -182,9 +182,13 @@ npm run dev                   # http://localhost:5174
 
 Open **http://localhost:5174** and sign in with your InventDB credentials.
 
-> The dev server runs on **5174**, not Vite's default 5173, so this app can run
-> beside a sibling InventDB app without either quietly attaching to the other's
-> server. `strictPort` is on, so a clash fails loudly instead of roaming.
+> **Both ports are deliberately off the defaults.** The API listens on **8010**,
+> not 8000, and the dev server on **5174**, not 5173, so this app can run beside
+> a sibling InventDB app without colliding. On Windows two servers can hold the
+> same port with neither one erroring, and requests then get split between them
+> — a frontend proxying to the wrong back end sees every module answer
+> `404 Unknown entity`. So both ends refuse to share: Vite's `strictPort`, and a
+> pre-bind check on the API.
 
 > The Vite dev server proxies `/api` to the back end, so there's no CORS setup in development.
 
@@ -208,7 +212,7 @@ python backend/check_inventdb.py <username> <password>
 | `INVENTDB_TIMEOUT` | `30` | Outbound request timeout (seconds) |
 | `INVENTDB_STREAM_TIMEOUT` | `600` | Idle gap allowed on an Analyze stream — not a turn budget |
 | `CORS_ORIGINS` | `localhost:5174,127.0.0.1:5174` | Allowed front-end origins |
-| `API_HOST` / `API_PORT` | `0.0.0.0` / `8000` | Where the API listens |
+| `API_HOST` / `API_PORT` | `0.0.0.0` / `8010` | Where the API listens |
 | `FRONTEND_DIST` | *(auto)* | Built SPA to serve, defaults to `../frontend/dist` |
 | `LEGAL_STATE_FILE` | `backend/instance/settings.json` | Where a runtime connection change persists |
 
@@ -217,7 +221,7 @@ python backend/check_inventdb.py <username> <password>
 | Variable | Default | Description |
 |---|---|---|
 | `VITE_API_BASE` | `/api` | API base. Use an absolute URL if hosting the SPA separately |
-| `VITE_PROXY_TARGET` | `http://localhost:8000` | Dev-only proxy target |
+| `VITE_PROXY_TARGET` | `http://localhost:8010` | Dev-only proxy target |
 | `VITE_PORT` | `5174` | Dev-server port. Playwright reads the same variable |
 
 ---
@@ -236,8 +240,8 @@ pip install -r requirements.txt
 cp .env.example .env                       # set INVENTDB_BASE_URL
 
 gunicorn -w 2 --worker-class gthread --threads 8 --timeout 0 \
-         -b 0.0.0.0:8000 wsgi:app          # Linux / macOS
-waitress-serve --listen=0.0.0.0:8000 wsgi:app   # Windows
+         -b 0.0.0.0:8010 wsgi:app          # Linux / macOS
+waitress-serve --listen=0.0.0.0:8010 wsgi:app   # Windows
 ```
 
 > **`--timeout 0` and threaded workers are required.** `/api/analyze/chat/stream` is a
@@ -273,14 +277,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
 COPY --from=web /web/dist ./_frontend_dist
 ENV FRONTEND_DIST=/app/_frontend_dist
-EXPOSE 8000
+EXPOSE 8010
 CMD ["gunicorn", "-w", "2", "--worker-class", "gthread", "--threads", "8", \
-     "--timeout", "0", "-b", "0.0.0.0:8000", "wsgi:app"]
+     "--timeout", "0", "-b", "0.0.0.0:8010", "wsgi:app"]
 ```
 
 ```bash
 docker build -t inventdb-legal .
-docker run -p 8000:8000 -e INVENTDB_BASE_URL=https://<slug>.sandbox.inventdb.com inventdb-legal
+docker run -p 8010:8010 -e INVENTDB_BASE_URL=https://<slug>.sandbox.inventdb.com inventdb-legal
 ```
 
 </details>

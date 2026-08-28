@@ -39,16 +39,21 @@ async function saveCurrentAs(page: import("@playwright/test").Page, name: string
 const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 test.describe("View switcher", () => {
-  test("every module offers one, defaulting to the full list", async ({ page }) => {
-    for (const { name, plural } of MODULES) {
+  // One test per module rather than one loop over all thirteen. A single test
+  // walking every module spends thirteen navigations against one timeout, and
+  // under `fullyParallel` that budget is shared with whatever else the other
+  // workers are doing — so it failed on machine load rather than on a defect.
+  // Split, each module carries its own budget and they run in parallel.
+  for (const { name, plural } of MODULES) {
+    test(`${name} offers one, defaulting to the full list`, async ({ page }) => {
       await page.goto(`/${name}`);
       // Escaped: several plurals carry regex punctuation — "Trust Ledger
       // (CTA)" would otherwise read as a group and match the wrong thing.
       await expect(page.locator(trigger)).toHaveText(
         new RegExp(`All ${escapeRegExp(plural)}`, "i")
       );
-    }
-  });
+    });
+  }
 
   test("starts with no saved views, so Manage has nothing to do", async ({ page }) => {
     await page.goto("/matters");
