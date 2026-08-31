@@ -10,19 +10,31 @@
       content="InventDB Legal — a modern legal practice management system for law firms: matters, time, billing, trust accounting and the deadline docket."
     />
 
-    <!-- Brand mark: the InventDB keystone. Drawn in Orbital Indigo (#48176a) rather
-         than the asset's own accent, to match the in-app mark's brand colour. -->
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='4 5 120 120'%3E%3Cpath d='M12 116 L12 54 L64 14 L116 54 L116 116' fill='none' stroke='%2348176a' stroke-width='13' stroke-linejoin='round' stroke-linecap='round'/%3E%3Crect x='48' y='78' width='32' height='38' rx='5' fill='%2348176a'/%3E%3C/svg%3E"
-    />
+    <!-- Brand mark: the "Counsel" balance, from inventdb-legal-logo/. The tab
+         icon is the solid cut — the full cut's pan outlines close up below
+         20px — drawn on nothing, so it sits in the tab strip rather than on a
+         plum chip. With no tile behind it the mark has to survive both a white
+         and a near-black tab strip, so favicon.svg carries the package's light
+         and dark colourways and switches on prefers-color-scheme.
+
+         The PNGs are the fallback for browsers with no SVG-favicon support,
+         which predate that switch and so take the light colourway. The
+         apple-touch icon keeps its plum tile on purpose: iOS composites a home
+         screen icon over whatever wallpaper is there, and a transparent one
+         would come out matted on black. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Poppins — the InventDB brand typeface.
-         300 captions · 400 body · 500 subheads · 600/700 headings. -->
+         300 captions · 400 body · 500 subheads · 600/700 headings.
+         Cormorant Garamond carries the wordmark only — 500 for "InventDB",
+         700 for "Legal"; nothing else in the app is serif. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
 

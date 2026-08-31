@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="InventDB Legal">
+  <circle cx="64" cy="27" r="15" fill="#48176a"></circle>
+  <path d="M53 38 L75 38 L64 120 Z" fill="#48176a"></path>
+  <path d="M64 46 L16 30 L16 44 L64 62 Z" fill="#48176a"></path>
+  <path d="M64 46 L112 30 L112 44 L64 62 Z" fill="#48176a"></path>
+  <path d="M16 32 L2 76 L30 76 Z" fill="#a184c4"></path>
+  <path d="M112 32 L98 76 L126 76 Z" fill="#a184c4"></path>
+</svg>

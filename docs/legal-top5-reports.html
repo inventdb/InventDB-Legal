@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Your Five Core Reports — InventDB Legal</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#12151c; --panel-2:#171b24; --panel-3:#1d222d;
+    --line:#252b38; --line-soft:#1e232e;
+    --ink:#e6eaf2; --ink-2:#a8b2c4; --muted:#727c8f;
+    --brand:#c9a44c; --brand-soft:#1e1a0e; --brand-line:#3d3218;
+    --accent:#a58ae8; --accent-soft:#181428;
+    --ok:#4fb894; --ok-soft:#0e1d18; --ok-line:#1d3830;
+    --warn:#e0a445; --warn-soft:#241a0c; --warn-line:#3d301a;
+    --danger:#e8736a; --danger-soft:#241312; --danger-line:#3d2320;
+    --code-bg:#070910; --code-ink:#d3d9e6; --code-prompt:#c9a44c;
+    --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+    --serif:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:20px}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.58 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .page{max-width:1060px;margin:0 auto;padding:36px 28px 90px}
+  code,kbd{font-family:var(--mono)}
+
+  header.hero{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:26px}
+  .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--brand);font-weight:700}
+  h1{font:400 35px/1.14 var(--serif);margin:8px 0 10px;letter-spacing:-.015em}
+  .subtitle{color:var(--ink-2);font-size:15.5px;max-width:78ch;line-height:1.66}
+  .subtitle b{color:var(--ink)}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-top:22px}
+  .meta-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+  .meta-card .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+  .meta-card .v{font-size:15px;font-weight:600;margin-top:4px;color:var(--ink)}
+  .pill{display:inline-block;background:var(--brand-soft);color:var(--brand);border:1px solid var(--brand-line);
+    border-radius:999px;padding:1px 9px;font-size:11px;font-weight:600;margin-left:6px}
+
+  h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--brand);margin:44px 0 4px;font-weight:700}
+  .seg-sub{color:var(--muted);font-size:13.5px;margin:0 0 12px;max-width:82ch;line-height:1.6}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:18px 20px;margin:18px 0}
+  .panel h3{margin:0 0 10px;font-size:15.5px;color:var(--ink)}
+  .panel.brand{background:linear-gradient(180deg,#1a1710,#12151c);border-color:var(--brand-line)}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:4px 26px}
+  .check{list-style:none;margin:6px 0 0;padding:0}
+  .check li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.8px;color:var(--ink-2);line-height:1.55}
+  .check li:last-child{border-bottom:none}
+  .check li::before{content:"\25A1  ";color:var(--brand);font-weight:700}
+  .check li b{color:var(--ink)}
+
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0 8px}
+  .toc h3{margin:0 0 10px;font-size:14px;color:var(--ink)}
+  .toc ol{margin:0;padding-left:0;list-style:none;counter-reset:tk}
+  .toc>ol>li{counter-increment:tk;padding:10px 0;border-bottom:1px solid var(--line)}
+  .toc>ol>li:last-child{border-bottom:none}
+  .toc>ol>li>a{display:flex;gap:11px;align-items:baseline;color:var(--ink);font-weight:600;font-size:14.5px}
+  .toc>ol>li>a::before{content:counter(tk);flex:none;background:var(--brand);color:#12151c;width:21px;height:21px;
+    border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700}
+  .toc>ol>li>a:hover{color:var(--brand);text-decoration:none}
+  .toc .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0 32px;line-height:1.5}
+  .toc .sub b{color:var(--ink-2);font-weight:600}
+
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 20px 17px;margin:14px 0}
+  .step-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:6px}
+  .step-no{flex:none;background:var(--brand);color:#12151c;width:28px;height:28px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .step-head .ttl{flex:1}
+  .step-head h3{margin:2px 0 2px;font-size:15.5px;color:var(--ink)}
+  .screen{font-size:12.3px;color:var(--muted)}
+  .screen b{color:var(--brand)}
+  .do,.see{font-size:14px;margin:8px 0;color:var(--ink-2);line-height:1.6}
+  .do::before{content:"DO ";font-size:10px;font-weight:700;color:var(--brand);letter-spacing:.08em}
+  .see::before{content:"SEE ";font-size:10px;font-weight:700;color:var(--ok);letter-spacing:.08em}
+  .do b,.see b{color:var(--ink)}
+  .do em,.see em{color:var(--ink-2)}
+  kbd{background:var(--panel-3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;color:var(--brand)}
+
+  .prompt{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;margin:9px 0;overflow:hidden}
+  .prompt .lbl{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line)}
+  .prompt .lbl span{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--code-prompt);font-weight:700}
+  .prompt .lbl em{font-style:normal;font-size:10.5px;color:var(--muted)}
+  .prompt pre{margin:0;padding:12px 14px;color:var(--code-ink);font-size:12.9px;line-height:1.6;
+    white-space:pre-wrap;font-family:var(--mono)}
+  .prompt pre::before{content:"\203A  ";color:var(--code-prompt)}
+
+  .cap-cal{background:var(--accent-soft);border:1px solid #322a52;border-radius:9px;padding:10px 13px;margin:9px 0;
+    font-size:13.4px;color:#c3b3ee;line-height:1.58}
+  .cap-cal b{color:#d8cbfa}
+  .cap-cal::before{content:"\26A1  "}
+  .val{background:var(--ok-soft);border:1px solid var(--ok-line);border-radius:9px;padding:10px 13px;margin:9px 0;
+    font-size:13.4px;color:#a5ddc6;line-height:1.58}
+  .val b{color:#c9f0e0}
+  .val::before{content:"\2728  "}
+  .note{background:var(--warn-soft);border:1px solid var(--warn-line);border-radius:9px;padding:10px 13px;margin:9px 0;
+    font-size:13.2px;color:#e3c78e;line-height:1.58}
+  .note b{color:#f2dcac}
+  .note::before{content:"\26A0  ";font-weight:700}
+  .bad{background:var(--danger-soft);border:1px solid var(--danger-line);border-radius:9px;padding:10px 13px;margin:9px 0;
+    font-size:13.2px;color:#eeaaa3;line-height:1.58}
+  .bad b{color:#f7c8c3}
+  .bad::before{content:"\2716  ";font-weight:700}
+
+  table.exp{width:100%;border-collapse:collapse;margin:0;font-size:13.2px;background:var(--panel)}
+  table.exp th,table.exp td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-2)}
+  table.exp th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;
+    background:var(--panel-3);border-bottom:1px solid var(--line);white-space:nowrap}
+  table.exp td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+  table.exp tr:last-child td{border-bottom:none}
+  table.exp td b{color:var(--ink)}
+  table.exp td.crit{color:var(--danger)}
+  table.exp tr.tot td{background:var(--panel-3);border-top:1px solid var(--line)}
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px;margin:10px 0}
+
+  .whatfor{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:13px 16px;margin:12px 0 4px;
+    font-size:14px;color:var(--ink-2);line-height:1.62}
+  .whatfor b{color:var(--ink)}
+  .whatfor .lab{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--brand);font-weight:700;
+    display:block;margin-bottom:5px}
+
+  .task-hd{background:linear-gradient(135deg,#231d0c 0%,#3c3116 55%,#1a1c26 100%);border:1px solid var(--brand-line);
+    border-radius:14px;padding:18px 22px;margin:42px 0 6px}
+  .task-hd .n{font-size:10.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--brand);font-weight:700}
+  .task-hd h2{color:var(--ink);margin:6px 0 6px;font:500 22px/1.25 var(--serif);text-transform:none;letter-spacing:-.01em}
+  .task-hd p{margin:0;color:#d5cdb4;font-size:14px;max-width:76ch;line-height:1.58}
+
+  footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);
+    font-family:var(--mono);font-size:11.5px;text-align:center;line-height:1.9}
+  footer b{color:var(--ink-2)}
+
+  @media (max-width:760px){.cols2{grid-template-columns:1fr}.page{padding:26px 18px 70px}h1{font-size:28px}}
+  @media print{
+    body{background:#fff;color:#111}
+    .step,.panel,.tbl-wrap,.task-hd{break-inside:avoid;background:#fff;border-color:#ccc}
+    .prompt{background:#f6f6f6;border-color:#ccc}.prompt pre{color:#111}
+    h1,h2,h3,td b{color:#111}.subtitle,.do,.see,td{color:#333}
+    .task-hd{background:#f2f2f2}.task-hd h2,.task-hd p{color:#111}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <div class="eyebrow">InventDB Legal &#183; plain-language build guide</div>
+  <h1>Build your five core reports</h1>
+  <p class="subtitle">You don&rsquo;t write any code, any SQL or any formulas. You type a sentence in plain English,
+  check the answer, then tell it to save that answer as a report and email it to you on a schedule. This guide gives
+  you the exact words to type, where to type them, and &mdash; most usefully &mdash; <b>the numbers you should get
+  back</b>, so you can tell straight away whether it worked.</p>
+  <div class="meta-grid">
+    <div class="meta-card"><div class="k">Reports</div><div class="v">5 <span class="pill">core set</span></div></div>
+    <div class="meta-card"><div class="k">Time each</div><div class="v">~6 minutes</div></div>
+    <div class="meta-card"><div class="k">Practice</div><div class="v">730 open matters</div></div>
+    <div class="meta-card"><div class="k">Today&rsquo;s date</div><div class="v">19 Aug 2026</div></div>
+  </div>
+</header>
+
+<!-- ============ BEFORE YOU START ============ -->
+<h2>Before you start</h2>
+<p class="seg-sub">Two minutes of orientation. Everything here is already set up on your account &mdash; you only need
+to know where things live.</p>
+
+<div class="panel brand">
+  <h3>The three screens you&rsquo;ll use</h3>
+  <ul class="check cols2">
+    <li><b>Analyze</b> &mdash; where you ask questions and where reports get created.</li>
+    <li><b>Reports</b> &mdash; where saved reports live. Opens &ldquo;Report Studio&rdquo;.</li>
+    <li><b>Workflows</b> &mdash; scheduled jobs, and the inbox of things waiting on you.</li>
+    <li>Dashboard, Records, Files and Import aren&rsquo;t needed for this.</li>
+  </ul>
+</div>
+
+<div class="panel">
+  <h3>How every one of these five works</h3>
+  <p style="margin:0 0 10px;color:var(--ink-2);font-size:14px">The rhythm is identical each time, so it is worth
+  reading once rather than five times:</p>
+  <ul class="check">
+    <li><b>Ask in Analyze.</b> Plain English. A short &ldquo;thinking&rdquo; timeline runs, then a table appears.</li>
+    <li><b>Check it against the numbers in this guide.</b> If they match, the question was understood. If they don&rsquo;t, this guide tells you what to say to correct it.</li>
+    <li><b>Click a row.</b> It should open the actual matter or invoice. If it opens the wrong thing, the answer is joined wrongly &mdash; say so and it will fix it.</li>
+    <li><b>Say &ldquo;turn this into a report&rdquo;.</b> A report card appears in the conversation.</li>
+    <li><b>Say &ldquo;create a workflow&rdquo;</b> to have it email itself to you on a schedule. Rehearse it in the sandbox before you activate it.</li>
+  </ul>
+</div>
+
+<div class="note"><b>Everything in Analyze is read-only.</b> You cannot break anything by asking. It never edits a
+matter, never sends an email and never moves money &mdash; changes only ever arrive as a proposal you approve.
+Ask badly, get a wrong table, ask again.</div>
+
+<!-- ============ TOC ============ -->
+<h2>What you&rsquo;re building</h2>
+<div class="toc">
+  <h3>The five reports, in the order you should build them</h3>
+  <ol>
+    <li>
+      <a href="#t1">What&rsquo;s due this week</a>
+      <div class="sub">The docket. The one report the firm cannot operate without. <b>Expect: 44 deadlines, 15 Critical, 0 overdue.</b></div>
+    </li>
+    <li>
+      <a href="#t2">Who&rsquo;s expected in court &mdash; and who can&rsquo;t be in two places</a>
+      <div class="sub">Diary clashes, before they become non-appearances. <b>Expect: 32 events, 7 clashes.</b></div>
+    </li>
+    <li>
+      <a href="#t3">What I can bill right now</a>
+      <div class="sub">Unbilled time, by attorney, with its age. <b>Expect: $300,640 across 773.3 hours.</b></div>
+    </li>
+    <li>
+      <a href="#t4">Who owes me money</a>
+      <div class="sub">The named chase list, not the ageing chart. <b>Expect: 470 invoices, $778,109.</b></div>
+    </li>
+    <li>
+      <a href="#t5">Is the client trust account clean</a>
+      <div class="sub">The one that has to be right. <b>Expect: $1,268,901.63 across 258 matters, 0 negatives.</b></div>
+    </li>
+  </ol>
+</div>
+
+<div class="val"><b>Build them in this order.</b> The first two are the fastest wins and the easiest to sanity-check.
+By the time you reach the trust account you&rsquo;ll recognise the rhythm, which matters, because that one is the
+longest and the only one you will ever have to defend to an auditor.</div>
+
+
+<!-- ==================== TASK 1 ==================== -->
+<div class="task-hd" id="t1">
+  <div class="n">Report one</div>
+  <h2>What&rsquo;s due this week</h2>
+  <p>Every open deadline falling due in the next seven days, grouped by whoever owns it, worst first &mdash; plus
+  anything already past its date, however far back.</p>
+</div>
+
+<div class="whatfor">
+  <span class="lab">What this tells you</span>
+  Whether anything is about to be missed while there is still time to stop it. For a litigation practice this is the
+  single most valuable half-page in the business &mdash; it turns &ldquo;I think something&rsquo;s due on the Orozco
+  matter&rdquo; into a named list with a statute cited next to each line.
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">1</div>
+    <div class="ttl"><h3>Open a fresh question</h3><div class="screen">Screen: <b>Analyze</b></div></div>
+  </div>
+  <div class="do">Click <b>Analyze</b> in the left menu. There&rsquo;s a text box at the bottom reading
+  <em>&ldquo;Ask anything about your data&hellip;&rdquo;</em>. If an old conversation is on screen, start a new one so
+  nothing earlier is carried over.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">2</div>
+    <div class="ttl"><h3>Ask the question</h3><div class="screen">Screen: <b>Analyze</b> &#183; composer</div></div>
+  </div>
+  <div class="do">Paste this in exactly as written, then press <kbd>Ask</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze</span><em>Ask</em></div><pre>Show me every deadline that is still open and falls due within the next seven days, and also include anything already past its due date no matter how long ago. Work out how urgent each one is from its actual due date compared with today, not from the days-remaining column, because that column was frozen when the data was loaded. For each one show who owns it, how urgent it is, the due date, the category, the statute or rule it comes from, the matter, and what has to be done. Put anything overdue at the top, then Critical, then High, then Medium, and within each group put the soonest first.</pre></div>
+  <div class="see">A short thinking timeline runs, then a table of <b>44 rows</b> appears.</div>
+  <div class="note"><b>The sentence about the frozen column is doing real work.</b> This dataset stores a
+  <em>days remaining</em> number that was calculated once, on 19 August 2026, and never moves. If you leave that
+  instruction out, the report is correct today and quietly wrong every day after &mdash; which is the worst kind of
+  wrong, because nobody notices.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">3</div>
+    <div class="ttl"><h3>Check the answer against this</h3><div class="screen">Verify before you go further</div></div>
+  </div>
+  <div class="see"><b>44 deadlines</b> in the window, and <b>nothing overdue</b>.</div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Urgency</th><th class="n">Count</th><th>What it contains</th></tr></thead>
+    <tbody>
+      <tr><td class="crit"><b>Overdue</b></td><td class="n">0</td><td>Earliest open deadline is 20 Aug &mdash; the docket is clean</td></tr>
+      <tr><td><b>Critical</b></td><td class="n">15</td><td>Appeal designations, bankruptcy schedules, statutes of limitation</td></tr>
+      <tr><td><b>High</b></td><td class="n">17</td><td>Responsive pleadings, discovery service, FL-320 responses</td></tr>
+      <tr><td><b>Medium</b></td><td class="n">12</td><td>Case administration, closing binders, opposition windows</td></tr>
+      <tr class="tot"><td><b>Total</b></td><td class="n"><b>44</b></td><td><b>Spread across 15 different owners</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="see">The first three rows should be Critical items dated <b>20 August 2026</b>:</div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Due</th><th>Owner</th><th>Authority</th><th>What&rsquo;s due</th></tr></thead>
+    <tbody>
+      <tr><td>20 Aug</td><td><b>Devon Blackwood</b></td><td>Cal. Rules of Court 8.121(a)</td><td>Designation of the record on appeal</td></tr>
+      <tr><td>20 Aug</td><td><b>Wei-Lin Chen</b></td><td>11 U.S.C. 109(h)</td><td>Credit counselling certificate to be filed</td></tr>
+      <tr><td>20 Aug</td><td><b>Adaeze Nwosu</b></td><td>Fed. R. Bankr. P. 1007(c)</td><td>Schedules and statement of financial affairs</td></tr>
+      <tr><td>21 Aug</td><td><b>Anahit Petrosyan</b></td><td>CCP 335.1 (2 yrs)</td><td>Statute of limitations expires &mdash; pedestrian collision</td></tr>
+    </tbody>
+  </table></div>
+  <div class="val"><b>If you got 44 rows and no overdue section, it worked.</b> If you got a much bigger number,
+  it has included completed deadlines &mdash; say <em>&ldquo;Only include deadlines whose status is still
+  Open&rdquo;</em>. If you got roughly 800, it ignored the seven-day window entirely.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">4</div>
+    <div class="ttl"><h3>Split it by owner</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="do">The box now reads <em>&ldquo;Ask a follow-up&hellip;&rdquo;</em>. Paste this and press <kbd>Send</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Group that by owner, and show me how many each person is carrying. Add the responsible attorney on each matter as well, so I can see where a deadline sits with a paralegal but the matter belongs to someone else.</pre></div>
+  <div class="see">Fifteen groups. The two heaviest are <b>Priya Raghunathan</b> and <b>Miguel Teran</b> with
+  <b>5 each</b>, then Devon Blackwood, Wei-Lin Chen, Yusuf Karimi and Marisol Alvarado on 4.</div>
+  <div class="cap-cal"><b>This is why the report is worth building.</b> One shared list of 44 gets skimmed by
+  everybody and actioned by nobody. Fifteen lists of three or four get done &mdash; and the workflow in step 6 sends
+  each person only their own.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">5</div>
+    <div class="ttl"><h3>Save it as a report</h3><div class="screen">Screen: <b>Analyze</b> &rarr; report card</div></div>
+  </div>
+  <div class="do">Paste this and press <kbd>Send</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Turn this into a report called "Docket Call". Put a summary line at the top with the number of deadlines due, how many are Critical, and how many are overdue. Let me pick a single owner when I open it, so each person can see just their own list.</pre></div>
+  <div class="see">A <b>report card</b> appears in the conversation with buttons to open it, edit it in Report Studio,
+  or schedule it. Opening it shows a <b>Live</b> badge &mdash; it re-runs against current data every time, so it is
+  never stale.</div>
+  <div class="cap-cal"><b>You can change it in plain English later.</b> In Report Studio, describe the change and
+  apply it. Nothing is overwritten &mdash; each edit saves as a new version and you can roll back.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">6</div>
+    <div class="ttl"><h3>Have it email each person their own list</h3><div class="screen">Screen: <b>Analyze</b> &rarr; <b>Workflows</b></div></div>
+  </div>
+  <div class="do">Paste this. It is worth editing the time to suit the firm before you send it.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a workflow: every weekday at 6:30 in the morning, run the "Docket Call" report and email each owner only their own deadlines. If anything Critical is overdue, stop and ask me before you text the responsible attorney about it. Build it in the sandbox first so I can rehearse it.</pre></div>
+  <div class="see">A <b>workflow card</b> appears listing the steps. In <b>Workflows</b> it shows as
+  <b>Draft &mdash; not activated</b> with a <b>Rehearsing</b> tag.</div>
+  <div class="do">Click <kbd>Run now</kbd> to rehearse. The queries run for real, so the numbers in the run are true
+  &mdash; but you&rsquo;ll see <em>&ldquo;side effects were mocked&rdquo;</em>, meaning no email left the building.
+  Check that the number of emails it would have sent is <b>15</b>, one per owner.</div>
+  <div class="note"><b>Nothing sends until you activate it.</b> A draft never fires and a rehearsal never emails
+  anyone. Rehearse first &mdash; it costs nothing and it is the only way to find out that one of your owners has a
+  blank name field.</div>
+</div>
+
+
+<!-- ==================== TASK 2 ==================== -->
+<div class="task-hd" id="t2">
+  <div class="n">Report two</div>
+  <h2>Who&rsquo;s expected in court &mdash; and who can&rsquo;t be in two places</h2>
+  <p>The next week&rsquo;s appearances, and every case where one person is booked into two different courthouses on
+  the same day.</p>
+</div>
+
+<div class="whatfor">
+  <span class="lab">What this tells you</span>
+  A missed appearance is not an administrative slip &mdash; it is an OSC re sanctions, an unhappy judge, and a
+  conversation with a client about why nobody was there. This report finds the clash while there is still an evening
+  in which to arrange cover.
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">1</div>
+    <div class="ttl"><h3>Ask for the week ahead</h3><div class="screen">Screen: <b>Analyze</b> &#183; new conversation</div></div>
+  </div>
+  <div class="do">Start a fresh conversation, paste this, press <kbd>Ask</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze</span><em>Ask</em></div><pre>List everything on the court calendar for the next seven days. For each one show the date and time, what kind of hearing it is, the courthouse and department, the judicial officer, the case number, the matter, and who is down to appear. Leave out anything that has already been continued to a later date. Put them in date and then time order.</pre></div>
+  <div class="see">A table of <b>32 events</b>, in order.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">2</div>
+    <div class="ttl"><h3>Check the answer against this</h3><div class="screen">Verify before you go further</div></div>
+  </div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Measure</th><th class="n">Expected</th><th>Reading</th></tr></thead>
+    <tbody>
+      <tr><td>Events in the next 7 days</td><td class="n">32</td><td>Of which <b>16</b> are actual in-court appearances</td></tr>
+      <tr><td>Busiest venue</td><td class="n">8</td><td>LASC Stanley Mosk</td></tr>
+      <tr><td>USCIS Los Angeles Field Office</td><td class="n">4</td><td>Immigration interviews &mdash; Miguel Teran</td></tr>
+      <tr><td>Held at the firm&rsquo;s own offices</td><td class="n">7</td><td>Depositions and client conferences</td></tr>
+      <tr><td class="crit">Events with no hearing type recorded</td><td class="n">6</td><td>A real data gap &mdash; see the note below</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Six of the events have no hearing type on them.</b> That is a genuine gap in the records, not
+  a fault in your question. They still have a date, a courthouse and someone appearing, so they belong on the list
+  &mdash; but somebody should fill them in. Ask <em>&ldquo;show me just the events with no type recorded&rdquo;</em>
+  and you can fix them from the result rows.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">3</div>
+    <div class="ttl"><h3>Now find the clashes</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="do">Paste this and press <kbd>Send</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Now look at the next fourteen days instead, and find anyone who is booked to appear at two different courthouses on the same day. Count different courthouses only — the same courthouse with different department numbers is fine, because they can walk between departments. Show me the person, the date, and the two locations.</pre></div>
+  <div class="see">Exactly <b>7 clashes</b>. The first three should be:</div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Who</th><th>Date</th><th>Booked at</th></tr></thead>
+    <tbody>
+      <tr><td><b>Marisol Alvarado</b></td><td>19 Aug 2026</td><td>LASC Family Law <b>+</b> LASC Stanley Mosk</td></tr>
+      <tr><td><b>Daniel J. Sung</b></td><td>27 Aug 2026</td><td>LASC Family Law <b>+</b> LASC Van Nuys</td></tr>
+      <tr><td><b>Anahit Petrosyan</b></td><td>31 Aug 2026</td><td>LASC Family Law <b>+</b> LASC Stanley Mosk</td></tr>
+    </tbody>
+  </table></div>
+  <div class="bad"><b>If you got dozens of clashes, it counted departments instead of courthouses.</b> Stanley Mosk
+  alone runs dozens of departments and an attorney walks between them all morning. Say <em>&ldquo;Only count it as a
+  clash when the two locations are different courthouses, not different departments in the same
+  building&rdquo;</em> and it will come back to 7. A report that cries wolf every morning is ignored within a
+  fortnight.</div>
+  <div class="val"><b>Note that Van Nuys is a genuine problem and Stanley Mosk plus Family Law may not be.</b> The
+  Family Law courthouse and Stanley Mosk are the same complex; Van Nuys is thirty minutes up the freeway. The report
+  surfaces all seven and a human decides &mdash; which is the right division of labour.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">4</div>
+    <div class="ttl"><h3>Save and schedule it for the afternoon</h3><div class="screen">Screen: <b>Analyze</b> &rarr; <b>Workflows</b></div></div>
+  </div>
+  <div class="do">Paste this, then the scheduling instruction below it.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Turn this into a report called "Court Diary and Clashes" with two sections: the week's appearances, then the clashes underneath.</pre></div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a workflow: every weekday at 4pm, run the "Court Diary and Clashes" report. Email tomorrow's appearances to whoever is appearing. If there are any clashes, stop and ask the office manager who should cover before doing anything else. Build it in the sandbox.</pre></div>
+  <div class="cap-cal"><b>Four in the afternoon, not eight in the morning.</b> A clash found at 4pm leaves an evening
+  to arrange cover. The same clash found at 8am the next day leaves a phone call from the courthouse steps.</div>
+</div>
+
+
+<!-- ==================== TASK 3 ==================== -->
+<div class="task-hd" id="t3">
+  <div class="n">Report three</div>
+  <h2>What I can bill right now</h2>
+  <p>Time that has been recorded, is billable, and has never made it onto an invoice &mdash; by attorney, with the
+  age of the oldest entry on each matter.</p>
+</div>
+
+<div class="whatfor">
+  <span class="lab">What this tells you</span>
+  Work you have already done and not yet asked to be paid for. <b>Age matters more than size:</b> a large young
+  balance is a healthy matter mid-stride; a small balance whose oldest entry is three months old is a matter nobody
+  has billed and possibly nobody is working.
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">1</div>
+    <div class="ttl"><h3>Ask the question</h3><div class="screen">Screen: <b>Analyze</b> &#183; new conversation</div></div>
+  </div>
+  <div class="do">Start a fresh conversation, paste this, press <kbd>Ask</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze</span><em>Ask</em></div><pre>Find all the time that has been recorded as billable but has never been put on an invoice. Group it by the attorney responsible for the matter, and then by matter. For each one show the total hours, what that time is worth at our standard rates, the date of the oldest unbilled entry, and how many days ago that was. Put the oldest first.</pre></div>
+  <div class="see">A table grouped by attorney, totalling <b>$300,640</b>.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">2</div>
+    <div class="ttl"><h3>Check the answer against this</h3><div class="screen">Verify before you go further</div></div>
+  </div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Responsible attorney</th><th class="n">Value</th><th class="n">Hours</th><th>Oldest entry</th></tr></thead>
+    <tbody>
+      <tr><td><b>Daniel J. Sung</b></td><td class="n">$80,706</td><td class="n">202.9</td><td>1 Aug 2026</td></tr>
+      <tr><td><b>Rebecca Fairhurst</b></td><td class="n">$48,140</td><td class="n">110.2</td><td>3 Aug 2026</td></tr>
+      <tr><td><b>Marisol Alvarado</b></td><td class="n">$39,698</td><td class="n">97.9</td><td>1 Aug 2026</td></tr>
+      <tr><td><b>Cormac Delaney</b></td><td class="n">$36,596</td><td class="n">86.4</td><td>1 Aug 2026</td></tr>
+      <tr><td><b>Farid Nazarian</b></td><td class="n">$21,798</td><td class="n">66.8</td><td>2 Aug 2026</td></tr>
+      <tr><td><b>Miguel Teran</b></td><td class="n">$21,310</td><td class="n">60.1</td><td>2 Aug 2026</td></tr>
+      <tr class="tot"><td><b>Everyone</b></td><td class="n"><b>$300,640</b></td><td class="n"><b>773.3</b></td><td><b>558 entries</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="val"><b>If your total is $300,640 over 773.3 hours, it worked</b> &mdash; and it matches the WIP tile
+  on the dashboard exactly. Nothing is older than 18 days, which means this firm bills cleanly on a monthly cycle
+  and has no aged tail to chase.</div>
+  <div class="note"><b>You may expect personal injury to appear here, and it won&rsquo;t.</b> That is correct. Time
+  on contingency matters is recorded but never marked billable, because the fee arrives once, at settlement. Those
+  10,659 entries are invisible to any billing report by design &mdash; ask for them separately if you want to see
+  the effort going into the contingency book.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">3</div>
+    <div class="ttl"><h3>Add the unbilled costs</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="do">Fees are only half of a bill. Paste this and press <kbd>Send</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Now add the costs. Find any expense the firm has paid out of its own operating account and not yet put on an invoice or recovered from a settlement. Show them by matter alongside the unbilled fees, so I can see the full amount each matter is carrying.</pre></div>
+  <div class="see"><b>241 cost lines</b> worth <b>$10,542</b> sitting unbilled and unrecovered.</div>
+  <div class="note"><b>Why the question asks about the account rather than the flag.</b> There is a field called
+  <em>advanced by firm</em>, and it originally said Yes on every one of the 8,027 cost lines &mdash; asking for it
+  would have returned the entire cost book, $2,085,053 instead of $10,542. It has since been rebuilt from the
+  account each cost was paid out of, so it is now trustworthy (2,231 genuinely advanced). The wording above works
+  either way, which is why it is written like that.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">4</div>
+    <div class="ttl"><h3>Save it and send it out on a Friday</h3><div class="screen">Screen: <b>Analyze</b> &rarr; <b>Workflows</b></div></div>
+  </div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Turn this into a report called "Work In Progress". Put the firm total at the top, then a section per attorney. Let me pick an attorney when I open it.</pre></div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a workflow: every Friday at 4pm, run "Work In Progress" and email each attorney their own section, asking them to review it before Monday lunchtime. Then wait until Monday at noon and ask the billing coordinator whether everyone has come back. Build it in the sandbox.</pre></div>
+  <div class="cap-cal"><b>The waiting step is what makes it a process rather than a reminder.</b> The workflow parks
+  itself over the weekend, then comes back on Monday and asks a person a question. It shows up in
+  <b>Workflows</b> as something waiting on you, and answering it lets the same run carry on from where it stopped.</div>
+</div>
+
+
+<!-- ==================== TASK 4 ==================== -->
+<div class="task-hd" id="t4">
+  <div class="n">Report four</div>
+  <h2>Who owes me money</h2>
+  <p>Every invoice with a balance, oldest first, with the client, the responsible attorney and how far past due it
+  actually is.</p>
+</div>
+
+<div class="whatfor">
+  <span class="lab">What this tells you</span>
+  Money you have already earned, invoiced, and not received. Most firms have an ageing <em>chart</em>; almost none
+  have the <b>named list</b>, which is the only version anybody can act on. This one also finds the invoices that
+  should have been written off years ago and are quietly inflating the receivable book.
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">1</div>
+    <div class="ttl"><h3>Ask the question</h3><div class="screen">Screen: <b>Analyze</b> &#183; new conversation</div></div>
+  </div>
+  <div class="do">Start a fresh conversation, paste this, press <kbd>Ask</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze</span><em>Ask</em></div><pre>List every invoice that still has a balance owing. For each one show the invoice number, the client, the matter, the date it was issued, the date it was due, the invoice total, the balance still outstanding, and how many days past due it is today — work that out from the due date and today's date rather than using the ageing bucket column, because that was frozen when the data was loaded. Add the responsible attorney for the matter. Leave out anything that has already been sent to collections. Oldest first.</pre></div>
+  <div class="see">A table of invoices, the oldest with a startling number in the days column.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">2</div>
+    <div class="ttl"><h3>Check the answer against this</h3><div class="screen">Verify before you go further</div></div>
+  </div>
+  <div class="see"><b>470 invoices</b> carrying <b>$778,109</b> in total. Ask it to summarise by bucket and you
+  should see:</div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>How overdue</th><th class="n">Invoices</th><th class="n">Balance</th><th>What to do with it</th></tr></thead>
+    <tbody>
+      <tr><td>Not yet due</td><td class="n">144</td><td class="n">$326,321</td><td>Nothing &mdash; healthy</td></tr>
+      <tr><td>1&ndash;30 days</td><td class="n">55</td><td class="n">$93,851</td><td>Statement of account, no chasing language</td></tr>
+      <tr><td>31&ndash;60 days</td><td class="n">44</td><td class="n">$64,913</td><td>Reminder, copy the attorney</td></tr>
+      <tr><td>61&ndash;90 days</td><td class="n">23</td><td class="n">$29,669</td><td>The attorney decides, not the system</td></tr>
+      <tr><td>91&ndash;120 days</td><td class="n">20</td><td class="n">$46,566</td><td>Managing partner</td></tr>
+      <tr><td class="crit"><b>Over 120 days</b></td><td class="n">184</td><td class="n">$216,788</td><td><b>Collections, write-off, or a payment plan</b></td></tr>
+      <tr class="tot"><td><b>Total</b></td><td class="n"><b>470</b></td><td class="n"><b>$778,109</b></td><td><b>Matches the dashboard tile</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="val"><b>If your total is $778,109 across 470 invoices, it worked.</b> The dashboard shows
+  $778,108.56 &mdash; the same number.</div>
+  <div class="note"><b>Look at the shape, not just the total.</b> The over-120 bucket is 184 invoices &mdash; 39% of
+  everything outstanding by count &mdash; but only 28% by value. That is a large pile of small, old balances, and
+  the honest answer for most of them is a write-off rather than a chase. The oldest is <b>INV-2024-0014</b> for
+  <b>$880</b>, now <b>641 days</b> past due.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">3</div>
+    <div class="ttl"><h3>Check nobody is about to be chased wrongly</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="do">Before this ever emails a client, ask for the exceptions. Paste this and press <kbd>Send</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Before I chase any of these, show me two things. First, any of these clients who have made a payment recently that has not been applied to an invoice yet. Second, any invoice on a matter that is already with collections. I do not want either group contacted.</pre></div>
+  <div class="see">A short exclusion list. There are <b>62 invoices already at collections</b> that must never receive
+  a friendly reminder from the firm.</div>
+  <div class="bad"><b>This step is not optional.</b> Chasing a client who paid last week is the fastest way to lose
+  a client who paid on time, and chasing a matter that is already with collections means they now have two people
+  contacting them and one of them is being nice about it.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">4</div>
+    <div class="ttl"><h3>Save it and build the escalation ladder</h3><div class="screen">Screen: <b>Analyze</b> &rarr; <b>Workflows</b></div></div>
+  </div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Turn this into a report called "Chase List", with a tier column: 1 to 30, 31 to 60, 61 to 90, and over 90. Show the firm total and the total per tier at the top.</pre></div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a workflow: every Monday at 8am, run the "Chase List". For anything 1 to 30 days late, email the client a statement of account with no chasing language. For 31 to 60 days, email a reminder and copy the responsible attorney. For 61 to 90 days, stop and ask the responsible attorney what to do. For anything over 90 days, stop and ask the managing partner, and do not contact the client either way. Skip anyone already with collections. Build it in the sandbox.</pre></div>
+  <div class="val"><b>The approval gate tightens as the debt ages.</b> Early reminders are routine and automatic;
+  anything past 60 days is a relationship decision and a lawyer makes it. Nothing past 90 days ever reaches a client
+  without a partner pressing a button.</div>
+  <div class="note"><b>Rehearse this one twice.</b> It is the only report in the five that emails clients. On the
+  first rehearsal check the tier counts (55 and 44 in the two automatic tiers). On the second, force a single live
+  run addressed to yourself before you activate it.</div>
+</div>
+
+
+<!-- ==================== TASK 5 ==================== -->
+<div class="task-hd" id="t5">
+  <div class="n">Report five</div>
+  <h2>Is the client trust account clean</h2>
+  <p>The balance, every matter holding client money, and the one exception that matters more than all the others put
+  together.</p>
+</div>
+
+<div class="whatfor">
+  <span class="lab">What this tells you</span>
+  Whether the firm can honestly answer an audit question today. California requires the trust bank balance, the
+  firm&rsquo;s books and the sum of every individual client ledger to agree. <b>A single client ledger showing a
+  negative balance means one client&rsquo;s money paid another client&rsquo;s costs</b> &mdash; and that is where a
+  State Bar audit starts.
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">1</div>
+    <div class="ttl"><h3>Ask for the exception first, not the balance</h3><div class="screen">Screen: <b>Analyze</b> &#183; new conversation</div></div>
+  </div>
+  <div class="do">Start a fresh conversation, paste this, press <kbd>Ask</kbd>.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze</span><em>Ask</em></div><pre>Look at the client trust ledger and find any matter whose running client ledger balance has ever gone below zero. For each one show the matter, the client, the date, the transaction that took it negative, and the balance at that point. If there aren't any, say so clearly.</pre></div>
+  <div class="see">It should come back and tell you plainly that there are <b>none</b>.</div>
+  <div class="val"><b>Zero is the right answer, and it is the answer you should get.</b> Across all 5,755 trust
+  transactions and 976 matters, no client ledger has ever gone negative. This report runs every day anyway &mdash;
+  its entire value is the morning it comes back with a row on it.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">2</div>
+    <div class="ttl"><h3>Now ask for the balance &mdash; carefully</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="do">Paste this and press <kbd>Send</kbd>. The second sentence is the important one.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Now tell me what is actually in the trust account. Take the running trust account balance from the most recent transaction — do not add up all the money in and subtract all the money out, because those columns record movement over the whole history and will not give you a balance. Then separately add up the final ledger balance for each individual matter, and tell me whether the two figures agree.</pre></div>
+  <div class="see">Two figures, and they should be the same one:</div>
+  <div class="tbl-wrap"><table class="exp">
+    <thead><tr><th>Measure</th><th class="n">Expected</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Running trust account balance</td><td class="n">$1,268,901.63</td><td>What the books say is in the account</td></tr>
+      <tr><td>Sum of all client ledgers</td><td class="n">$1,268,901.63</td><td>What the clients are collectively owed</td></tr>
+      <tr><td>Matters currently holding funds</td><td class="n">258</td><td>Out of 976 that have ever held any</td></tr>
+      <tr class="tot"><td><b>Do they agree?</b></td><td class="n"><b>Yes</b></td><td><b>To the cent</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="bad"><b>If you got minus $5,870,598, this instance has not had the data repair applied to it.</b>
+  The trust ledger shipped with the deposit amounts missing from 1,829 of its 2,217 deposit rows &mdash; every
+  unearned flat fee and every retainer top-up &mdash; so adding the money-in column up came out $7,139,500 short and
+  the subtraction went negative. The running balance was always right, which is how the missing amounts were
+  recovered. Ask your administrator to run <b>backend/repair_dataset.py</b>, then ask this question again: both
+  routes now give $1,268,901.63.</div>
+  <div class="val"><b>Ask for it both ways every time, whatever the state of your data.</b> A trust balance that can
+  be reached by two independent routes and agrees is a balance you can sign. One that can only be reached one way is
+  a number you are trusting on faith &mdash; and this is the one report where that is not good enough.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">3</div>
+    <div class="ttl"><h3>Turn it into the reconciliation statement</h3><div class="screen">Screen: <b>Analyze</b> &#183; follow-up box</div></div>
+  </div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; follow-up</span><em>Send</em></div><pre>Turn this into a report called "Trust Three-Way Reconciliation" for a month end that I can choose when I open it. Four sections: the book balance, the sum of the individual client ledgers, anything recorded but not yet cleared by the bank, and any matter with a negative balance. Finish with one line saying whether the three figures agree — just yes or no, in words.</pre></div>
+  <div class="see">A report card. Opening it shows the statement, ending in a single word.</div>
+  <div class="note"><b>The uncleared-items section will be empty, and that is correct.</b> Every one of the 5,755
+  trust transactions has a bank clearing date recorded, so there are no deposits in transit and no outstanding
+  cheques to reconcile. Keep the section &mdash; the month it stops being empty, you want it already on the page.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">4</div>
+    <div class="ttl"><h3>Freeze it, don&rsquo;t keep it live</h3><div class="screen">Screen: <b>Report Studio</b></div></div>
+  </div>
+  <div class="do">Open the report and save it as a <b>snapshot</b> rather than leaving it Live.</div>
+  <div class="bad"><b>This is the one report that must not be live.</b> A live report re-runs its questions every
+  time somebody opens it. That is exactly right for the other four and exactly wrong here &mdash; next month&rsquo;s
+  numbers would silently replace the figures a partner signed. A signed reconciliation is evidence; freeze it, and
+  keep the file in <b>Files</b> against the trust record, where re-uploading a corrected version keeps the old one
+  rather than discarding it.</div>
+</div>
+
+<div class="step">
+  <div class="step-head"><div class="step-no">5</div>
+    <div class="ttl"><h3>Schedule both halves</h3><div class="screen">Screen: <b>Analyze</b> &rarr; <b>Workflows</b></div></div>
+  </div>
+  <div class="do">Two workflows, not one &mdash; a daily exception check and a monthly statement.</div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a workflow: every morning at 7am, every day including weekends, check for any client trust ledger with a negative balance. If there are none, email me a one-line note saying so. If there are any, text me straight away and then stop and wait for me to confirm it has been corrected. Build it in the sandbox.</pre></div>
+  <div class="prompt"><div class="lbl"><span>Analyze &#183; schedule</span><em>Send</em></div><pre>Create a second workflow: on the first day of every month at 7am, produce the "Trust Three-Way Reconciliation" for the month that just ended, then stop and ask me to sign it. Once I have signed it, email it to the bookkeeper and confirm the monthly billing run can begin. Build it in the sandbox.</pre></div>
+  <div class="val"><b>Send the empty one too.</b> A report that only arrives when something is wrong is
+  indistinguishable from a report that has quietly stopped running. One line a day saying &ldquo;258 matters, no
+  negative ledgers&rdquo; is how you know the check is alive.</div>
+  <div class="cap-cal"><b>The monthly one cannot finish on its own, by design.</b> It stops and waits for a
+  signature, and the bill run is told to wait for the release note. You cannot apply trust money to an invoice from
+  a ledger nobody has proved.</div>
+</div>
+
+
+<!-- ============ AFTERWARDS ============ -->
+<h2>Once all five are running</h2>
+<p class="seg-sub">Four habits that keep them useful. Reports rot faster than anyone expects &mdash; usually
+silently, because a question that returns no rows is not an error.</p>
+
+<div class="panel">
+  <ul class="check">
+    <li><b>Give every workflow a named owner</b>, not a role and not a distribution list. An unowned approval is an approval nobody presses.</li>
+    <li><b>Let only two things interrupt a person</b> &mdash; a negative trust ledger, and a practising certificate about to lapse. Everything else waits for its slot. Add a third alarm and all three start being ignored.</li>
+    <li><b>Keep sending the empty ones.</b> Silence is ambiguous: it means either all-clear, or the workflow broke three weeks ago.</li>
+    <li><b>Once a quarter, read one rehearsal run of each workflow end to end.</b> Check the row counts against the numbers in this guide. Data drifts, and a filter that matched everything in March can match nothing in September without anyone being told.</li>
+  </ul>
+</div>
+
+<div class="val"><b>Then keep going.</b> These five are the ones every litigation practice needs. The
+<a href="legal-reports.html">reporting catalogue</a> lists forty-one more that this data will support &mdash; and
+ten that it won&rsquo;t, with the reason for each.</div>
+
+<footer>
+  <b>InventDB Legal</b> &#183; plain-language build guide &#183; namespace <b>legal</b> on InventDB SOAR<br>
+  Every expected figure verified against the dataset at 19 August 2026 and reconciled to the dashboard (10/10 checks).<br>
+  Companion: <a href="legal-reports.html">What this practice can actually report on</a>
+</footer>
+
+</div>
+</body>
+</html>

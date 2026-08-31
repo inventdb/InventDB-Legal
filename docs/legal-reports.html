@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What This Practice Can Actually Report On — InventDB Legal</title>
+<style>
+  :root{
+    --bg:#0b0d12; --paper:#11141b; --paper-2:#151922; --paper-3:#1c212c;
+    --rule:#252b38; --rule-soft:#1e242f;
+    --ink:#e6eaf2; --ink-2:#a3adc0; --ink-3:#6f7889;
+    --accent:#c9a44c; --accent-wash:#221c0e;
+    --crit:#e8736a; --crit-wash:#241312;
+    --warn:#e0a445; --warn-wash:#241a0c;
+    --good:#4fb894; --good-wash:#0e1d18;
+    --info:#69aee0; --info-wash:#0e1a24;
+    --mono:ui-monospace,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+    --serif:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:20px}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1220px;margin:0 auto;padding:38px 30px 90px}
+
+  /* ---------- masthead ---------- */
+  .mast{border-bottom:1px solid var(--rule);padding-bottom:28px;margin-bottom:34px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);margin:0 0 16px;
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .eyebrow .dot{color:var(--rule)}
+  h1{font:400 38px/1.14 var(--serif);margin:0 0 14px;letter-spacing:-.012em;color:var(--ink)}
+  .standfirst{font-size:16.5px;line-height:1.66;color:var(--ink-2);max-width:78ch;margin:0 0 12px}
+  .standfirst .inline,.standfirst b{color:var(--ink)}
+  .sourceline{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin:0;line-height:1.8}
+  .sourceline b{color:var(--good)}
+  .sourceline b.warnb{color:var(--warn)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);
+    border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin-top:24px}
+  .stat{background:var(--paper);padding:13px 15px}
+  .stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-bottom:7px}
+  .stat .v{font:600 20px/1.1 var(--sans);color:var(--ink);font-variant-numeric:tabular-nums}
+  .stat .s{font-size:11.5px;color:var(--ink-3);margin-top:5px;line-height:1.4}
+
+  /* ---------- two column ---------- */
+  .cols{display:grid;grid-template-columns:200px minmax(0,1fr);gap:44px;align-items:start}
+  .index{position:sticky;top:20px}
+  .navtitle{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+    padding-bottom:9px;border-bottom:1px solid var(--rule);margin-bottom:6px}
+  .index a{display:flex;gap:10px;padding:6px 2px;color:var(--ink-2);font-size:13.2px;border-bottom:1px solid var(--rule-soft)}
+  .index a:hover{color:var(--accent);text-decoration:none}
+  .index a .ix{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);flex:none;padding-top:2px}
+  .index .cross{margin-top:18px;padding-top:12px;border-top:1px solid var(--rule);font-size:12.6px}
+
+  /* ---------- sections ---------- */
+  .group+.group{margin-top:56px}
+  .group>h2{font:500 23px/1.25 var(--serif);margin:0 0 6px;color:var(--ink);display:flex;gap:13px;align-items:baseline}
+  .group>h2 .ix{font-family:var(--mono);font-size:12px;color:var(--accent);flex:none}
+  .sectionnote{color:var(--ink-2);font-size:14.4px;margin:0 0 20px;max-width:72ch;padding-left:34px}
+  @media (max-width:820px){.sectionnote{padding-left:0}}
+
+  /* ---------- callout ---------- */
+  .callout{border:1px solid var(--rule);border-left:3px solid var(--warn);background:var(--paper-2);
+    border-radius:4px;padding:17px 20px;margin:0 0 13px}
+  .callout.crit{border-left-color:var(--crit)}
+  .callout.good{border-left-color:var(--good)}
+  .callout h3{font:600 13.5px/1.4 var(--sans);margin:0 0 8px;color:var(--ink)}
+  .callout p{margin:0 0 9px;font-size:14.2px;color:var(--ink-2);line-height:1.64}
+  .callout p:last-child{margin-bottom:0}
+  .callout b{color:var(--ink)}
+  .inline{font-family:var(--mono);font-size:.87em;background:var(--paper-3);padding:1px 5px;border-radius:3px;color:var(--accent)}
+
+  /* ---------- report cards ---------- */
+  .rpt{border:1px solid var(--rule);background:var(--paper);border-radius:4px;padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .rpt-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+  .rpt-head .id{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.07em;flex:none}
+  .rpt-head h3{font:600 1.09rem/1.35 var(--serif);margin:0;flex:1 1 auto;min-width:190px;color:var(--ink)}
+  .pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;
+    border-radius:3px;white-space:nowrap;flex:none;background:var(--paper-3);color:var(--ink-3);border:1px solid var(--rule)}
+  .pill.daily{background:var(--crit-wash);color:var(--crit);border-color:#3d2320}
+  .pill.weekly{background:var(--warn-wash);color:var(--warn);border-color:#3d301a}
+  .pill.month{background:var(--accent-wash);color:var(--accent);border-color:#3a3018}
+  .pill.quart{background:var(--good-wash);color:var(--good);border-color:#1d3830}
+  .pill.standing{background:var(--info-wash);color:var(--info);border-color:#1e3244}
+  .rpt .answers{font-size:14.3px;color:var(--ink-2);margin:0 0 12px;line-height:1.62;max-width:76ch}
+  .rpt .answers strong{color:var(--ink);font-weight:600}
+
+  .meta{display:grid;gap:6px;margin:0 0 11px}
+  .meta .row{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:baseline}
+  .meta .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+  .meta .val{font-family:var(--mono);font-size:12.3px;color:var(--ink-2);line-height:1.65}
+  .tbl{color:var(--info)}
+
+  .proof{border-top:1px dashed var(--rule);padding-top:11px;margin:11px 0 0;font-size:13px;color:var(--ink-2);
+    display:flex;gap:10px;align-items:baseline;line-height:1.6}
+  .proof .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);flex:none;padding-top:2px}
+  .proof b{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+  .proof b.crit{color:var(--crit)}
+  .proof b.warn{color:var(--warn)}
+  .proof b.good{color:var(--good)}
+
+  /* ---------- tables ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--paper);margin:12px 0}
+  table{border-collapse:collapse;width:100%;font-size:12.9px;min-width:520px}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule-soft)}
+  th{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+    background:var(--paper-3);border-bottom:1px solid var(--rule);white-space:nowrap}
+  td{color:var(--ink-2);vertical-align:top}
+  td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;color:var(--ink)}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:var(--paper-2)}
+  td b{color:var(--ink);font-weight:600}
+  td .mono{font-family:var(--mono);font-size:12px}
+  td.crit{color:var(--crit)}
+  tr.total td{background:var(--paper-3);border-top:1px solid var(--rule)}
+
+  /* ---------- gaps ---------- */
+  ul.gaps{list-style:none;padding:0;margin:0}
+  ul.gaps li{padding:11px 0 11px 22px;border-bottom:1px solid var(--rule-soft);font-size:14.2px;color:var(--ink-2);
+    position:relative;line-height:1.62}
+  ul.gaps li:last-child{border-bottom:0}
+  ul.gaps li::before{content:"\2014";position:absolute;left:0;top:11px;color:var(--crit);font-family:var(--mono)}
+  ul.gaps li b{color:var(--ink);font-weight:600}
+  ul.gaps.fix li::before{color:var(--good)}
+
+  footer{margin-top:74px;padding-top:22px;border-top:1px solid var(--rule);font-family:var(--mono);
+    font-size:11.5px;color:var(--ink-3);line-height:1.9}
+  footer b{color:var(--ink-2)}
+
+  @media (max-width:900px){
+    .cols{grid-template-columns:1fr;gap:26px}
+    .index{position:static}
+    .wrap{padding:26px 18px 70px}
+    h1{font-size:29px}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    .index{display:none}.cols{grid-template-columns:1fr}
+    .rpt,.callout,.tablewrap{break-inside:avoid;background:#fff;border-color:#ccc}
+    h1,h2,h3,td b,.proof b{color:#111}
+    .standfirst,.answers,td,.callout p,.sectionnote{color:#333}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">
+      <span>InventDB &#183; namespace <b style="color:var(--ink-2)">legal</b></span>
+      <span class="dot">&#183;</span><span>Alvarado &amp; Sung LLP &#183; Los Angeles County</span>
+      <span class="dot">&#183;</span><span>data as of 2026-08-19</span>
+    </p>
+    <h1>What this practice can actually report on</h1>
+    <p class="standfirst">
+      Forty-one reports a California litigation firm can build today from the thirteen types in
+      <span class="inline">legal</span> &mdash; grouped by the rhythm they would actually be run on, each one
+      checked against the live data rather than assumed from the schema. Where a report comes back
+      <b>empty</b> in this dataset, it says so, because a report nobody can clear is a report nobody reads.
+    </p>
+    <p class="sourceline">
+      13 types &#183; 68,000+ records &#183; headline figures reconcile <b>exactly</b> to the shipped dashboard contract (10 of 10)<br>
+      Five data defects found and repaired via <b>backend/repair_dataset.py</b> &mdash; largest was $7,139,500 of missing trust deposits (&sect;00 rule 1)<br>
+      Three defects deliberately <b class="warnb">not</b> repaired because they are not derivable &mdash; see &sect;09
+    </p>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Matters</div><div class="v">1,300</div><div class="s">730 open &#183; 570 closed</div></div>
+      <div class="stat"><div class="k">Due this week</div><div class="v">44</div><div class="s">15 Critical &#183; 0 overdue</div></div>
+      <div class="stat"><div class="k">WIP</div><div class="v">$300.6k</div><div class="s">773.3 h unbilled &#183; 558 entries</div></div>
+      <div class="stat"><div class="k">Receivables</div><div class="v">$778.1k</div><div class="s">470 invoices &#183; oldest 641 days</div></div>
+      <div class="stat"><div class="k">Client trust</div><div class="v">$1.269M</div><div class="s">258 matters holding &#183; 0 negative</div></div>
+      <div class="stat"><div class="k">Collected 12mo</div><div class="v">$10.09M</div><div class="s">operating account only</div></div>
+    </div>
+  </header>
+
+  <div class="cols">
+    <nav class="index">
+      <div class="navtitle">Contents</div>
+      <a href="#rules"><span class="ix">00</span><span>Rules before you build</span></a>
+      <a href="#daily"><span class="ix">01</span><span>The morning board</span></a>
+      <a href="#billing"><span class="ix">02</span><span>Time &amp; billing</span></a>
+      <a href="#money"><span class="ix">03</span><span>Cash &amp; receivables</span></a>
+      <a href="#trust"><span class="ix">04</span><span>The trust account</span></a>
+      <a href="#docket"><span class="ix">05</span><span>Docket &amp; calendar</span></a>
+      <a href="#intake"><span class="ix">06</span><span>Intake &amp; clients</span></a>
+      <a href="#partner"><span class="ix">07</span><span>The partnership view</span></a>
+      <a href="#risk"><span class="ix">08</span><span>Ethics &amp; compliance</span></a>
+      <a href="#gaps"><span class="ix">09</span><span>What it can't support</span></a>
+      <div class="cross"><a href="legal-top5-reports.html">&rarr; Build the five core reports</a></div>
+    </nav>
+
+    <main>
+
+      <!-- ============ 00 RULES ============ -->
+      <section class="group" id="rules">
+        <h2><span class="ix">00</span>Rules before you build</h2>
+        <p class="sectionnote">
+          Six things in this dataset will silently produce wrong reports if you don&rsquo;t encode them. All six were
+          found by testing the ledger, time and deadline tables against each other &mdash; not by reading the schema.
+          Two of them are wrong in the shipped code.
+        </p>
+
+        <div class="callout crit">
+          <h3>1 &#183; <span class="inline">trust_ledger_cta.amount_in</span> is empty on 1,829 deposit rows &mdash; <span style="color:var(--good)">now repaired</span></h3>
+          <p>
+            Summing the columns gave <b>&minus;$5,870,598</b> &mdash; not a balance, and not a number anyone should
+            ever see against a client trust account. The cause was not the arithmetic. It was that
+            <span class="inline">amount_in</span> was <em>blank</em> on <b>1,829 of the 2,217 deposit rows</b>: every
+            <em>flat fee (unearned)</em> (1,062), every <em>retainer replenishment</em> (755), and 12 settlement
+            deposits.
+          </p>
+          <p>
+            The running balances always carried those deposits, so the missing figures were exactly recoverable as
+            <span class="inline">balance &minus; previous_balance + amount_out</span>. All <b>1,829 derived cleanly</b>,
+            recovering <b>$7,139,500</b> &mdash; and the repaired total of <b>$15,562,000</b> matches, to the cent,
+            the money <span class="inline">payments_and_receipts</span> independently records as deposited to trust.
+            Every one of the 1,829 has a matching payment row.
+          </p>
+          <p>
+            <b>After the repair, <span class="inline">amount_in &minus; amount_out</span> gives $1,268,901.63</b>
+            &mdash; the running <span class="inline">trust_account_balance</span>, the sum of all 976 final client
+            ledgers, and the figure the shipped tests already assert. The endpoints were right all along.
+            Run <span class="inline">backend/repair_dataset.py</span>; if your instance still reports a negative
+            trust balance, the repair has not been applied to it yet.
+          </p>
+        </div>
+
+        <div class="callout">
+          <h3>2 &#183; Contingency time is not flagged at all &mdash; so WIP already excludes it</h3>
+          <p>
+            All <b>10,659</b> time entries on contingency matters have <span class="inline">billable</span> and
+            <span class="inline">billed</span> <em>null</em> &mdash; not false, absent. The usual advice to filter
+            contingency out of WIP is unnecessary here: any report keyed on
+            <em>billable = true and billed = false</em> already excludes them by construction.
+          </p>
+          <p>
+            The consequence runs the other way. <b>2,931</b> of those entries are marked
+            <span class="inline">lodestar_eligible</span>, and none of them will appear in any WIP or realisation
+            report. Contingency effort has to be reported separately or it is invisible.
+          </p>
+        </div>
+
+        <div class="callout">
+          <h3>3 &#183; Four obvious exception reports return nothing</h3>
+          <p>
+            Verified against the data, not assumed: <b>0</b> overdue deadlines (the earliest open due date is
+            2026-08-20, the day after the as-of date); <b>0</b> trust rows without a
+            <span class="inline">bank_cleared_date</span>, so there are no deposits in transit or outstanding
+            checks; <b>0</b> future in-court events without an <span class="inline">appearing_name</span>.
+          </p>
+          <p>
+            And <span class="inline">calendared</span> is <em>null on all 804 open deadlines</em> &mdash; only
+            completed ones say Yes. An &ldquo;uncalendared deadlines&rdquo; report would flag the entire open docket
+            every morning. <b>Do not build it against this field.</b>
+          </p>
+        </div>
+
+        <div class="callout">
+          <h3>4 &#183; Two ageing columns, two different clocks</h3>
+          <p>
+            <span class="inline">aging_bucket</span> is computed from the <b>due date</b>;
+            <span class="inline">days_outstanding</span> is computed from the <b>issue date</b>. On
+            INV-2024-0014 they read 641 and 671 respectively, and both are right.
+          </p>
+          <p>
+            Both are frozen at 2026-08-19. Recomputing every bucket from the due date at that date reproduces the
+            stored value on <b>470 of 470</b> outstanding invoices &mdash; which confirms the freeze exactly. For a
+            chase list anyone will act on, derive from <span class="inline">due_date</span> against today.
+          </p>
+        </div>
+
+        <div class="callout">
+          <h3>5 &#183; &ldquo;Matters with no SOL deadline row&rdquo; looks alarming and isn&rsquo;t</h3>
+          <p>
+            238 open matters carry a <span class="inline">limitations_date</span> with no deadline row in the
+            Statute of Limitations category. <b>All 238 have already been filed.</b> Filing is what satisfies the
+            limitation, so the docket correctly stops tracking it.
+          </p>
+          <p>
+            Add <em>and <span class="inline">date_filed</span> is empty</em> and the list is <b>zero</b>. That
+            filtered version is the report worth running; the unfiltered one is 238 rows of noise that will train
+            people to ignore the alert.
+          </p>
+        </div>
+
+        <div class="callout">
+          <h3>6 &#183; Three fields that looked like filters and weren&rsquo;t &mdash; <span style="color:var(--good)">two repaired</span></h3>
+          <p>
+            <span class="inline">costs.advanced_by_firm</span> read <b>Yes on all 8,027 rows</b>, which made it
+            useless. <span class="inline">paid_from</span> carries the real distinction, so the flag has been
+            rewritten from it: <b>2,231 rows</b> ($618,713) are genuinely advanced by the firm, <b>5,796</b>
+            ($1,466,340) are not. <span style="color:var(--good)">Repaired.</span>
+          </p>
+          <p>
+            <span class="inline">intake.disposition</span> only ever held <em>Signed</em> (137) or nothing (454)
+            &mdash; yet 205 of the blanks carried a real <span class="inline">decline_reason</span>, and 386 rows
+            used the literal string <span class="inline">"0"</span> where they meant no value. Both fixed: the
+            book now reads <b>137 Signed / 205 Declined / 249 unresolved</b>.
+            <span style="color:var(--good)">Repaired.</span>
+          </p>
+          <p>
+            <span class="inline">court_calendar.continued_to</span> is populated on 2,177 of 3,040 rows, but only
+            <b>3</b> of those are future-dated &mdash; so filtering continuances out of a forward diary barely
+            changes it. Not a defect, just far less important than it looks. <b>Left as is.</b>
+          </p>
+        </div>
+
+        <div class="callout good">
+          <h3>&#10003; &nbsp;What did reconcile</h3>
+          <p>
+            Every headline count and total matches the shipped dashboard contract exactly &mdash; matters, clients,
+            deadlines, time entries, unbilled hours (<b>773.3</b>), WIP value (<b>$300,639.50</b>) and AR
+            outstanding (<b>$778,108.56</b>), 10 checks of 10.
+          </p>
+          <p>
+            Write-downs also tie across grains: <b>$271,306</b> summed per time entry equals $271,306 summed per
+            invoice, to the pound. That is unusual and worth relying on.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 01 DAILY ============ -->
+      <section class="group" id="daily">
+        <h2><span class="ix">01</span>The morning board</h2>
+        <p class="sectionnote">
+          Eight attorneys, one screen, before nine. These decide what happens today. All of them are exception
+          lists, all of them should be clearable within ninety minutes, and two of them are currently empty &mdash;
+          which is the correct and welcome answer.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;01</span><h3>The docket call</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Every open deadline falling due in the next seven days, grouped by the person who owns it, Critical first &mdash; plus anything already past due, whatever the window. <strong>The one report the firm cannot operate without.</strong></p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per deadline</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">deadlines_and_sol</span> &rarr; matters</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Derive urgency from due_date, not days_remaining</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>44</b> deadlines in the next 7 days &mdash; <b class="crit">15 Critical</b>, 17 High, 12 Medium &mdash; spread across <b>15 owners</b>. Heaviest: Priya Raghunathan and Miguel Teran, 5 each. <b class="good">0 overdue.</b></span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;02</span><h3>Tomorrow in court</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">The next 48 hours of the calendar with courthouse, department, judicial officer, case number and who is appearing &mdash; sent the evening before rather than read on the morning of.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per event</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">court_calendar</span> &rarr; matters</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Sort on date AND time &#183; drop rows with continued_to</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>32</b> events in the next 7 days, <b>16</b> of them actually in court. Busiest venue LASC Stanley Mosk (8). Six future events have <b class="warn">no event_type</b> recorded.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;03</span><h3>Diary clash check</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Any timekeeper booked into two different <em>courthouses</em> on the same day. Each one is a non-appearance waiting to happen, and a non-appearance is an OSC re sanctions.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per person-day clash</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">court_calendar</span> &rarr; timekeepers</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Count distinct court_location &mdash; never department</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b class="crit">7 clashes</b> in the next 14 days. Marisol Alvarado on 19 Aug (Family Law + Stanley Mosk), Daniel J. Sung on 27 Aug (Family Law + Van Nuys), Anahit Petrosyan on 31 Aug (Family Law + Stanley Mosk).</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;04</span><h3>The SOL tripwire</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Statutes of limitation falling inside 90 days, and &mdash; separately &mdash; any <strong>unfiled</strong> open matter whose limitations date has no deadline row covering it.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per deadline / per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">deadlines_and_sol</span> + <span class="tbl">matters</span> + lookups</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Exclude filed matters (rule 5) &#183; never assume 2 years</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>127</b> SOL deadlines open, <b class="warn">70 inside 90 days</b>, <b class="crit">21 inside 30 days</b>. Uncovered unfiled matters: <b class="good">0</b> &mdash; the 238 uncovered matters are all already filed.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;05</span><h3>Retainer replenishment</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Open hourly matters whose trust balance has dropped below the threshold written into their own engagement. <strong>The cheapest cash in the firm</strong> &mdash; the client already agreed to top up; somebody has to ask.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">matters</span> &rarr; trust_ledger_cta</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Re-derive the balance before anyone sends a demand</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b class="warn">58 matters</b> below threshold, total shortfall <b>$85,121</b>. Largest: MT-2498 Yazdani (appeal) and MT-3048 Downey Fleet, both $4,500 thresholds against a <b>$0</b> balance.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;06</span><h3>Overnight intake</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">New leads ordered by <strong>how close their claim is to expiring</strong>, not by when they called. The caller whose limitation runs out first gets screened first.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per lead</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">intake_and_leads</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Sort on days_to_limitations_at_intake ascending</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>19</b> leads in the last 14 days. Tightest clocks in the book are all public-entity claims: Whitcombe at <b class="crit">108 days</b> and Gutierrez at 109 &mdash; six-month Government Code windows, not two-year ones.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;07</span><h3>Trust exception sweep</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Any matter ledger showing a negative balance. In a pooled client trust account that means one client&rsquo;s money paid another&rsquo;s costs &mdash; it is where a State Bar audit starts.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">trust_ledger_cta</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Report the named matters, never a count</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b class="good">0 negative ledgers</b> across all 5,755 transactions and 976 matters. Runs daily anyway: the entire value of this report is the morning it is not empty.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;08</span><h3>Yesterday&rsquo;s time</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Hours recorded per fee earner against their implied daily target, with the entry lag alongside. Private, individual, and never sent to a supervisor.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per timekeeper</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> &rarr; timekeepers</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Only billing_timekeeper = Yes and active = Yes (11 people)</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>August to date: <b>1,839.3 h</b> over 1,342 entries. Leaders Anahit Petrosyan <b>171.8 h</b> and Yusuf Karimi 170.9 h. Firm-wide mean lag <b class="good">1.63 days</b>.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 02 TIME & BILLING ============ -->
+      <section class="group" id="billing">
+        <h2><span class="ix">02</span>Time &amp; billing</h2>
+        <p class="sectionnote">
+          The Friday-to-Monday rhythm: what can be billed, what should be written down before a client sees it, and
+          where the gap between the rate card and the bank account opens up.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;09</span><h3>Work in progress by attorney</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Unbilled billable time by matter and responsible attorney, with the age of the oldest entry on each. <strong>Age is the signal, not size</strong> &mdash; a big young balance is a healthy matter; a small old one is a matter nobody has billed.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> &rarr; matters</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">No fee-model filter needed &mdash; see rule 2</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Responsible attorney</th><th class="num">WIP value</th><th class="num">Hours</th><th>Oldest entry</th></tr></thead>
+              <tbody>
+                <tr><td><b>Daniel J. Sung</b></td><td class="num">$80,706</td><td class="num">202.9</td><td>2026-08-01</td></tr>
+                <tr><td><b>Rebecca Fairhurst</b></td><td class="num">$48,140</td><td class="num">110.2</td><td>2026-08-03</td></tr>
+                <tr><td><b>Marisol Alvarado</b></td><td class="num">$39,698</td><td class="num">97.9</td><td>2026-08-01</td></tr>
+                <tr><td><b>Cormac Delaney</b></td><td class="num">$36,596</td><td class="num">86.4</td><td>2026-08-01</td></tr>
+                <tr><td><b>Farid Nazarian</b></td><td class="num">$21,798</td><td class="num">66.8</td><td>2026-08-02</td></tr>
+                <tr><td><b>Miguel Teran</b></td><td class="num">$21,310</td><td class="num">60.1</td><td>2026-08-02</td></tr>
+                <tr class="total"><td><b>All attorneys</b></td><td class="num"><b>$300,640</b></td><td class="num"><b>773.3</b></td><td><b>2026-08-01</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>558</b> unbilled entries worth <b>$300,640</b>. Nothing is older than 18 days &mdash; this book bills cleanly on a monthly cycle and there is <b class="good">no aged tail</b>.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;10</span><h3>Entry lag &amp; the reconstruction tail</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">The distribution of days between doing the work and recording it. <strong>Do not report the mean</strong> &mdash; it is the tail an insurance panel auditor or a fee application attacks.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per entry, bucketed</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Report the tail and its value, not the average</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Mean lag <b class="good">1.63 days</b> &mdash; excellent. But <b class="warn">1,288 entries</b> exceed 7 days, carrying <b>$649,283</b> of value, and 164 exceed 14. Worst is 23 days (TE-106833, Miguel Teran).</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;11</span><h3>Pre-bill / proforma pack</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">One draft bill per matter for attorney review: every unbilled entry with its narrative and UTBMS coding, every unbilled cost, the trust available to apply, and flags on the entries a client will query.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One rendered page per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> + costs + matters + trust</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Flag thin narratives and block-billed entries here, not later</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>$300,640</b> of fees plus <b>$10,542</b> of unbilled unrecovered advances across 241 cost lines. Trust available to apply against these bills: <b>$1.269M</b> across 258 matters.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;12</span><h3>The realisation waterfall</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Where the money leaks, in order: value at standard rates &rarr; billed at agreed rates &rarr; less write-downs &rarr; invoiced &rarr; collected. <strong>Each drop has a different owner and a different fix.</strong></p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per step, repeated per practice area</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> + invoices + payments</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Operating receipts only, NSF excluded</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Step</th><th class="num">Amount</th><th class="num">Of previous</th><th>What the drop means</th></tr></thead>
+              <tbody>
+                <tr><td><b>Value at standard rates</b></td><td class="num">$4,760,400</td><td class="num">&mdash;</td><td>Billed entries at rate-card value</td></tr>
+                <tr><td><b>Gross fee at agreed rates</b></td><td class="num">$4,580,940</td><td class="num">96.2%</td><td>Rate concessions and panel rates</td></tr>
+                <tr><td><b>Net after write-downs</b></td><td class="num">$4,309,635</td><td class="num">94.1%</td><td>$271,306 written down before issue</td></tr>
+                <tr><td><b>Invoiced (all fee models)</b></td><td class="num">$7,699,678</td><td class="num">&mdash;</td><td>Includes flat &amp; statutory fees</td></tr>
+                <tr class="total"><td><b>Collected to operating</b></td><td class="num"><b>$10,057,375</b></td><td class="num">&mdash;</td><td>Excl. $37,123 returned/NSF</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Rate realisation <b class="good">96.2%</b>, write-down rate <b>5.9%</b>. Note the step change at &ldquo;invoiced&rdquo;: <b>$2,614,396</b> of billed fees come from flat-fee and statutory work that never passed through a time entry.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;13</span><h3>Write-down analysis</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Who is writing down, on which task codes, and on whose matters. The one report that turns a percentage into a conversation.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per timekeeper &times; task code</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> + invoices + lookups</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Group on the UTBMS code, label from lookups</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>$271,306</b> written down, plus <b>$22,663</b> of courtesy discount at invoice level. The two grains agree to the pound &mdash; unusual, and it means either source can be trusted.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;14</span><h3>Hours against target</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Billable hours per fee earner, week and year to date, against the annual target on their own timekeeper record &mdash; with a pace differential rather than a bare percentage.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per timekeeper</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">timekeepers</span> &rarr; time_entries</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Targets differ by role: 1,400&ndash;1,750 h</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>11</b> active billing timekeepers. Targets range from 1,400 h (paralegals) to 1,750 h (associates); partners carry 1,500&ndash;1,600 h. August pace: Petrosyan 171.8 h against a 1,750 h year.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 03 CASH ============ -->
+      <section class="group" id="money">
+        <h2><span class="ix">03</span>Cash &amp; receivables</h2>
+        <p class="sectionnote">
+          The receivable book is healthy at the front and rotten at the back: two thirds of the balance sits in
+          buckets under 60 days, but 184 invoices have been outstanding for more than four months.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;15</span><h3>Receivables ageing</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">The canonical schedule &mdash; balance by bucket, with invoice counts. The chart everyone recognises, and the one that tells you the least on its own.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per bucket</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">invoices</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Recompute from due_date &mdash; the stored bucket is frozen</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Bucket</th><th class="num">Invoices</th><th class="num">Balance</th><th class="num">Share</th></tr></thead>
+              <tbody>
+                <tr><td>Current (not yet due)</td><td class="num">144</td><td class="num">$326,321</td><td class="num">41.9%</td></tr>
+                <tr><td>1&ndash;30 days</td><td class="num">55</td><td class="num">$93,851</td><td class="num">12.1%</td></tr>
+                <tr><td>31&ndash;60 days</td><td class="num">44</td><td class="num">$64,913</td><td class="num">8.3%</td></tr>
+                <tr><td>61&ndash;90 days</td><td class="num">23</td><td class="num">$29,669</td><td class="num">3.8%</td></tr>
+                <tr><td>91&ndash;120 days</td><td class="num">20</td><td class="num">$46,566</td><td class="num">6.0%</td></tr>
+                <tr><td class="crit"><b>Over 120 days</b></td><td class="num">184</td><td class="num">$216,788</td><td class="num">27.9%</td></tr>
+                <tr class="total"><td><b>Total outstanding</b></td><td class="num"><b>470</b></td><td class="num"><b>$778,109</b></td><td class="num"><b>100%</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Reconciles to the dashboard tile at <b>$778,108.56</b>. The over-120 bucket is <b class="crit">39% of all outstanding invoices by count</b> but only 28% by value &mdash; many small, old balances.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;16</span><h3>The chase list</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Not the chart &mdash; the <strong>named list</strong>. Every invoice with a balance, oldest first, with client, responsible attorney and the escalation tier its age puts it in.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per invoice</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">invoices</span> &rarr; matters &rarr; clients</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Exclude status = Sent to collections (62 invoices)</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Invoice</th><th>Client</th><th class="num">Balance</th><th class="num">Days past due</th><th>Bucket</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">INV-2026-0817</td><td><b>Kang Brothers Wholesale</b></td><td class="num">$16,190</td><td class="num">97</td><td>91&ndash;120 days</td></tr>
+                <tr><td class="mono">INV-2026-0484</td><td><b>Bagramyan Construction</b></td><td class="num">$8,701</td><td class="num">133</td><td>Over 120 days</td></tr>
+                <tr><td class="mono">INV-2026-1578</td><td><b>Casa Bonita Restaurant</b></td><td class="num">$11,262</td><td class="num">4</td><td>1&ndash;30 days</td></tr>
+                <tr><td class="mono">INV-2024-0014</td><td><b>Gutierrez, Maria</b></td><td class="num">$880</td><td class="num">641</td><td>Over 120 days</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>204</b> invoices are more than 90 days past due, worth <b class="crit">$263,355</b>. The oldest is INV-2024-0014 at <b class="crit">641 days</b> &mdash; $880 that should have been written off or sent out long ago.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;17</span><h3>Billed vs collected by month</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">The cash trend. Collections consistently exceed billings because trust applications settle invoices raised in earlier months &mdash; a healthy pattern in a trust-funded practice, and a confusing one if nobody explains it.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per month</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">invoices</span> + <span class="tbl">payments_and_receipts</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Collected = operating account only (rule 6 of ethics)</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Month</th><th class="num">Billed</th><th class="num">Collected (operating)</th><th class="num">Net</th></tr></thead>
+              <tbody>
+                <tr><td>2026-04</td><td class="num">$485,132</td><td class="num">$796,604</td><td class="num">+$311,472</td></tr>
+                <tr><td>2026-05</td><td class="num">$482,959</td><td class="num">$786,789</td><td class="num">+$303,830</td></tr>
+                <tr><td>2026-06</td><td class="num">$558,905</td><td class="num">$710,390</td><td class="num">+$151,485</td></tr>
+                <tr><td>2026-07</td><td class="num">$659,902</td><td class="num">$1,347,748</td><td class="num">+$687,846</td></tr>
+                <tr><td>2026-08 <span style="color:var(--ink-3)">(to 19th)</span></td><td class="num">$528,362</td><td class="num">$849,292</td><td class="num">+$320,930</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>July was the strongest month on both sides &mdash; <b>$659,902</b> billed, <b class="good">$1,347,748</b> collected. Twelve-month operating receipts total <b>$10,094,497</b>.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;18</span><h3>Receipts by method &amp; account</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Where money arrives and which account it lands in. The single most important split in a law firm&rsquo;s books, and the one most often got wrong.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per method &times; account</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">payments_and_receipts</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Trust receipts are never revenue</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>6,433</b> receipts: 4,216 to operating (<b>$10.09M</b>), 2,217 to trust (<b>$15.56M</b>). Dominant method is <em>Trust transfer</em> (3,218), then Check (1,154) and ACH (859). Cash is rare at 171.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;19</span><h3>Returned &amp; NSF payments</h3><span class="pill standing">Standing</span></div>
+          <p class="answers">Payments that bounced. A returned <em>trust</em> deposit is materially worse than a returned operating one &mdash; it can leave the pooled account short against other clients&rsquo; ledgers.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per payment</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">payments_and_receipts</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Never net these off; report them separately</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b class="warn">15</b> returned payments totalling <b>$37,123</b>. Small in count, but any realisation report that fails to exclude them overstates collections by that amount.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;20</span><h3>Cost advances outstanding</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">What the firm has fronted and not recovered. Uses <span class="inline">paid_from</span>, because the <span class="inline">advanced_by_firm</span> flag says Yes on every row (rule 6).</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per cost line</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">costs_and_disbursements</span> &rarr; matters</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">advanced_by_firm is now trustworthy &mdash; rebuilt from paid_from</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Genuinely advanced: <b>2,231</b> lines, <b>$618,713</b>. Of those, <b class="warn">241 lines / $10,542</b> are neither invoiced nor recovered from a settlement. Total cost book $2,085,053 across 8,027 lines.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 04 TRUST ============ -->
+      <section class="group" id="trust">
+        <h2><span class="ix">04</span>The trust account</h2>
+        <p class="sectionnote">
+          Pacific Heritage Bank IOLTA &times;4417. California requires that the bank balance, the firm&rsquo;s book
+          balance and the sum of the individual client ledgers agree at every month end. These four reports are how
+          you prove it &mdash; and rule 1 explains why the obvious way to compute the balance is wrong.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;21</span><h3>Three-way reconciliation</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Bank balance, book balance and the sum of every client ledger, side by side, with the reconciling items between them. <strong>Ends in one word: Ties, or doesn&rsquo;t.</strong></p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One statement per month end</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">trust_ledger_cta</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Snapshot, never live &mdash; a signed statement must not re-query</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Book balance <b>$1,268,901.63</b>; sum of 976 client ledgers <b>$1,268,901.63</b> &mdash; <b class="good">ties to the cent</b>, and since the rule-1 repair the in/out columns agree with both. <b>258</b> matters currently hold funds. Zero uncleared items, so there are no reconciling adjustments to make.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;22</span><h3>Client ledger register</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Every matter holding client funds, with its running balance &mdash; the sub-ledger that must sum to the account balance and the document an auditor asks for first.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter holding funds</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">trust_ledger_cta</span> &rarr; matters &rarr; clients</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Take the latest-dated row per matter, not a sum</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>976</b> matters have trust history; <b>258</b> hold a positive balance today. Mean holding <b>$4,918</b>. Peak account balance over the window was <b>$2,760,634</b>; the floor was $10,000.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;23</span><h3>Earned-fee transfer audit</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Every transfer out of trust to the operating account, matched to what earned it. <strong>A transfer without an invoice behind it is the taking of an unearned fee.</strong></p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per transfer</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">trust_ledger_cta</span> &rarr; invoices / settlements</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Contingency transfers match a settlement, not an invoice</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>2,318</b> earned-fee transfers and <b>792</b> earned-flat-fee transfers &mdash; the two largest transaction types in the ledger. Invoices record <b>$5,457,916</b> applied from trust, which is the figure these must reconcile to.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;24</span><h3>Unearned flat fees held</h3><span class="pill month">Monthly</span></div>
+          <p class="answers">Staged flat-fee matters: deposited, earned to date, and therefore <strong>still the client&rsquo;s money</strong>. A liability report, not an asset one.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">matters</span> + trust_ledger_cta + invoices</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Cross-check against closed matters &mdash; those must refund</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>1,062</b> unearned flat-fee deposits against <b>792</b> earned-flat-fee transfers. <b>580</b> matters are on a flat fee model (412 Flat Fee, 168 Flat Fee &ndash; Staged) &mdash; the firm&rsquo;s single largest fee arrangement by count.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 05 DOCKET ============ -->
+      <section class="group" id="docket">
+        <h2><span class="ix">05</span>Docket &amp; calendar</h2>
+        <p class="sectionnote">
+          804 open deadlines running out to February 2027, and 866 future calendar events. The forward view is
+          where a litigation practice either stays ahead of the court or starts explaining itself to one.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;25</span><h3>Fourteen-day look-ahead</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Everything on the calendar for the next fortnight by attorney, with trials and final status conferences flagged so preparation blocks get booked before the week fills.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per event</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">court_calendar</span> + deadlines_and_sol</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Read out loud in the Monday meeting</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>74</b> events in the next 14 days, <b>83</b> deadlines. Mix is Status Conferences (9), Demurrer Hearings (7), Depositions (5), Pretrial Conferences (5), plus USCIS interviews and biometrics appointments.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;26</span><h3>Deadline load by category</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">What kind of work the next month actually consists of &mdash; a staffing report disguised as a docket report.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per category</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">deadlines_and_sol</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Nine categories exist; six carry real volume</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Category</th><th class="num">Due in 30 days</th><th>Who absorbs it</th></tr></thead>
+              <tbody>
+                <tr><td><b>Court Filing</b></td><td class="num">40</td><td>Paralegals, with attorney sign-off</td></tr>
+                <tr><td><b>Discovery</b></td><td class="num">40</td><td>Associates &mdash; the drafting load</td></tr>
+                <tr><td><b>Case Administration</b></td><td class="num">39</td><td>Support staff</td></tr>
+                <tr><td class="crit"><b>Statute of Limitations</b></td><td class="num">21</td><td>Responsible attorney only</td></tr>
+                <tr><td><b>Pleading</b></td><td class="num">16</td><td>Associates</td></tr>
+                <tr><td><b>Criminal</b></td><td class="num">7</td><td>Criminal defence team</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>172</b> deadlines fall in the next 30 days and <b>465</b> in the next 90. Court Filing and Discovery are tied at 40 each &mdash; the month is a drafting month.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;27</span><h3>Appearance record</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Who appeared where, and what happened. Retrospective only &mdash; and the field only exists for events already held.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per past event</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">court_calendar</span> &rarr; timekeepers</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Filter to past dates or the forward diary reads as failure</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>2,174</b> past events; <span class="inline">appeared</span> is recorded on <b>493</b> of them and null on the rest. On future events it is null on 865 of 866 &mdash; as it should be. <b class="warn">Coverage of the field is partial</b>, so treat it as a sample, not a register.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;28</span><h3>Stalled matters</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Open matters with no time entry, cost, calendar event or deadline movement in 30 days. Nothing has gone wrong on these; nothing has gone at all.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per matter</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">matters</span> &rarr; time_entries, court_calendar</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Exclude legitimately quiet stages (PI treating, etc.)</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>730 open matters against 147 possible stage values. <b class="warn">Pre-Litigation &ndash; Treating</b> is genuinely dormant for months while a client is under medical care &mdash; exclude it or the report cries wolf on most of the PI book.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 06 INTAKE ============ -->
+      <section class="group" id="intake">
+        <h2><span class="ix">06</span>Intake &amp; clients</h2>
+        <p class="sectionnote">
+          The intake log only starts on 5 January 2026 &mdash; 853 of the 1,239 clients predate it entirely. Every
+          report in this section must be windowed to that date, and none of them can speak to the firm&rsquo;s
+          history before it.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;29</span><h3>Unscreened lead backlog</h3><span class="pill daily">Daily</span></div>
+          <p class="answers">Leads with no recorded outcome, oldest first. <strong>The largest single data-quality finding in this dataset</strong>, and one that is also a live risk.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per lead</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">intake_and_leads</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">A blank disposition with a decline reason is a decline (rule 6)</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>After repair, 591 leads read <b>137 Signed</b>, <b>205 Declined</b>, and <b class="crit">249 with no outcome at all</b>. That last figure is the report: every one is a person who contacted the firm and was never told anything.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;30</span><h3>Why we say no</h3><span class="pill weekly">Weekly</span></div>
+          <p class="answers">Decline reasons ranked. <strong>The more useful half of the funnel</strong> &mdash; the top two reasons say marketing is pointed at the wrong people, not that screening is too strict.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per reason</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">intake_and_leads</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">&lsquo;Conflict of interest&rsquo; is a compliance signal, not a marketing one</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Decline reason</th><th class="num">Leads</th><th>What it actually tells you</th></tr></thead>
+              <tbody>
+                <tr><td><b>Damages below firm threshold</b></td><td class="num">39</td><td>Advertising reaching the wrong claim size</td></tr>
+                <tr><td><b>Liability too weak</b></td><td class="num">33</td><td>Healthy &mdash; screening working as intended</td></tr>
+                <tr><td><b>Outside firm practice areas</b></td><td class="num">30</td><td>Referral-out revenue being left on the table</td></tr>
+                <tr><td class="crit"><b>Statute of limitations expired</b></td><td class="num">27</td><td>They came too late &mdash; or were held too long</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>205</b> leads carry a decline reason. The 27 expired-limitations declines deserve a second look: if any of those clocks ran out <em>during</em> screening, that is a different and much more serious report.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;31</span><h3>Referral source performance</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Which sources send volume, and which send matters that convert and pay. A source producing many leads and little revenue is a cost centre wearing a marketing budget.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per source</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">intake_and_leads</span> + clients + matters</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Two referral_source fields exist &mdash; pick one and say which</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Top sources: Former client referral <b>121</b>, Attorney referral <b>107</b>, Google search <b>72</b>, Family or friend <b>70</b>, Repeat client 41. <b class="good">Word of mouth outperforms paid search two to one</b> on volume alone.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;32</span><h3>Client language &amp; access</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Preferred language across the client base, and portal enablement. Operational, not demographic &mdash; it determines which correspondence templates and which interpreters the firm needs on hand.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per language</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">clients</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Seven languages in the controlled vocabulary</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>1,239</b> clients. The lookup carries English, Spanish, Korean, Armenian, Mandarin, Farsi and Tagalog &mdash; a Los Angeles practice, and any automated client email must respect this field.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 07 PARTNERSHIP ============ -->
+      <section class="group" id="partner">
+        <h2><span class="ix">07</span>The partnership view</h2>
+        <p class="sectionnote">
+          Slower questions with enough history to mean something. None of these should be run monthly &mdash; at that
+          frequency the noise exceeds the signal and the partnership starts managing variance instead of the practice.
+        </p>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;33</span><h3>Caseload by attorney</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Open matters per responsible attorney, split by practice area and fee model. The capacity conversation, held with numbers.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per attorney</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">matters</span> &rarr; timekeepers</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Contingency matters carry different effort profiles</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Attorney</th><th class="num">Open matters</th><th>Note</th></tr></thead>
+              <tbody>
+                <tr><td class="crit"><b>Miguel Teran</b></td><td class="num">124</td><td>Immigration-heavy &mdash; high volume, low hours each</td></tr>
+                <tr><td><b>Yusuf Karimi</b></td><td class="num">91</td><td></td></tr>
+                <tr><td><b>Priya Raghunathan</b></td><td class="num">90</td><td></td></tr>
+                <tr><td><b>Marisol Alvarado</b></td><td class="num">81</td><td>Managing partner &mdash; 1,500 h target</td></tr>
+                <tr><td><b>Daniel J. Sung</b></td><td class="num">73</td><td>Largest WIP holder at $80.7k</td></tr>
+                <tr><td><b>Farid Nazarian</b></td><td class="num">66</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>730 open matters over 11 active fee earners. Practice mix: Personal Injury <b>117</b>, Immigration <b>98</b>, Family Law <b>68</b>, Workers Comp 57, Business Litigation 55, Employment 51.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;34</span><h3>Revenue by practice area</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Where the fee income comes from, at standard-rate value on billed time. Note what is <em>missing</em>: contingency practice areas barely appear, because their revenue arrives at settlement.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per practice area</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">time_entries</span> + settlements_and_liens</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Show settlement revenue as a separate line, never blended</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Practice area</th><th class="num">Billed value</th><th>Fee model</th></tr></thead>
+              <tbody>
+                <tr><td><b>Family Law</b></td><td class="num">$1,656,025</td><td>Hourly / flat</td></tr>
+                <tr><td><b>Business Litigation</b></td><td class="num">$1,374,786</td><td>Hourly</td></tr>
+                <tr><td><b>Insurance Defense</b></td><td class="num">$486,866</td><td>Hourly &ndash; panel rates</td></tr>
+                <tr><td><b>Probate &amp; Trust Admin</b></td><td class="num">$407,097</td><td>Statutory fee</td></tr>
+                <tr><td><b>Appellate</b></td><td class="num">$185,599</td><td>Hourly</td></tr>
+                <tr class="total"><td><b>Personal Injury</b></td><td class="num"><b>&mdash;</b></td><td><b>Contingency &mdash; see R&#8209;35</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Family Law is the largest hourly practice at <b>$1.66M</b>. Personal Injury is the largest caseload (117 open matters) and contributes <b class="warn">nothing</b> to this report &mdash; which is exactly why R&#8209;35 exists.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;35</span><h3>Settlement &amp; lien performance</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">The contingency side of the business. Gross recovery, the firm&rsquo;s fee, and &mdash; the number clients feel most &mdash; <strong>how much of the asserted liens got negotiated away</strong>.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per settlement</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">settlements_and_liens</span> &rarr; matters &rarr; trust</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">54 settlements &mdash; quote the count with every average</span></div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Measure</th><th class="num">Amount</th><th>Reading</th></tr></thead>
+              <tbody>
+                <tr><td>Gross settlements (54)</td><td class="num">$8,162,300</td><td>Mean $151k per matter</td></tr>
+                <tr><td>Attorney fees</td><td class="num">$2,938,109</td><td>36.0% blended &mdash; between the 33&#8531;% and 40% tiers</td></tr>
+                <tr><td>Liens asserted against clients</td><td class="num">$2,099,613</td><td>Medical providers and statutory liens</td></tr>
+                <tr><td>Liens actually paid</td><td class="num">$1,027,612</td><td><b>51.1% negotiated away</b></td></tr>
+                <tr class="total"><td><b>Net to clients</b></td><td class="num"><b>$3,998,883</b></td><td><b>49% of gross reaches the client</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>The lien reduction rate of <b class="good">51.1%</b> is the single most quotable number the firm has &mdash; over a million dollars returned to clients purely through negotiation. Small sample: <b>54</b> settlements.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;36</span><h3>Fee model mix</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">How the firm actually gets paid. Determines cash-flow shape, trust exposure and how much of the book is even visible to a WIP report.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per fee model</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">matters</span></span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Ten models in use across 1,300 matters</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span>Flat Fee <b>412</b> &#183; Contingency <b>221</b> &#183; Hourly&ndash;Evergreen <b>201</b> &#183; Flat Fee Staged 168 &#183; Hourly&ndash;Trust 146 &#183; WCAB statutory 66 &#183; Probate statutory 44 &#183; Insurance panel 30 &#183; MICRA 7 &#183; Pro Bono 5. <b class="warn">Only 377 matters are hourly</b> &mdash; 29% of the book.</span></p>
+        </article>
+
+        <article class="rpt">
+          <div class="rpt-head"><span class="id">R&#8209;37</span><h3>Timekeeper scorecard</h3><span class="pill quart">Quarterly</span></div>
+          <p class="answers">Hours, utilisation, realisation on their own time, entry lag, matters worked, and MCLE standing. Half performance review, half regulatory check.</p>
+          <div class="meta">
+            <div class="row"><span class="lab">Grain</span><span class="val">One row per timekeeper</span></div>
+            <div class="row"><span class="lab">Types</span><span class="val"><span class="tbl">timekeepers</span> &rarr; time_entries &rarr; invoices</span></div>
+            <div class="row"><span class="lab">Rule</span><span class="val">Three MCLE groups on staggered three-year cycles</span></div>
+          </div>
+          <p class="proof"><span class="lab">Live</span><span><b>19</b> timekeepers, <b>17</b> billing, <b>11</b> currently active. MCLE splits Group 1 (4), Group 2 (4), Group 3 (3), with due dates 2027-02-01 and 2028-02-01. Rates run $140&ndash;$525 for 2026.</span></p>
+        </article>
+      </section>
+
+      <!-- ============ 08 RISK ============ -->
+      <section class="group" id="risk">
+        <h2><span class="ix">08</span>Ethics &amp; compliance</h2>
+        <p class="sectionnote">
+          No natural cadence, because the question is always live. Schedule them and route each to a named person
+          &mdash; an unowned compliance report is one that gets acknowledged and forgotten.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th style="width:20%">Report</th><th>What it finds</th><th style="width:30%">Live position</th></tr></thead>
+            <tbody>
+              <tr><td><span class="mono">R&#8209;38</span> <b>Engagement letter gaps</b></td><td>Open matters with no <span class="inline">fee_agreement_date</span>, or clients with no engagement letter. An unsigned fee agreement is an unenforceable fee</td><td>730 open matters to check against both date fields</td></tr>
+              <tr><td><span class="mono">R&#8209;39</span> <b>Conflict check gaps</b></td><td>Clients holding an open matter with no conflict check date, or a result that was never cleared</td><td>1,239 clients; check <span class="inline">conflict_cleared_by</span> is populated too</td></tr>
+              <tr><td><span class="mono">R&#8209;40</span> <b>Rule 1.5.1 consent</b></td><td>Referred-out leads with a fee arrangement but no written client consent. Without it, California will not enforce the fee division</td><td><b>0 exposures</b> &mdash; <span class="inline">referred_to</span> is never populated in this data</td></tr>
+              <tr><td><span class="mono">R&#8209;41</span> <b>Closed matters holding trust</b></td><td>Matters marked Closed with a residual client balance. Unearned funds must be refunded; holding them is a violation regardless of intent</td><td>570 closed matters against 258 currently holding funds</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout crit" style="margin-top:18px">
+          <h3>Only two things should ever interrupt a person</h3>
+          <p>
+            A <b>negative client trust ledger</b> (R&#8209;07) and an <b>MCLE lapse inside 60 days</b> (R&#8209;37).
+            The first means the account cannot honestly answer an audit question; the second suspends a licence, and
+            the remedy takes weeks.
+          </p>
+          <p>
+            Everything else waits for its slot. The moment a third alarm is added, all three begin to be ignored.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 09 GAPS ============ -->
+      <section class="group" id="gaps">
+        <h2><span class="ix">09</span>What it can&rsquo;t support</h2>
+        <p class="sectionnote">
+          Each of these is a request a partner will make, and the honest answer. Saying so precisely here saves
+          somebody a fortnight discovering it.
+        </p>
+
+        <ul class="gaps">
+          <li><b>A firm profit and loss.</b> There is no overhead ledger &mdash; no rent, salaries, insurance, software or marketing. <span class="inline">costs_and_disbursements</span> is <em>client</em> cost. What <span class="inline">/api/reports/pnl</span> returns is a revenue-and-client-cost summary; calling it a P&amp;L in front of an accountant will not go well.</li>
+          <li><b>Profit per partner.</b> Follows from the above. <span class="inline">hourly_cost_rate</span> supports <em>contribution</em>, which is real and useful, but it is not profit.</li>
+          <li><b>Time in each stage.</b> <span class="inline">matters.stage</span> holds only the current value across 147 possible stages, with no history. Not derivable retrospectively.</li>
+          <li><b>Win rate.</b> <span class="inline">court_calendar.outcome</span> describes what happened at a hearing, and <span class="inline">appeared</span> is only populated on 493 of 2,174 past events. No motion-level or case-level win rate exists.</li>
+          <li><b>A conflicts search.</b> Conflict checking here is a date, a result and a clearer &mdash; not a searchable index of adverse parties and related entities. <span class="inline">opposing_party</span> gives you a text search, which is a start and not a system.</li>
+          <li><b>Utilisation by hour.</b> <span class="inline">time_entries.date</span> has no time component. Daily granularity is the floor.</li>
+          <li><b>Any full-funnel intake history.</b> Logging starts 5 Jan 2026 and <b>853 of 1,239 clients predate it</b>. Conversion over the firm&rsquo;s history compares a real numerator against a missing denominator.</li>
+          <li><b>Settlement benchmarks by carrier.</b> 54 settlements across many carriers and matter types. Directional only, and never quoted without its count.</li>
+          <li><b>Deposits in transit or outstanding checks.</b> <span class="inline">bank_cleared_date</span> is populated on all 5,755 trust rows, so the reconciling-items section of the three-way statement is structurally empty.</li>
+          <li><b>Anything from the documents.</b> Files holds attachments with OCR and semantic search &mdash; genuinely good for <em>finding</em> a document. There is no structured extraction, so no report can derive a deadline, party or amount from a filed pleading.</li>
+        </ul>
+
+        <div class="callout crit" style="margin-top:22px">
+          <h3>Three defects left in place, deliberately</h3>
+          <p style="margin-bottom:12px">
+            Five data defects were derivable and have been repaired (&sect;00). These three are <b>not derivable from
+            the data</b>, so <span class="inline">repair_dataset.py</span> reports them and changes nothing &mdash;
+            inventing a value here would destroy the signal rather than restore it.
+          </p>
+          <ul class="gaps" style="margin-top:4px">
+            <li><b><span class="inline">deadlines_and_sol.calendared</span> &mdash; null on all 804 open deadlines.</b> Every completed row says Yes, so the tempting fix is to stamp Yes on the rest. Don&rsquo;t: &ldquo;open and uncalendared&rdquo; is a real and dangerous state, and asserting the opposite would erase the exact safety signal the field exists for. Capture it at source.</li>
+            <li><b><span class="inline">court_calendar.event_type</span> &mdash; missing on 429 of 3,040 events, 61 of them future-dated.</b> The hearing type cannot be inferred from the venue or the matter. The 61 future ones are the ones somebody has to fill in this week.</li>
+            <li><b><span class="inline">intake_and_leads.disposition</span> &mdash; 249 leads with no outcome and no reason.</b> This is a genuinely unresolved backlog, not a data-entry artefact. Work it; do not label it.</li>
+          </ul>
+        </div>
+
+        <div class="callout good" style="margin-top:14px">
+          <h3>And one change that would retire most of &sect;09</h3>
+          <p>
+            <b>Write a row on every stage change.</b> <span class="inline">matters.stage</span> holds only the
+            current value across 147 possible stages, which is why cycle time, time-in-stage and any pipeline
+            report are impossible. A single append-only history would make all of them exact within a quarter.
+            It is the smallest change on this page with the largest payoff.
+          </p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <b>InventDB Legal</b> &#183; reporting catalogue &#183; namespace <b>legal</b> on InventDB SOAR<br>
+    Figures verified against the dataset at 2026-08-19 and reconciled to the shipped dashboard contract (10/10).<br>
+    Synthetic firm and matters; real statutory citations, UTBMS code sets, courthouse names and CA trust-accounting structure.<br>
+    Companion: <a href="legal-top5-reports.html">Build your five core reports</a>
+  </footer>
+
+</div>
+</body>
+</html>

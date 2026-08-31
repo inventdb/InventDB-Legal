@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="InventDB Legal">
+  <!--
+    InventDB Legal — the Counsel mark, solid cut, on no background.
+
+    Derived from inventdb-legal-logo/favicon/favicon-transparent.svg. The one
+    addition is the colour-scheme switch: with no plum tile behind it, a single
+    fixed colourway would go invisible on half the browsers in the world —
+    Orbital Indigo vanishes into a dark tab strip, Wisteria Bloom washes out on
+    a light one. So the mark carries both of the package's colourways and takes
+    whichever the tab strip calls for. The hexes are the package's own; nothing
+    is invented here.
+
+    The solid cut, not the full one: below 20px the full cut's 5.5-unit pan
+    outlines close up into a smudge. See the package README's two-cuts rule.
+  -->
+  <style>
+    .ink { fill: #48176a; } /* Orbital Indigo */
+    .pan { fill: #a184c4; } /* the light colourway's second tone */
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #c696e8; } /* Wisteria Bloom */
+      .pan { fill: #7d63a0; } /* the dark colourway's second tone */
+    }
+  </style>
+  <!-- The glyph's ink spans y 12–120, so it sits 2 units high in the box. -->
+  <g transform="translate(0 -2)">
+    <circle class="ink" cx="64" cy="27" r="15"></circle>
+    <path class="ink" d="M53 38 L75 38 L64 120 Z"></path>
+    <path class="ink" d="M64 46 L16 30 L16 44 L64 62 Z"></path>
+    <path class="ink" d="M64 46 L112 30 L112 44 L64 62 Z"></path>
+    <path class="pan" d="M16 32 L2 76 L30 76 Z"></path>
+    <path class="pan" d="M112 32 L98 76 L126 76 Z"></path>
+  </g>
+</svg>

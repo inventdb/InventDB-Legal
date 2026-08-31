@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 128" width="520" height="128" role="img" aria-label="InventDB Legal — Legal Practice Management">
+  <g transform="translate(4 6) scale(0.88)">
+  <circle cx="64" cy="28" r="13.5" fill="#48176a"></circle>
+  <path d="M55 41 C57 60 60 86 64 117 C68 86 71 60 73 41 Z" fill="#48176a"></path>
+  <path d="M64 46 C50 44 34 40 22 34 L22 41.5 C36 48.5 52 54 64 57 Z" fill="#48176a"></path>
+  <path d="M64 46 C78 44 94 40 106 34 L106 41.5 C92 48.5 76 54 64 57 Z" fill="#48176a"></path>
+  <path d="M22 35 L8 67 L36 67 Z" fill="none" stroke="#a184c4" stroke-width="5.5" stroke-linejoin="round"></path>
+  <path d="M8 67 A14 14 0 0 0 36 67 Z" fill="#48176a"></path>
+  <path d="M106 35 L92 67 L120 67 Z" fill="none" stroke="#a184c4" stroke-width="5.5" stroke-linejoin="round"></path>
+  <path d="M92 67 A14 14 0 0 0 120 67 Z" fill="#48176a"></path>
+  </g>
+  <g font-family="Cormorant Garamond, Georgia, serif">
+    <text x="146" y="62" font-size="46" font-weight="500" fill="#2a1035">InventDB <tspan font-style="italic" font-weight="300" fill="#7d7369">Legal</tspan></text>
+  </g>
+  <rect x="146" y="76" width="330" height="1" fill="#cfc6bd"></rect>
+  <text x="146" y="98" font-family="Poppins, Helvetica, Arial, sans-serif" font-size="13" letter-spacing="3.6" fill="#7d7369">LEGAL PRACTICE MANAGEMENT</text>
+</svg>

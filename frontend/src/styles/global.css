@@ -40,6 +40,10 @@
   --brand-tint: #f3e9fa; /* Nebula Lavender — row hover, soft fills */
   --brand-line: rgba(72, 23, 106, 0.26);
   --on-brand: #ffffff;
+  /* The Counsel mark's second tone — the pan outlines. Straight from the logo
+     package's colourway table; contexts that reverse the mark (the sidebar
+     tile, the login hero) override it locally. */
+  --mark-tone: #a184c4;
   --brand-grad: linear-gradient(145deg, #48176a 0%, #6a229d 100%);
 
   /* ---- surfaces ---- */
@@ -103,6 +107,10 @@
 
   --font: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
+  /* The logo package's wordmark face, and its only job: the lockup. Nothing
+     else in the product is serif. Fallbacks mirror the lockup SVG's own. */
+  --font-wordmark: "Cormorant Garamond", Cormorant, Garamond, Georgia,
+    "Times New Roman", serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
 
   /* ---- motion ----
@@ -130,6 +138,7 @@
   --brand-tint: rgba(198, 150, 232, 0.09);
   --brand-line: rgba(198, 150, 232, 0.34);
   --on-brand: #ffffff;
+  --mark-tone: #7d63a0; /* the package's dark-theme second tone */
   --brand-grad: linear-gradient(145deg, #48176a 0%, #6a229d 100%);
 
   --bg: #17151a; /* derived: below Midnight Graphite */
@@ -735,59 +744,84 @@ select option:checked {
   transition: transform 0.22s var(--ease);
 }
 /* ---- Brand lockup -------------------------------------------------------
-   Keystone + wordmark + expanded product name, per
-   assets/logo-3c/lockup-horizontal-{light,dark}.svg. The asset's proportions
-   (accent product word, all-caps tagline at ~0.34x the wordmark, tracked 0.22em) are
-   kept; the colours come from tokens so the lockup follows the theme. */
+   Counsel mark + wordmark + expanded product name, per
+   inventdb-legal-logo/lockup/lockup-horizontal-{light,dark,reversed}.svg.
+   The asset's structure is kept — serif wordmark, a hairline rule, an
+   all-caps tagline under it — while the colours come from tokens so the
+   lockup follows the theme. "Legal" is set bold rather than the asset's
+   italic 300; see .brand-lockup-suffix. */
 .brand-lockup {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+/* The tagline is the wider of the two lines at both sizes, so the wordmark is
+   centred over it rather than left-aligned — flush left, it hangs off one end
+   of the rule and leaves a ragged edge under "Legal". Centring is what the
+   column is measured to anyway: the rule spans the tagline, and the wordmark
+   sits on that axis. */
 .brand-lockup-text {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  text-align: center;
 }
+/* Cormorant Garamond 500, the package's wordmark face. Its x-height sits well
+   below Poppins', so the sizes below run ~20% larger than the sans wordmark
+   they replace just to hold the same optical weight; the sans' -0.02em
+   tightening comes off, since the serif is already narrow. */
 .brand-lockup-name {
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-family: var(--font-wordmark);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.1;
   color: var(--text);
   white-space: nowrap;
 }
+/* "Legal" stays in the wordmark face and steps up to bold instead of the
+   asset's italic 300 — the product word carries the weight, and the accent
+   colour separates it from "InventDB" without a change of voice. Cormorant's
+   bold is narrow, so it takes a touch of tracking to keep it from setting
+   tighter than the 500 beside it. */
 .brand-lockup-suffix {
-  margin-left: 0.3em;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  margin-left: 0.26em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--brand);
 }
-/* The asset tracks this line at 0.22em all-caps — a logo treatment. Nothing
-   else in the product is uppercase (see .nav-section, the app's label idiom),
-   so the tracking is pulled back and the colour taken from --text-faint to
-   match. Enough of the lockup's voice to be recognisable, not a foreign
-   element in the sidebar. */
+/* The asset rules a hairline between wordmark and tagline; here it is the
+   tagline's own top border, so it spans the text column instead of the
+   asset's fixed 330 units and can never outrun the sidebar.
+
+   The asset tracks this line at 0.28em all-caps. At the sidebar's 7.5px that
+   pushes "LEGAL PRACTICE MANAGEMENT" past the 178px the text column actually
+   has, and nothing else in the product is uppercase (see .nav-section, the
+   app's label idiom) — so the tracking lands at 0.2em: the lockup's voice
+   without the overflow or the shouting. */
 .brand-lockup-tag {
   text-transform: uppercase;
   font-weight: 500;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.2em;
   line-height: 1.2;
   color: var(--text-faint);
   white-space: nowrap;
+  border-top: 1px solid var(--border);
 }
 .brand-lockup--sm .brand-lockup-name {
-  font-size: 14.5px;
+  font-size: 17px;
 }
 .brand-lockup--sm .brand-lockup-tag {
-  font-size: 7.8px;
-  margin-top: 2px;
+  font-size: 7.5px;
+  margin-top: 3px;
+  padding-top: 3px;
 }
 .brand-lockup--lg .brand-lockup-name {
-  font-size: 20px;
+  font-size: 24px;
 }
 .brand-lockup--lg .brand-lockup-tag {
   font-size: 10px;
-  margin-top: 3px;
+  margin-top: 4px;
+  padding-top: 5px;
 }
 
 .sidebar-brand {
@@ -798,8 +832,9 @@ select option:checked {
   height: var(--topbar-h);
   border-bottom: 1px solid var(--border);
 }
-/* The keystone sits on the brand gradient — per the brand book's "white logo
-   on gradients" rule, so the mark inherits #fff through currentColor. */
+/* The mark sits on the brand gradient — per the brand book's "white logo on
+   gradients" rule, so it inherits #fff through currentColor and the pans take
+   the package's reversed second tone. */
 .sidebar-brand .logo {
   display: grid;
   place-items: center;
@@ -808,6 +843,7 @@ select option:checked {
   border-radius: 9px;
   background: var(--brand-grad);
   color: #ffffff;
+  --mark-tone: rgba(255, 255, 255, 0.55);
   flex-shrink: 0;
 }
 .nav {
@@ -1662,7 +1698,10 @@ table.data tbody tr:hover {
 }
 .login-hero {
   background: var(--brand-grad);
+  /* The mark reads these two: #fff through currentColor, and the package's
+     reversed second tone for the pan outlines. */
   color: #ffffff;
+  --mark-tone: rgba(255, 255, 255, 0.55);
   padding: 56px;
   display: flex;
   flex-direction: column;
@@ -1696,7 +1735,8 @@ table.data tbody tr:hover {
   gap: 12px;
 }
 /* On the brand gradient the token accents would disappear, so the lockup goes
-   monochrome-light here — the brand book's "white logo on gradients" rule.
+   monochrome-light here — the brand book's "white logo on gradients" rule,
+   and the package's own lockup-horizontal-reversed.svg.
    --brand-grad is identical in both themes, so these are fixed values. */
 .login-hero .brand-lockup-name {
   color: #ffffff;
@@ -1706,6 +1746,7 @@ table.data tbody tr:hover {
 }
 .login-hero .brand-lockup-tag {
   color: rgba(255, 255, 255, 0.78);
+  border-top-color: rgba(255, 255, 255, 0.3);
 }
 .login-hero h1 {
   font-size: 40px;

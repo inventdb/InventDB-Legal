@@ -1,31 +1,44 @@
 /**
- * The InventDB keystone, traced verbatim from the logo redesign package
- * (Logo redesign request/assets/logo-3c/keystone-open-currentcolor.svg).
+ * InventDB Legal — the "Counsel" mark, traced verbatim from the brand package
+ * (inventdb-legal-logo/mark/counsel-{,small-}currentcolor.svg).
  *
- * An open arch — the load-bearing keystone of a building — with the doorway
- * filled. The delivered artwork ships in three colourways (accent #9184d9,
- * light #e9e9ed, currentColor); we take the currentColor cut so the mark
- * inherits whatever it sits in rather than hardcoding a fourth palette into
- * the app: white on the brand gradient in the sidebar tile and the login hero,
- * Orbital Indigo / Wisteria Bloom anywhere it lands on a plain surface.
+ * An advocate whose curved, tapering arms carry the two pans of the balance:
+ * the arm tips land exactly on the pan apexes, bowls filled, pan outlines in
+ * the second tone. Everything sits on the asset's own 0 0 128 128 grid, so the
+ * mark can be swapped for any other cut in the package without re-fitting.
  *
- * The source viewBox is 0 0 128 128; we crop to the glyph's stroked bounds
- * (x 5.5–122.5, y 7.5–122.5 once the 13px round-capped stroke is accounted
- * for) so the mark fills its box at 19–26px instead of floating in the
- * asset's own padding. Clear space is handled by the container.
+ * Two cuts ship, and the component picks between them by size — the README's
+ * rule, not a judgement call at each call site:
+ *   full  (>= 20px) — outlined pans, filled bowls, tapered arms.
+ *   solid (<  20px) — outlines dropped and the arms thickened, so the glyph
+ *                     survives a 16px favicon or a dense table row.
+ *
+ * Colour: the primary shapes take `currentColor`, so the mark inherits its
+ * surroundings exactly as the previous keystone did — white on the brand
+ * gradient in the sidebar tile and the login hero, Orbital Indigo / Wisteria
+ * Bloom on a plain surface. The second tone reads `--mark-tone`, which
+ * global.css sets per theme and per context (#a184c4 light, #7d63a0 dark,
+ * rgba(255,255,255,.55) on the gradient); it falls back to `currentColor` for
+ * a one-colour rendering wherever that token is not in scope. Passing `tone`
+ * overrides both.
  */
 export function BrandMark({
   size = 20,
+  tone,
   title,
 }: {
   size?: number;
+  tone?: string;
   title?: string;
 }) {
+  const second = tone ?? "var(--mark-tone, currentColor)";
+  const solid = size < 20;
+
   return (
     <svg
       width={size}
       height={size}
-      viewBox="4 5 120 120"
+      viewBox="0 0 128 128"
       role={title ? "img" : "presentation"}
       aria-hidden={title ? undefined : true}
       aria-label={title}
@@ -33,15 +46,48 @@ export function BrandMark({
       style={{ display: "block", flexShrink: 0 }}
     >
       {title && <title>{title}</title>}
-      <path
-        d="M12 116 L12 54 L64 14 L116 54 L116 116"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={13}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <rect x="48" y="78" width="32" height="38" rx="5" fill="currentColor" />
+      {solid ? (
+        <>
+          <circle cx="64" cy="27" r="15" fill="currentColor" />
+          <path d="M53 38 L75 38 L64 120 Z" fill="currentColor" />
+          <path d="M64 46 L16 30 L16 44 L64 62 Z" fill="currentColor" />
+          <path d="M64 46 L112 30 L112 44 L64 62 Z" fill="currentColor" />
+          <path d="M16 32 L2 76 L30 76 Z" fill={second} />
+          <path d="M112 32 L98 76 L126 76 Z" fill={second} />
+        </>
+      ) : (
+        <>
+          <circle cx="64" cy="28" r="13.5" fill="currentColor" />
+          <path
+            d="M55 41 C57 60 60 86 64 117 C68 86 71 60 73 41 Z"
+            fill="currentColor"
+          />
+          <path
+            d="M64 46 C50 44 34 40 22 34 L22 41.5 C36 48.5 52 54 64 57 Z"
+            fill="currentColor"
+          />
+          <path
+            d="M64 46 C78 44 94 40 106 34 L106 41.5 C92 48.5 76 54 64 57 Z"
+            fill="currentColor"
+          />
+          <path
+            d="M22 35 L8 67 L36 67 Z"
+            fill="none"
+            stroke={second}
+            strokeWidth={5.5}
+            strokeLinejoin="round"
+          />
+          <path d="M8 67 A14 14 0 0 0 36 67 Z" fill="currentColor" />
+          <path
+            d="M106 35 L92 67 L120 67 Z"
+            fill="none"
+            stroke={second}
+            strokeWidth={5.5}
+            strokeLinejoin="round"
+          />
+          <path d="M92 67 A14 14 0 0 0 120 67 Z" fill="currentColor" />
+        </>
+      )}
     </svg>
   );
 }
