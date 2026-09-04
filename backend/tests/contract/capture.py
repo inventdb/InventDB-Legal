@@ -1598,7 +1598,21 @@ def capture_live(*, include_writes: bool, out: Path) -> Path:
     return written
 
 
+def _pin_clock() -> None:
+    """Record against the same date the tests replay at.
+
+    Without this the recordings capture whatever month the capture was run in,
+    and the suite breaks the next time the month rolls over.
+    """
+    from datetime import date
+
+    from app import clock
+
+    clock.today = lambda: date(2026, 8, 19)  # noqa: E731 - matches CONTRACT_TODAY
+
+
 def main(argv: list[str] | None = None) -> int:
+    _pin_clock()
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         "--synthetic",

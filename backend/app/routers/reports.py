@@ -24,6 +24,7 @@ from typing import Any
 
 from flask import Blueprint, Response, jsonify, request, stream_with_context
 
+from .. import clock
 from ..context import authed_client
 from ..errors import ApiError
 from ..inventdb import InventDBClient, _safe_ident
@@ -687,7 +688,7 @@ def deadlines_due():
         days = max(1, min(int(request.args.get("days", 30)), 365))
     except (TypeError, ValueError):
         days = 30
-    today = datetime.now(timezone.utc).date()
+    today = clock.today()
     end = today + timedelta(days=days)
     rows = _rows(
         client,

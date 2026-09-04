@@ -28,7 +28,11 @@ import os
 from pathlib import Path
 from typing import Any
 
+from datetime import date
+
 import pytest
+
+from app import clock
 
 from tests.contract import spec
 from tests.contract.spec import ENDPOINTS, sql_key, validate
@@ -48,6 +52,18 @@ pytestmark = pytest.mark.contract
 # ===========================================================================
 # Fixtures
 # ===========================================================================
+
+
+#: The sample dataset's own as-of date, from its README sheet. Several figures
+#: are scoped to "this month" or "the next 30 days" and build that window into
+#: the SQL, so a recording only stays valid while the calendar agrees with it.
+#: Pinning here is what stops this suite going red on the 1st of every month.
+CONTRACT_TODAY = date(2026, 8, 19)
+
+
+@pytest.fixture(autouse=True)
+def _pinned_clock(monkeypatch):
+    monkeypatch.setattr(clock, "today", lambda: CONTRACT_TODAY)
 
 
 @pytest.fixture(scope="module")

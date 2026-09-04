@@ -19,6 +19,7 @@ from typing import Any
 
 from flask import Blueprint, jsonify
 
+from .. import clock
 from ..context import authed_client
 from ..inventdb import InventDBClient
 
@@ -136,7 +137,9 @@ def _sum_dist(client: InventDBClient, table: str, column: str, amount: str, limi
 
 
 def _today() -> date:
-    return datetime.now(timezone.utc).date()
+    # Delegates to the shared seam so a test can pin the calendar once and have
+    # every date-scoped query in the app agree with it.
+    return clock.today()
 
 
 def _recent_months(count: int = 6) -> list[str]:
