@@ -310,25 +310,6 @@ npx playwright install chromium               # first E2E run only
 
 ---
 
-## 🧠 Two things InventDB's SQL engine does that shaped this app
-
-Both were found against a live instance, and both are the kind of behaviour that
-returns a plausible number rather than an error — so each is pinned by a test.
-
-**A `GROUP BY` collapses when the `WHERE` contains a function call.**
-`WHERE lower(deposited_to) = 'operating'` next to `GROUP BY y, m` comes back as a
-*single* row holding the grand total. The cash-flow chart drew twelve months as
-one bar and looked fine. Every aggregate here groups on the column and filters in
-Python instead.
-
-**A statement returns at most 1,000 rows.**
-So nothing is totalled by fetching rows and adding them up — every figure on the
-dashboard is a `SUM`/`COUNT` run inside InventDB — and free-text search is pushed
-upstream as an `OR` of `LIKE`s. Filtering a fetched page would have searched the
-first 1,000 of 34,000 time entries and called it the whole table.
-
----
-
 ## 🔌 API
 
 All endpoints live under `/api`. Data routes require a bearer token from the login proxy.

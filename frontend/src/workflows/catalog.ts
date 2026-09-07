@@ -97,7 +97,7 @@ export const STEP_KINDS: StepKind[] = [
         type: "sql",
         required: true,
         placeholder: "SELECT * FROM legal.deadlines_and_sol WHERE due_date < '2026-12-31'",
-        hint: "SELECT only — InventDB's SQL engine does not mutate. Use the record steps to write.",
+        hint: "SELECT only — the SQL step cannot write. Use the record steps to write.",
       },
     ],
   },

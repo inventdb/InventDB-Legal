@@ -5,9 +5,9 @@ worth pinning is the *statement*: which predicate selects "open", how the month
 window is composed, and — the one that bit — that no aggregate is grouped by an
 alias while its WHERE holds a function call.
 
-That last one is not a style rule. On this engine a ``GROUP BY y, m`` collapses
-to a single row when the WHERE contains something like ``lower(col) = 'x'``, so
-twelve months of collections came back as one bucket holding the lot. The chart
+That last one is not a style rule. A ``GROUP BY y, m`` does not survive a WHERE
+that contains something like ``lower(col) = 'x'``, so twelve months of
+collections came back as one bucket holding the lot. The chart
 still drew, which is what made it worth a test rather than a comment.
 
 Dates are expressed relative to "now" rather than frozen, because the handlers
@@ -321,7 +321,7 @@ def test_collections_are_grouped_by_account_not_filtered_by_one(api, fake):
     """The regression this file exists for.
 
     ``WHERE lower(deposited_to) = 'operating'`` alongside ``GROUP BY y, m``
-    collapses to one row on this engine — every month's collections landing in
+    does not group reliably — every month's collections landing in
     a single bucket. Grouping on the column instead keeps the months, and the
     two possible values are separated here rather than upstream.
     """

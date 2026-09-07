@@ -290,7 +290,7 @@ def test_list_returns_rows_with_paging_metadata(api, fake, rows):
 def test_count_tolerates_every_shape_inventdb_might_name_the_column(
     api, fake, count_rows, expected
 ):
-    """InventDB's SQL layer ignores `AS` aliases on some aggregates, so the
+    """Aggregate columns are not guaranteed to keep an `AS` alias, so the
     column can come back as `c`, `COUNT(*)` or something else entirely."""
     fake.on_sql("COUNT(*)", rows=count_rows)
     assert api.get("/api/matters").get_json()["total"] == expected
@@ -323,9 +323,9 @@ def test_a_failing_page_query_returns_an_empty_list_not_an_error(api, fake):
 def test_search_pushes_the_match_into_sql_rather_than_filtering_a_page(api, fake):
     """Free text becomes an OR of LIKEs, not a Python scan of a fetched page.
 
-    This engine returns at most 1000 rows per statement. Filtering a fetched
-    page here would search the first 1000 time entries out of 34,000 and report
-    the result as the whole table — not a slow answer, a wrong one.
+    A statement comes back as a bounded page. Filtering a fetched page here
+    would search the first page of 34,000 time entries and report the result as
+    the whole table — not a slow answer, a wrong one.
     """
     fake.on_sql("SELECT *", rows=[{"_id": "1", "matter_caption": "Zhang v. Pineda"}])
 

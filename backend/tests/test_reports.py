@@ -544,7 +544,7 @@ def test_cashflow_groups_by_year_and_month_in_sql(api, fake):
 
 
 def test_cashflow_splits_the_accounts_by_grouping_not_by_filtering(api, fake):
-    """The engine collapses a GROUP BY when the WHERE holds a function call.
+    """A GROUP BY does not survive a WHERE that holds a function call.
 
     ``WHERE lower(deposited_to) = 'operating'`` next to ``GROUP BY y, m`` came
     back as one row carrying every month's total, so the split is done on the

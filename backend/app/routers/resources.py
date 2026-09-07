@@ -137,12 +137,12 @@ def list_records(entity_name: str):
 
     order_sql = f" ORDER BY {ident(order_by, 'order_by')} {order_dir}" if order_by else ""
 
-    # Free text searches inside InventDB rather than here. It has to: the engine
-    # returns at most 1000 rows per statement, so filtering a fetched page in
-    # Python would search the first page and call it the whole table — on a
-    # practice with 34,000 time entries that is not a slow answer, it is a wrong
-    # one. LIKE is case-insensitive on this engine and composes with OR, so the
-    # match runs where the rows are and only the page comes back.
+    # Free text searches upstream rather than here. It has to: a statement comes
+    # back as a bounded page, so filtering a fetched page in Python would search
+    # the first page and call it the whole table — on a practice with 34,000
+    # time entries that is not a slow answer, it is a wrong one. LIKE is
+    # case-insensitive here and composes with OR, so the match runs where the
+    # rows are and only the page comes back.
     if q and entity.search_fields:
         pattern = like_literal(q)
         clauses = [

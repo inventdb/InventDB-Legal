@@ -315,8 +315,8 @@ def charts():
     # counting both would book the same dollar twice.
     #
     # The split is done by grouping on `deposited_to` rather than by a
-    # `WHERE lower(deposited_to) = …`: this engine collapses a GROUP BY to a
-    # single row when the WHERE contains a function call, which silently turned
+    # `WHERE lower(deposited_to) = …`: an aggregate does not group reliably
+    # when the WHERE contains a function call, which silently turned
     # twelve months of collections into one bar holding the lot. Grouping on the
     # column keeps the months and costs nothing — there are only two values.
     collected_rows = _rows(

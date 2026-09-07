@@ -183,8 +183,8 @@ function FieldControl({
 
   let control;
   if (field.ref) {
-    // A combobox rather than a <select>. InventDB returns at most 1000 rows per
-    // query, and this practice has more matters and more clients than that — a
+    // A combobox rather than a <select>. A reference lookup comes back as a
+    // bounded page, and this practice has more matters and more clients — a
     // dropdown would silently make several hundred real records unpickable. An
     // input with a datalist suggests what was fetched while still accepting any
     // key that exists, so the cap limits the hints and never the answer.

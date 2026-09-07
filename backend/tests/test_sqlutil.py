@@ -270,7 +270,7 @@ def test_sql_literal_does_not_escape_backslashes():
     Blindly escaping backslashes would corrupt legitimate data (a Windows path
     would gain doubled separators) on the engines where it isn't needed, so this
     asserts today's behaviour and flags the question rather than guessing at
-    InventDB's dialect.
+    the target dialect.
     """
     assert sql_literal("C:\\Users\\legal") == "'C:\\Users\\legal'"
     assert sql_literal("trailing\\") == "'trailing\\'"
@@ -316,7 +316,7 @@ def test_like_literal_escapes_the_escape_character_itself():
 def test_like_escape_declares_the_backslash():
     """The clause is what makes the escaping above mean anything.
 
-    Backslash is not special to this engine unless a pattern says it is, so a
+    Backslash is not special here unless a pattern says it is, so a
     generated comparison must carry the ESCAPE clause or every escape written
     by :func:`like_literal` is read as a literal backslash instead.
     """

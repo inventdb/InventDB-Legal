@@ -575,7 +575,7 @@ def cashflow():
 
     # Operating deposits only — a deposit into trust is still the client's money.
     # Grouped on `deposited_to` rather than filtered by `lower(deposited_to)`:
-    # this engine collapses a GROUP BY to one row when the WHERE holds a function
+    # an aggregate does not group reliably when the WHERE holds a function
     # call, which would pile every month's collections into a single bucket.
     collected_rows = _rows(
         client,
