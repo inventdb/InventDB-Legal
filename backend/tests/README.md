@@ -93,7 +93,7 @@ with real ones:
 
 ```bash
 cd backend
-INVENTDB_BASE_URL=https://<slug>.sandbox.inventdb.com \
+INVENTDB_BASE_URL=https://<slug>.cloud.inventdb.com \
 INVENTDB_USERNAME=you INVENTDB_PASSWORD=... \
 python -m tests.contract.capture
 ```
@@ -164,7 +164,7 @@ marker.
    does not exist while the rest of the app works.
 
 8. **The catch-all 500 handler echoes `str(exc)`** to the client
-   (`test_app.py`). Fine for a sandbox; worth revisiting before an untrusted
+   (`test_app.py`). Fine for a demo instance; worth revisiting before an untrusted
    deployment.
 
 9. **A `GROUP BY` collapses when the `WHERE` holds a function call**
