@@ -356,7 +356,7 @@ export const ENTITIES: EntityConfig[] = [
     titleFields: ["client_name"],
     defaultSort: { field: "client_name", dir: "asc" },
     describeExample:
-      "New individual client Esperanza Escobedo, 6614 Slauson Ave, Van Nuys 91405. (626) 976-7073, esperanza.escobedo@gmail.com. Spanish-speaking, came in on an attorney referral. Conflict check cleared, photo ID verified, engagement letter signed today.",
+      "New individual client Esperanza Escobedo, 6614 Slauson Ave, Van Nuys 91405. (626) 555-0173, esperanza.escobedo@example.com. Spanish-speaking, came in on an attorney referral. Conflict check cleared, photo ID verified, engagement letter signed today.",
     fields: [
       { name: "client_name", label: "Client Name", type: "text", required: true, table: true },
       {
@@ -830,7 +830,7 @@ export const ENTITIES: EntityConfig[] = [
     titleFields: ["prospect_name"],
     defaultSort: { field: "date_received", dir: "desc" },
     describeExample:
-      "Call from Josefina Tolentino about a rear-end collision on the 405 last month, (424) 822-8650, found us through a Spanish-language radio ad. Screened by intake; signing.",
+      "Call from Josefina Tolentino about a rear-end collision on the 405 last month, (424) 555-0148, found us through a Spanish-language radio ad. Screened by intake; signing.",
     fields: [
       { name: "date_received", label: "Received", type: "date", required: true, table: true },
       { name: "prospect_name", label: "Prospect", type: "text", required: true, table: true },

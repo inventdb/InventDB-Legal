@@ -163,7 +163,7 @@
     </p>
     <p class="sourceline">
       13 types &#183; 68,000+ records &#183; headline figures reconcile <b>exactly</b> to the shipped dashboard contract (10 of 10)<br>
-      Five data defects found and repaired via <b>backend/repair_dataset.py</b> &mdash; largest was $7,139,500 of missing trust deposits (&sect;00 rule 1)<br>
+      Five data defects found and repaired during dataset preparation &mdash; largest was $7,139,500 of missing trust deposits (&sect;00 rule 1)<br>
       Three defects deliberately <b class="warnb">not</b> repaired because they are not derivable &mdash; see &sect;09
     </p>
 
@@ -224,7 +224,7 @@
             <b>After the repair, <span class="inline">amount_in &minus; amount_out</span> gives $1,268,901.63</b>
             &mdash; the running <span class="inline">trust_account_balance</span>, the sum of all 976 final client
             ledgers, and the figure the shipped tests already assert. The endpoints were right all along.
-            Run <span class="inline">backend/repair_dataset.py</span>; if your instance still reports a negative
+            If your instance still reports a negative
             trust balance, the repair has not been applied to it yet.
           </p>
         </div>
@@ -979,7 +979,7 @@
           <h3>Three defects left in place, deliberately</h3>
           <p style="margin-bottom:12px">
             Five data defects were derivable and have been repaired (&sect;00). These three are <b>not derivable from
-            the data</b>, so <span class="inline">repair_dataset.py</span> reports them and changes nothing &mdash;
+            the data</b>, so they are reported and left untouched &mdash;
             inventing a value here would destroy the signal rather than restore it.
           </p>
           <ul class="gaps" style="margin-top:4px">
