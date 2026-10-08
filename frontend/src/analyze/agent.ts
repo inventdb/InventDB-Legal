@@ -21,9 +21,32 @@ export interface AgentStep {
   /** Card payload: a Plotly-style figure, or a card spec keyed by step type. */
   chart?: any;
   executionTimeMs?: number;
-  sources?: { title?: string; url?: string; snippet?: string }[];
+  /**
+   * Web sources carry title/url/snippet. File citations (an answer built from
+   * file passages) carry `key` (S1, S2, … as written in the answer), the file,
+   * the quoted words and whether the quote was found in the passage the model
+   * was given (`verified`: true / false / null when the citation had no quote).
+   */
+  sources?: AgentSource[];
   /** "External Inference" | "InventDB Inference" | "Cache" */
   inferenceSource?: string;
+}
+
+export interface AgentSource {
+  title?: string;
+  url?: string;
+  snippet?: string;
+  key?: string;
+  filename?: string;
+  quote?: string | null;
+  verified?: boolean | null;
+  preview?: string;
+  attachmentId?: string;
+  namespace?: string;
+  typeName?: string;
+  recordId?: string;
+  charOffset?: number;
+  charLength?: number;
 }
 
 export interface ChatMessage {

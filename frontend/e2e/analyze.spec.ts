@@ -218,6 +218,64 @@ test.describe("Analyze", () => {
     await expect(web).toHaveAttribute("aria-pressed", "true");
   });
 
+  test("an answer from documents numbers its citations and opens the cited file", async ({ page }) => {
+    // InventDB keys every file passage it hands the model (S1, S2, …) and
+    // returns the ones the answer cites as `sources`. They used to render as
+    // web chips ("source 1", no link) with the raw [S1] left in the prose.
+    const source = (key: string, quote: string | null, verified: boolean | null) => ({
+      key,
+      filename: "signed-lease.pdf",
+      quote,
+      verified,
+      preview: "The term of this lease is twelve months.",
+      attachmentId: "att-1",
+      namespace: "legal",
+      typeName: "invoices",
+      recordId: "inv-1",
+    });
+    await page.route(/\/api\/analyze\/chat\/stream/, (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        body: sseBody([
+          { type: "info", content: "Searching documents" },
+          {
+            type: "done",
+            content:
+              'The lease runs "for a term of twelve (12) months" [S1].\n\n' +
+              "> Rent is due on the first day of each month\n[S2/S1]\n\n" +
+              'The rent is \\"payable in advance\\" [S1]. It says nothing about pets [S9].',
+            sources: [
+              source("S1", "for a term of twelve (12) months", true),
+              source("S2", "Rent is due on the first day of each month", false),
+            ],
+          },
+        ]),
+      })
+    );
+    await page.locator(".an-ask .an-composer-input").fill("How long is the lease?");
+    await page.locator(".an-ask button[type=submit]").click();
+
+    const answer = page.locator(".atl-answer");
+    await expect(answer.locator(".an-quote")).toContainText("Rent is due on the first day");
+    // Numbers in the order the answer cites them; a key with no source is dropped.
+    await expect(answer.locator(".an-cite-group").first()).toHaveText("1");
+    await expect(answer.locator(".an-cite-group").nth(1)).toHaveText("21");
+    await expect(answer).not.toContainText("[S");
+    // escaped quote marks show as quote marks, not with their backslashes
+    await expect(answer).toContainText('The rent is "payable in advance"');
+    await expect(answer).not.toContainText("\\");
+
+    const list = answer.locator(".an-cite-item");
+    await expect(list).toHaveCount(2);
+    await expect(list.first()).toContainText("“for a term of twelve (12) months”");
+    await expect(list.nth(1)).toContainText("These words were not found in the file");
+    await expect(page.locator(".an-chip-rail")).toHaveCount(0);
+
+    await answer.locator("button.an-cite").first().click();
+    await expect(page.locator(".modal").getByRole("heading", { name: "signed-lease.pdf" })).toBeVisible();
+  });
+
   test("a failed turn says so instead of going quiet", async ({ page }) => {
     await page.route(/\/api\/analyze\/chat\/stream/, (route) =>
       route.fulfill({

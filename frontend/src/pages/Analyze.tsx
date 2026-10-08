@@ -25,6 +25,7 @@ import {
 import {
   friendlyAiError,
   streamAgent,
+  type AgentSource,
   type AgentStep,
   type ChatMessage,
 } from "../analyze/agent";
@@ -64,7 +65,8 @@ import { AgentTimeline, AtlNode } from "../analyze/Timeline";
 import { ChartAdapter } from "../analyze/ChartAdapter";
 import { DataGrid } from "../analyze/DataGrid";
 import { Followups } from "../analyze/Followups";
-import { Markdown } from "../analyze/Markdown";
+import { Markdown, type Cites } from "../analyze/Markdown";
+import { FileDetail } from "../files/FileDetail";
 import {
   ModelPicker,
   useDefaultModelFamily,
@@ -1122,6 +1124,8 @@ function ExchangeView({
   const steps = exchange.steps;
   const stamp = (stepType: string, patch: Record<string, unknown>) =>
     onCardState(stepType, patch);
+  // The cited file open in the preview (a citation number or a source row was clicked).
+  const [openSource, setOpenSource] = useState<AgentSource | null>(null);
 
   const webSearch = webSearchFromSteps(steps);
   const research = researchFromSteps(steps);
@@ -1174,6 +1178,18 @@ function ExchangeView({
   const inferenceSource = steps.find((s) => s.inferenceSource)?.inferenceSource;
   const sources = steps.find((s) => s.sources?.length)?.sources;
   const answer = answerOf(steps);
+  // File citations (S1, S2, … from file passages) are numbered in the order the
+  // answer cites them and listed under it; web sources keep their chips. Before
+  // this, file citations were drawn as web chips ("source 1", no link) and the
+  // answer's [S3] markers showed as raw text.
+  const fileSources = (sources || []).filter((s) => s.key && (s.filename || s.attachmentId));
+  const webSources = (sources || []).filter((s) => !s.key);
+  const cites = citationMap(answer || "", fileSources, setOpenSource);
+  const citedList = cites
+    ? Object.entries(cites)
+        .sort((a, b) => a[1].n - b[1].n)
+        .map(([k, c]) => ({ c, s: fileSources.find((x) => x.key === k)! }))
+    : [];
   const hasGrid = !!(dataStep?.data && dataStep.data.length);
 
   // A turn that did work but emitted no formal answer isn't a blank card:
@@ -1331,7 +1347,10 @@ function ExchangeView({
         ) : answer && !hideProse ? (
           <AtlNode type="answer" tone="accent">
             <div className="atl-answer">
-              <Markdown text={answer} skipTables={skipAnswerTables} />
+              <Markdown text={answer} skipTables={skipAnswerTables} cites={cites} />
+              {citedList.length > 0 && (
+                <CitedFiles items={citedList} onOpen={setOpenSource} />
+              )}
             </div>
           </AtlNode>
         ) : exchange.running ? (
@@ -1529,7 +1548,7 @@ function ExchangeView({
           </AtlNode>
         )}
 
-        {(lastSql || sources) && (
+        {(lastSql || webSources.length > 0) && (
           <AtlNode type="sql" tone="muted">
             <div className="an-receipt-wrap">
               {lastSql && (
@@ -1545,9 +1564,9 @@ function ExchangeView({
                   )}
                 </Receipt>
               )}
-              {sources && (
+              {webSources.length > 0 && (
                 <div className="an-chip-rail">
-                  {sources.map((s, i) => (
+                  {webSources.map((s, i) => (
                     <a
                       key={i}
                       className="an-chip"
@@ -1583,7 +1602,91 @@ function ExchangeView({
         />
       )}
       <div ref={bottomRef} aria-hidden style={{ height: 1 }} />
+
+      {openSource?.attachmentId && (
+        <FileDetail
+          file={{
+            attachment_id: openSource.attachmentId,
+            filename: openSource.filename,
+            record_id: openSource.recordId,
+            record_type: openSource.typeName,
+            namespace: openSource.namespace,
+          }}
+          onClose={() => setOpenSource(null)}
+          onDeleted={() => setOpenSource(null)}
+        />
+      )}
     </div>
+  );
+}
+
+/**
+ * The answer's file citations keyed as the answer writes them (S1, S2, …),
+ * numbered in the order it cites them; sources it never cites follow.
+ * `undefined` when the turn cited no files.
+ */
+function citationMap(
+  answer: string,
+  fileSources: AgentSource[],
+  open: (s: AgentSource) => void
+): Cites | undefined {
+  if (!fileSources.length) return undefined;
+  const order: string[] = [];
+  for (const m of answer.matchAll(/S\d+/g)) {
+    if (!order.includes(m[0]) && fileSources.some((s) => s.key === m[0])) order.push(m[0]);
+  }
+  for (const s of fileSources) if (s.key && !order.includes(s.key)) order.push(s.key);
+  const map: Cites = {};
+  order.forEach((k, i) => {
+    const s = fileSources.find((x) => x.key === k)!;
+    map[k] = {
+      n: i + 1,
+      title: s.filename || "file",
+      quote: s.quote,
+      onOpen: s.attachmentId ? () => open(s) : undefined,
+    };
+  });
+  return map;
+}
+
+/** The numbered files under an answer, each with the words quoted from it. */
+function CitedFiles({
+  items,
+  onOpen,
+}: {
+  items: { c: { n: number }; s: AgentSource }[];
+  onOpen: (s: AgentSource) => void;
+}) {
+  return (
+    <ol className="an-cite-list" aria-label="Sources">
+      {items.map(({ c, s }) => (
+        <li key={c.n} className="an-cite-item">
+          <span className="an-cite-n">{c.n}</span>
+          <span className="an-cite-body">
+            {s.attachmentId ? (
+              <button
+                type="button"
+                className="an-cite-file"
+                onClick={() => onOpen(s)}
+                title={`Open ${s.filename || ""}`}
+              >
+                {s.filename || s.attachmentId}
+              </button>
+            ) : (
+              <span className="an-cite-file">{s.filename}</span>
+            )}
+            {(s.quote || s.preview) && (
+              <span className="an-cite-quote">{s.quote ? `“${s.quote}”` : s.preview}</span>
+            )}
+            {s.verified === false && (
+              <span className="an-cite-warn">
+                These words were not found in the file; check the source.
+              </span>
+            )}
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }
 

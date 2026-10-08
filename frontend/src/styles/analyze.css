@@ -729,6 +729,119 @@
   background: var(--surface-3);
 }
 
+.an-quote {
+  margin: 8px 0;
+  padding: 4px 0 4px 12px;
+  border-left: 3px solid var(--brand-line);
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+/* ---- file citations ------------------------------------------------------ */
+/* [S3] markers become small numbers that open the cited file, and the answer
+   ends with the numbered files, each with the words quoted from it. */
+
+.an-cite-group {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 2px;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.an-cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35em;
+  height: 1.35em;
+  padding: 0 3px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-line);
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-family: var(--font-mono);
+  font-size: 0.68em;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.an-cite:hover,
+button.an-cite:focus-visible {
+  background: var(--brand);
+  color: var(--surface);
+  outline: none;
+}
+
+.an-cite-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 8px;
+}
+
+.an-cite-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+}
+
+.an-cite-n {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  border-radius: 4px;
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.an-cite-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.an-cite-file {
+  justify-self: start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font-family: var(--font-mono);
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.an-cite-file:hover,
+button.an-cite-file:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.an-cite-quote {
+  color: var(--text-muted);
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.an-cite-warn {
+  color: var(--warn);
+  font-size: 0.92em;
+}
+
 /* ---- tables -------------------------------------------------------------- */
 
 .an-table-wrap {
