@@ -113,8 +113,16 @@ function coerce(v: unknown, type: ColType): unknown {
     return null;
   }
   if (type === "date") {
-    if (v instanceof Date)
-      return `${v.getFullYear()}-${pad2(v.getMonth() + 1)}-${pad2(v.getDate())}`;
+    if (v instanceof Date) {
+      // SheetJS builds a date cell's Date from an 1899 epoch in local time and
+      // corrects the offset in whole minutes. Where that 1899 offset had seconds
+      // in it — India's did — every date lands seconds before midnight:
+      // Monday 16 September read back as Sunday 23:59:50, so the whole sheet
+      // imported one day early. A cell holds no seconds, so round to the
+      // minute before reading the day.
+      const d = new Date(Math.round(v.getTime() / 60_000) * 60_000);
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    }
     const m = String(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
     if (m) return `${m[1]}-${pad2(+m[2])}-${pad2(+m[3])}`;
     const d = new Date(String(v));

@@ -141,6 +141,16 @@ export function listResponse(rows: Rec[], url: URL) {
 
   for (const [key, value] of params) {
     if (RESERVED.has(key) || !value) continue;
+    // `date__gte` / `date__lt` bound a column, as the backend's range filters do.
+    const range = /^(.+)__(gte|lt)$/.exec(key);
+    if (range) {
+      const [, col, op] = range;
+      out = out.filter((r) => {
+        const v = String(r[col] ?? "");
+        return v !== "" && (op === "gte" ? v >= value : v < value);
+      });
+      continue;
+    }
     out = out.filter((r) => String(r[key] ?? "") === value);
   }
 
@@ -1067,10 +1077,13 @@ export async function installMockApi(
         for (const m of String(body.where ?? "").matchAll(re)) {
           terms.push([m[1], (m[2] ?? m[3]).replace(/''/g, "'")]);
         }
+        const needle = typeof body.q === "string" ? body.q.trim().toLowerCase() : "";
         let matched = rowsOf.filter(
           (r) =>
             Object.entries(filters).every(([k, v]) => (v === null ? r[k] == null : same(r[k], v))) &&
-            terms.every(([k, v]) => same(r[k], v))
+            terms.every(([k, v]) => same(r[k], v)) &&
+            (!needle ||
+              Object.entries(r).some(([k, v]) => !k.startsWith("_") && String(v ?? "").toLowerCase().includes(needle)))
         );
         const orderBy = typeof body.order_by === "string" ? body.order_by : null;
         if (orderBy) {

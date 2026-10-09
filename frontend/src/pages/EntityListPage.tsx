@@ -4,6 +4,7 @@ import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
   ArrowUp,
+  CalendarDays,
   ChevronFirst,
   ChevronLast,
   ChevronLeft,
@@ -11,6 +12,7 @@ import {
   Pencil,
   Plus,
   Search,
+  Table2,
   Trash2,
 } from "lucide-react";
 
@@ -35,6 +37,7 @@ import { Alert, Badge, EmptyState, Spinner } from "../components/ui";
 import { ViewSwitcher } from "../views/ViewSwitcher";
 import { ViewDesigner, type DesignedView } from "../views/ViewDesigner";
 import { ReportFrame } from "../components/ReportFrame";
+import { CalendarView, monthKey, parseMonth } from "../calendar/CalendarView";
 import {
   useCreateView,
   useDeleteViews,
@@ -101,7 +104,40 @@ function EntityModule({ config }: { config: EntityConfig }) {
   const activeView = (views.data ?? []).find((v) => v.id === activeViewId) ?? null;
   const customView = activeView?.mode === "custom" ? activeView : null;
 
+  // A module with a calendar can also be read by month. Which way, and which
+  // month, live in the URL, so a reload or a shared link keeps them.
+  const calendarOn = !!config.calendar && params.get("view") === "calendar";
+  const calMonth = useMemo(() => {
+    const now = new Date();
+    return parseMonth(params.get("month")) ?? { y: now.getFullYear(), m: now.getMonth() };
+  }, [params]);
+  const [calCount, setCalCount] = useState<number | null>(null);
+  const setLayout = (calendar: boolean) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (calendar) next.set("view", "calendar");
+        else {
+          next.delete("view");
+          next.delete("month");
+        }
+        return next;
+      },
+      { replace: true }
+    );
+  const setCalMonth = (m: { y: number; m: number }) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("month", monthKey(m));
+        return next;
+      },
+      { replace: true }
+    );
+
   function applyView(view: SavedView) {
+    // A designed view draws its own layout, so it is a table-side view.
+    if (view.mode === "custom" && calendarOn) setLayout(false);
     setDesigning(false);
     setActiveViewId(view.id);
     setRawSearch(view.search);
@@ -230,7 +266,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
     // doesn't flash the empty state and collapse the table's height.
     // Skipped entirely for a custom view: its rows come from the report engine,
     // so fetching the grid's page as well would be a wasted round trip.
-    { placeholderData: keepPreviousData, enabled: !customView }
+    { placeholderData: keepPreviousData, enabled: !customView && !calendarOn }
   );
 
   const rendered = useRenderedView(config.name, customView, page, pageSize);
@@ -363,7 +399,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
     // view is not a table — it is a document, and it has to be allowed to run
     // past the fold and let the page scroll. Locking the page around it clipped
     // everything below the first screen with nothing to scroll.
-    <div className={`content${customView || designing ? "" : " content-fill"}`}>
+    <div className={`content${customView || designing || calendarOn ? "" : " content-fill"}${calendarOn ? " is-calendar" : ""}`}>
       <div className="page-head">
         <div className="stat-ico" style={{ width: 40, height: 40 }}>
           <Icon name={config.icon} size={20} />
@@ -421,8 +457,33 @@ function EntityModule({ config }: { config: EntityConfig }) {
             onChange={(e) => setRawSearch(e.target.value)}
           />
         </div>
+        {config.calendar && (
+          <div className="view-mode" role="group" aria-label="Show as">
+            <button type="button" aria-pressed={!calendarOn} onClick={() => setLayout(false)}>
+              <Table2 size={15} aria-hidden /> Table
+            </button>
+            <button
+              type="button"
+              aria-pressed={calendarOn}
+              onClick={() => {
+                if (customView) applyAllView();
+                setLayout(true);
+              }}
+            >
+              <CalendarDays size={15} aria-hidden /> Calendar
+            </button>
+          </div>
+        )}
         <span className="count-pill">
-          {loading ? "…" : totalKnown ? `${total} records` : "— records"}
+          {calendarOn
+            ? calCount == null
+              ? "…"
+              : `${calCount} this month`
+            : loading
+            ? "…"
+            : totalKnown
+            ? `${total} records`
+            : "— records"}
         </span>
       </div>
 
@@ -497,14 +558,16 @@ function EntityModule({ config }: { config: EntityConfig }) {
         />
       )}
 
-      {list.isError && !customView && (
+      {list.isError && !customView && !calendarOn && (
         <Alert kind="error">{errorMessage(list.error)}</Alert>
       )}
       {rendered.isError && (
         <Alert kind="error">{errorMessage(rendered.error)}</Alert>
       )}
 
-      {customView ? (
+      {calendarOn ? (
+        <CalendarView config={config} month={calMonth} onMonth={setCalMonth} q={q} onCount={setCalCount} />
+      ) : customView ? (
         rendered.isLoading ? (
           <div className="custom-view custom-view--busy">
             <Spinner />
@@ -617,7 +680,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
       {/* Gated on the RESULT, not on `items`: a custom view is rendered by the
           engine and never fills `items`, so keying off it left the pager
           appearing only when stale table rows happened to still be in cache. */}
-      {total > 0 && (
+      {total > 0 && !calendarOn && (
         <nav className="pager" aria-label={`${config.labelPlural} pagination`}>
           <p className="pager-status" aria-live="polite">
             Showing <b>{firstRow.toLocaleString()}</b>–<b>{lastRow.toLocaleString()}</b> of{" "}

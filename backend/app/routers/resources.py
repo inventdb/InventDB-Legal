@@ -23,6 +23,11 @@ bp = Blueprint("resources", __name__, url_prefix="/api")
 
 _RESERVED = {"q", "limit", "offset", "order_by", "order_dir"}
 
+#: A filter may also bound a column instead of matching it: ``date__gte=2026-10-01``
+#: and ``date__lt=2026-11-01`` give the events of one month, which is what the
+#: court calendar's month view asks for.
+_RANGE_SUFFIXES = (("__gte", ">="), ("__lt", "<"))
+
 _KEY_PREFIX = {
     "matters": "MT",
     "clients": "CL",
@@ -132,8 +137,13 @@ def list_records(entity_name: str):
         value = args.get(key)
         if value in (None, ""):
             continue
-        col = ident(key, "filter column")
-        where.append(f"{col} = {sql_literal(value)}")
+        column, op = key, "="
+        for suffix, symbol in _RANGE_SUFFIXES:
+            if key.endswith(suffix):
+                column, op = key[: -len(suffix)], symbol
+                break
+        col = ident(column, "filter column")
+        where.append(f"{col} {op} {sql_literal(value)}")
 
     order_sql = f" ORDER BY {ident(order_by, 'order_by')} {order_dir}" if order_by else ""
 

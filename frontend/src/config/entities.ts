@@ -57,6 +57,27 @@ export interface EntityConfig {
   describeExample: string;
   fields: FieldDef[];
   defaultSort?: { field: string; dir: "asc" | "desc" };
+  /**
+   * A module whose records happen on a day can also be read as a calendar: a
+   * month on a desktop, a day-by-day agenda on a phone. The fields say what an
+   * event is — when, what, and for which matter.
+   */
+  calendar?: CalendarSpec;
+}
+
+export interface CalendarSpec {
+  /** The day it happens, `YYYY-MM-DD`. */
+  date: string;
+  /** The time of day, `HH:MM`, when it has one. */
+  time?: string;
+  /** What it is — the event's name on the calendar. */
+  title: string;
+  /** Which matter it is for. */
+  subtitle?: string;
+  /** Where, said in the agenda under the title. */
+  place?: string[];
+  /** A yes/no field that tells two kinds of event apart, and what each is called. */
+  tone?: { field: string; yes: string; no: string };
 }
 
 // ---- Shared vocabularies (from `legal.lookups`) ----------------------------
@@ -728,6 +749,14 @@ export const ENTITIES: EntityConfig[] = [
     icon: "gavel",
     titleFields: ["event_type"],
     defaultSort: { field: "date", dir: "desc" },
+    calendar: {
+      date: "date",
+      time: "time",
+      title: "event_type",
+      subtitle: "matter_caption",
+      place: ["court_location", "department"],
+      tone: { field: "in_court", yes: "In court", no: "Out of court" },
+    },
     describeExample:
       "Case management conference on MT-3213 at LASC Stanley Mosk, Dept. 56 before Hon. Priscilla Yee-Barron, 3 December at 08:30. Farid Nazarian appearing.",
     fields: [

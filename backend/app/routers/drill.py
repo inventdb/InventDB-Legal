@@ -25,7 +25,7 @@ from flask import Blueprint, jsonify, request
 from ..context import authed_client
 from ..entities import get_entity
 from ..errors import ApiError
-from ..sqlutil import ident, safe_where, sql_literal
+from ..sqlutil import LIKE_ESCAPE, ident, like_literal, safe_where, sql_literal
 
 bp = Blueprint("drill", __name__, url_prefix="/api/drill")
 
@@ -172,6 +172,17 @@ def drill_records(entity_name: str):
             raise ApiError(400, f"filter {column!r} must be a single value")
         else:
             conditions.append(f"{prefix}{col} = {sql_literal(value)}")
+
+    # The page's own search, when the figure was drawn under one (a calendar
+    # day's "+3 more" while the calendar is searched for "deposition").
+    q = body.get("q")
+    if q is not None and not isinstance(q, str):
+        raise ApiError(400, "q must be text")
+    if q and q.strip() and entity.search_fields:
+        pattern = like_literal(q.strip())
+        conditions.append(
+            "(" + " OR ".join(f"{prefix}{ident(f, 'search column')} LIKE {pattern}{LIKE_ESCAPE}" for f in entity.search_fields) + ")"
+        )
 
     limit = max(1, min(_int(body, "limit", 10), MAX_PAGE))
     offset = max(0, _int(body, "offset", 0))

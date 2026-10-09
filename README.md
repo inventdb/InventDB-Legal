@@ -66,7 +66,7 @@ Three things follow from this shape:
 
 | Module | Tracks |
 |---|---|
-| ⚖️ **Court Calendar** | Hearings, depositions and conferences — court, department, judicial officer, who appeared, outcome |
+| ⚖️ **Court Calendar** | Hearings, depositions and conferences — court, department, judicial officer, who appeared, outcome. Read it as a **table or a calendar**: the month on a desktop (a few events a day, the rest of a busy day one click away, in court and out of court told apart by colour), a day-by-day agenda on a phone |
 | ⏰ **Deadlines & SOL** | The docket: authority, trigger event, computation, due date, days remaining, owner, priority |
 | 📣 **Intake & Leads** | Prospects, referral source, claim type, disposition, decline reason, referral-fee arrangement |
 | 📋 **Lookups** | Every controlled vocabulary the other modules use — practice areas, UTBMS code sets, limitations periods |
@@ -296,9 +296,9 @@ docker run -p 8010:8010 -e INVENTDB_BASE_URL=https://<slug>.cloud.inventdb.com i
 
 | Suite | Command | Expected |
 |---|---|---|
-| Back end + contract | `cd backend && python -m pytest` | **1248 passed, 6 xfailed** |
+| Back end + contract | `cd backend && python -m pytest` | **1252 passed, 6 xfailed** |
 | Types | `cd frontend && npm run typecheck` | 0 errors |
-| End-to-end | `cd frontend && npx playwright test` | **591 passed, 27 files** |
+| End-to-end | `cd frontend && npx playwright test` | **601 passed, 29 files** |
 
 - The backend suite ships a **fake InventDB**, so it needs no network, no secrets and no live instance.
 - The E2E suite mocks `/api` in the browser and starts its own Vite server — no backend required.
@@ -331,7 +331,7 @@ All endpoints live under `/api`. Data routes require a bearer token from the log
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/<entity>` | List (`q`, filters, `order_by`, `limit`, `offset`) |
+| `GET` | `/api/<entity>` | List (`q`, filters, `order_by`, `limit`, `offset`). A filter matches a column (`status=Open`) or bounds it (`date__gte=2026-10-01&date__lt=2026-11-01`) |
 | `POST` | `/api/<entity>` | Create |
 | `GET/PUT/DELETE` | `/api/<entity>/<id>` | Read / update / delete |
 | `GET` | `/api/dashboard/summary` · `/charts` | Aggregated metrics |
@@ -398,7 +398,7 @@ All endpoints live under `/api`. Data routes require a bearer token from the log
 
 | Method | Path | Purpose |
 |---|---|---|
-| `POST` | `/api/drill/<entity>` | One page of the records behind a figure: the query's own `WHERE` (one read-only condition) plus equality `filters` |
+| `POST` | `/api/drill/<entity>` | One page of the records behind a figure: the query's own `WHERE` (one read-only condition), equality `filters`, and the page's search `q` |
 | `GET` | `/api/drill/<entity>/<id>/access` | May the caller change this record — readable under their token, then an admin role or a write grant |
 | `GET` | `/api/drill/<entity>/<id>/files` | The record's files: attached to it, or filed in a folder named for its number (a matter's, a lead's; a client's matters'; an invoice's matter, by its number in the name) |
 

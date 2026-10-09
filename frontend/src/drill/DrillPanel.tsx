@@ -142,7 +142,7 @@ export function DrillPanel() {
               }
             />
           ) : (
-            <ListView key={`${depth}:${frame.entity}:${frame.where}:${JSON.stringify(frame.filters)}`} frame={frame} />
+            <ListView key={`${depth}:${frame.entity}:${frame.where}:${JSON.stringify(frame.filters)}:${frame.q ?? ""}`} frame={frame} />
           )}
         </div>
       </aside>
@@ -427,7 +427,8 @@ function ListView({ frame }: { frame: Extract<DrillFrame, { kind: "list" }> }) {
       <DrillGrid
         entity={frame.entity}
         title={cfg.labelPlural}
-        query={{ where: frame.where, alias: frame.alias, filters: frame.filters }}
+        query={{ where: frame.where, alias: frame.alias, filters: frame.filters, q: frame.q }}
+        initialSort={frame.sort}
         pageSize={25}
         maxColumns={6}
         emptyText="No records match any more — the data may have changed since the figure was drawn."

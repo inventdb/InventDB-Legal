@@ -321,3 +321,16 @@ def test_files_of_a_record_hidden_from_this_person_are_none(api, fake, status):
 def test_files_refuse_ids_that_could_change_the_upstream_url(api, fake, bad):
     assert api.get(f"/api/drill/matters/{bad}/files").status_code in (400, 404)
     assert fake.calls == []
+
+
+def test_drill_carries_the_page_search_over_the_module_search_fields(api, fake):
+    api.post("/api/drill/court_calendar", json={"filters": {"date": "2026-10-09"}, "q": "depo"})
+    sql = fake.sql_log[0]
+    assert "date = '2026-10-09'" in sql
+    assert "event_type LIKE '%depo%' ESCAPE" in sql
+    assert " OR " in sql
+
+
+def test_drill_search_must_be_text(api, fake):
+    assert api.post("/api/drill/court_calendar", json={"q": ["x"]}).status_code == 400
+    assert fake.sql_log == []

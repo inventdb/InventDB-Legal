@@ -1,0 +1,281 @@
+/* ==========================================================================
+   Calendar — a module's records by day (the court calendar's other view).
+   Only the month and its events: no chrome a week or a year would need.
+   ========================================================================== */
+
+/* ---- Table | Calendar --------------------------------------------------- */
+.view-mode {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+.view-mode button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-faint);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.view-mode button[aria-pressed="true"] {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+.view-mode button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+/* ---- The calendar card ------------------------------------------------- */
+.cal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px 16px;
+  transition: opacity var(--dur-2) var(--ease);
+}
+.cal.is-loading { opacity: 0.6; }
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.cal-title {
+  margin: 0 6px;
+  min-width: 9.5em;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+}
+.cal-legend {
+  margin: 0 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.cal-legend .cal-dot + .cal-dot,
+.cal-legend .cal-dot:not(:first-child) { margin-left: 10px; }
+.cal-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Two kinds of event, told apart by one quiet colour each. */
+.tone-yes { --tone: var(--brand-strong); --tone-soft: var(--brand-tint); }
+.tone-no { --tone: var(--chart-3); --tone-soft: var(--success-soft); }
+.cal-dot.tone-yes, .cal-dot.tone-no { background: var(--tone); }
+
+/* ---- The month ---------------------------------------------------------- */
+.cal-month {
+  display: grid;
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+.cal-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.cal-weekday {
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 6px 6px 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.cal-day.is-outside { background: var(--surface-2); }
+.cal-day.is-outside .cal-date { color: var(--text-faint); opacity: 0.7; }
+
+.cal-date {
+  align-self: flex-start;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 26px;
+  text-align: center;
+}
+button.cal-date { cursor: pointer; }
+button.cal-date:hover { background: var(--neutral-soft); }
+.cal-day.is-today .cal-date {
+  background: var(--brand-solid);
+  color: #fff;
+  font-weight: 600;
+}
+
+.cal-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 6px;
+  border: 0;
+  border-left: 3px solid var(--tone, var(--brand));
+  border-radius: 4px;
+  background: var(--tone-soft, var(--brand-tint));
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+}
+.cal-chip:hover { filter: brightness(0.97); }
+.cal-chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.cal-chip-time {
+  flex: none;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.cal-chip-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cal-more {
+  align-self: flex-start;
+  padding: 1px 6px;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.cal-more:hover { text-decoration: underline; }
+
+/* ---- The agenda (a phone) ---------------------------------------------- */
+.cal-agenda,
+.cal-agenda ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cal-agenda-day + .cal-agenda-day { margin-top: 14px; }
+.cal-agenda-date {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 6px 2px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+.cal-agenda-num { font-size: 18px; font-weight: 600; color: var(--text); }
+.cal-agenda-day.is-today .cal-agenda-num { color: var(--brand); }
+.cal-agenda-today {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.cal-agenda-event {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px 9px 9px;
+  border: 0;
+  border-left: 3px solid var(--tone, var(--brand));
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cal-agenda-event + * { margin-top: 0; }
+.cal-agenda ul li + li { margin-top: 4px; }
+.cal-agenda-event:hover,
+.cal-agenda-event:focus-visible { background: var(--tone-soft, var(--brand-tint)); }
+.cal-agenda-time {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cal-agenda-body { display: grid; gap: 1px; min-width: 0; }
+.cal-agenda-title { font-size: 14px; font-weight: 600; }
+.cal-agenda-sub,
+.cal-agenda-place {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cal-empty {
+  margin: 18px 0 6px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 13.5px;
+}
+
+/* ---- Narrow screens ---------------------------------------------------- */
+@media (max-width: 720px) {
+  .cal { padding: 10px 10px 12px; }
+  .cal-head { margin-bottom: 6px; }
+  .cal-title { min-width: 0; flex: 1; font-size: 16px; }
+  .cal-nav { flex: 1; }
+}
+@media (max-width: 1100px) {
+  .cal-day { min-height: 100px; padding: 5px 4px 6px; }
+  .cal-chip { padding: 2px 4px; gap: 4px; }
+}
+
+/* A phone in calendar mode: the month first. The module's description, its
+   icon tile and the count are what a desktop has room for. */
+@media (max-width: 720px) {
+  .content.is-calendar .page-head .stat-ico,
+  .content.is-calendar .page-head .titles p,
+  .content.is-calendar .toolbar .count-pill { display: none; }
+  .content.is-calendar .page-head { margin-bottom: 10px; }
+  .content.is-calendar .toolbar { gap: 8px; }
+  .content.is-calendar .view-mode { flex: 1; }
+  .content.is-calendar .view-mode button { flex: 1; justify-content: center; }
+}

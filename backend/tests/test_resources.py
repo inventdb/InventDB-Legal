@@ -161,6 +161,25 @@ def test_arbitrary_query_params_become_equality_filters(api, fake):
     )
 
 
+def test_a_range_filter_bounds_a_column_for_a_calendar_month(api, fake):
+    api.get(
+        "/api/court_calendar",
+        query_string={"date__gte": "2026-10-01", "date__lt": "2026-11-01", "order_by": "date"},
+    )
+    assert fake.sql_log[0] == (
+        "SELECT * FROM legal.court_calendar WHERE date >= '2026-10-01' AND date < '2026-11-01' "
+        "ORDER BY date ASC LIMIT 500 OFFSET 0"
+    )
+
+
+def test_a_range_bound_is_still_a_literal_and_its_column_still_an_identifier(api, fake):
+    api.get("/api/court_calendar", query_string={"date__gte": "2026-10-01' OR '1'='1"})
+    assert "date >= '2026-10-01'' OR ''1''=''1'" in fake.sql_log[0]
+    fake.calls.clear()
+    assert api.get("/api/court_calendar", query_string={"da te__lt": "x"}).status_code == 400
+    assert fake.sql_log == []
+
+
 def test_multiple_filters_are_anded_together(api, fake):
     api.get("/api/matters", query_string={"client_name": "Mumbai", "status": "Occupied"})
     where = fake.sql_log[0].split(" WHERE ")[1].split(" ORDER BY ")[0]

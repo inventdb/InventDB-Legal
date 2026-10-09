@@ -21,6 +21,7 @@ export interface GridQuery {
   filters?: Record<string, unknown>;
   where?: string;
   alias?: string;
+  q?: string;
 }
 
 interface Page {
@@ -37,6 +38,7 @@ export function DrillGrid({
   onOpen,
   emptyText,
   hideWhenEmpty = false,
+  initialSort,
 }: {
   entity: string;
   query: GridQuery;
@@ -47,11 +49,13 @@ export function DrillGrid({
   emptyText?: string;
   /** Related sections with nothing in them collapse to the "none" line instead. */
   hideWhenEmpty?: boolean;
+  /** The order the grid opens in, instead of the module's default. */
+  initialSort?: { field: string; dir: "asc" | "desc" };
 }) {
   const cfg = ENTITY_BY_NAME[entity];
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState<{ field: string; dir: "asc" | "desc" } | null>(
-    cfg?.defaultSort ?? null
+    initialSort ?? cfg?.defaultSort ?? null
   );
 
   const q = useQuery({

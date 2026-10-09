@@ -17,6 +17,7 @@ import "./styles/import.css";
 import "./styles/dashboard.css";
 import "./styles/views.css";
 import "./styles/drill.css";
+import "./styles/calendar.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

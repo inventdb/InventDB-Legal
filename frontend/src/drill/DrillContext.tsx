@@ -42,6 +42,10 @@ export type DrillFrame =
       where?: string;
       alias?: string;
       filters?: Record<string, unknown>;
+      /** The page's own search, when the list was opened under one. */
+      q?: string;
+      /** How the list reads first — a day's events by time. */
+      sort?: { field: string; dir: "asc" | "desc" };
     };
 
 interface DrillState {
