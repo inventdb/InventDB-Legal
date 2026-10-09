@@ -54,6 +54,8 @@ class Call:
     # ordinary form fields alongside it (the folder an upload targets).
     files: Optional[dict[str, Any]] = None
     data: Optional[dict[str, Any]] = None
+    #: The read timeout the app gave this request, in seconds.
+    timeout: Any = None
 
     @property
     def upload(self) -> Optional[tuple[str, bytes, str]]:
@@ -329,6 +331,7 @@ class FakeInventDB:
             headers=dict(headers or {}),
             files=dict(files) if files else None,
             data=dict(data) if data else None,
+            timeout=timeout,
         )
         self.calls.append(call)
 

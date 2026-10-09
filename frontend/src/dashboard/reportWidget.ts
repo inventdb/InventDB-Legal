@@ -15,7 +15,7 @@
  * backend does the generate → persist → prove-it-renders loop in one route, so
  * a widget that cannot render never reaches the grid.
  */
-import { api } from "../api/client";
+import { AI_TIMEOUT_MS, api } from "../api/client";
 import { buildSchemaSummary, NS, type SchemaEntry } from "./suggest";
 import { WIDGET_KIT_GUIDE } from "./widgetKit";
 
@@ -71,7 +71,7 @@ export async function generateWidget(
       model_family: opts?.modelFamily,
       title: opts?.title,
     },
-    { signal: opts?.signal }
+    { signal: opts?.signal, timeout: AI_TIMEOUT_MS }
   );
 
   if (!data?.html) throw new Error("The assistant didn't return a usable widget — try rephrasing.");

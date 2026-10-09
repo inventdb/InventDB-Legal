@@ -61,6 +61,11 @@ class Settings:
     # total budget: the agent can reason for minutes without emitting anything,
     # so this only catches a genuinely dead connection.
     inventdb_stream_timeout: float = float(_get("INVENTDB_STREAM_TIMEOUT", "600"))
+    # A call that makes InventDB's model write something and only then answers
+    # (a view's layout, a report widget, a workflow fix). Designing a layout
+    # takes about a minute, so the ordinary 30 s cut every one of them off with
+    # "Read timed out" -- a design that was still being written.
+    inventdb_ai_timeout: float = float(_get("INVENTDB_AI_TIMEOUT", "300"))
     api_host: str = _get("API_HOST", "0.0.0.0")
     # 8010, not the conventional 8000. A sibling InventDB app defaults to
     # 8000, and on Windows two dev servers can both bind the same port

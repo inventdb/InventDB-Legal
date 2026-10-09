@@ -211,6 +211,7 @@ python backend/check_inventdb.py <username> <password>
 | `INVENTDB_NAMESPACE` | `legal` | Namespace holding all practice data |
 | `INVENTDB_APP` | `legal` | App label sent to `/api/auth/me` |
 | `INVENTDB_TIMEOUT` | `30` | Outbound request timeout (seconds) |
+| `INVENTDB_AI_TIMEOUT` | `300` | Timeout for the calls InventDB answers with a model: designing a view, fixing a workflow from a run |
 | `INVENTDB_STREAM_TIMEOUT` | `600` | Idle gap allowed on an Analyze stream — not a turn budget |
 | `CORS_ORIGINS` | `localhost:5174,127.0.0.1:5174` | Allowed front-end origins |
 | `API_HOST` / `API_PORT` | `0.0.0.0` / `8010` | Where the API listens |
@@ -451,6 +452,7 @@ InventDB-Legal/
 |---|---|
 | `401` on login | Credentials aren't valid for the configured instance. Verify with `check_inventdb.py`, check `INVENTDB_BASE_URL` |
 | `502 Could not reach InventDB` | Check network access and that the base URL is reachable |
+| `504 InventDB took longer than N s to answer` | InventDB was reached but did not finish in time. Retry; if a view design or workflow fix keeps hitting it, raise `INVENTDB_AI_TIMEOUT` (and keep any proxy's idle timeout above it) |
 | CORS errors | Set `CORS_ORIGINS` to your exact front-end origin, or use single-service deployment |
 | Empty dashboard | Confirm `INVENTDB_NAMESPACE`, or start adding records — types don't exist until first write |
 | Port 5174 already in use | Another copy of this app. `strictPort` refuses to roam on purpose; stop it or set `VITE_PORT` |

@@ -22,6 +22,7 @@ os.environ["INVENTDB_BASE_URL"] = BASE_URL
 os.environ["INVENTDB_NAMESPACE"] = NAMESPACE
 os.environ["INVENTDB_APP"] = "legal"
 os.environ["INVENTDB_TIMEOUT"] = "5"
+os.environ["INVENTDB_AI_TIMEOUT"] = "90"
 os.environ["CORS_ORIGINS"] = "http://localhost:5173"
 # The base URL is overridable at runtime and persisted to a state file. Point
 # that file somewhere disposable so a developer who has repointed their own

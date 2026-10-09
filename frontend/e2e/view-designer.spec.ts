@@ -156,6 +156,36 @@ test.describe("Designed views", () => {
     await expect(designer(page)).toHaveCount(0);
     await expect(page.locator("table.data")).toBeVisible();
   });
+
+  // Designing is a model call: a real one on the court calendar took 55 s, so
+  // the browser's ordinary 60 s limit cut longer ones off mid-design.
+  test("a design that takes over a minute still lands", async ({ page }) => {
+    test.setTimeout(150_000);
+    await page.route("**/api/views/*/design", async (route) => {
+      await new Promise((r) => setTimeout(r, 61_000));
+      await route.fallback();
+    });
+    await page.goto("/court_calendar");
+    await describeNewView(page, "show a true calendar view with events on the calendar");
+    await expect(designer(page).locator("iframe")).toBeVisible({ timeout: 90_000 });
+    await expect(designer(page).locator(".alert.error")).toHaveCount(0);
+  });
+
+  test("a design InventDB is too slow to finish says so, and keeps the description", async ({ page }) => {
+    const ask = "show a true calendar view with events on the calendar";
+    await page.route("**/api/views/*/design", (route) =>
+      route.fulfill({
+        status: 504,
+        json: { error: "InventDB took longer than 300 s to answer — try again in a moment" },
+      })
+    );
+    await page.goto("/court_calendar");
+    await describeNewView(page, ask);
+    await expect(designer(page).locator(".alert.error")).toHaveText(
+      "InventDB took longer than 300 s to answer — try again in a moment"
+    );
+    await expect(page.getByLabel("Describe the view")).toHaveValue(ask);
+  });
 });
 
 /* Every module, the same loop. */

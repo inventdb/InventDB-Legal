@@ -16,7 +16,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { api } from "../api/client";
+import { AI_TIMEOUT_MS, api } from "../api/client";
 
 export interface ViewSort {
   col: string;
@@ -156,7 +156,7 @@ export function useSetDefaultView(entity: string) {
 export function useDesignView(entity: string) {
   return useMutation<DesignResult, unknown, DesignRequest>({
     mutationFn: async (req) => {
-      const { data } = await api.post<DesignResult>(`/views/${entity}/design`, req);
+      const { data } = await api.post<DesignResult>(`/views/${entity}/design`, req, { timeout: AI_TIMEOUT_MS });
       return data;
     },
   });

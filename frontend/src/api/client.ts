@@ -12,6 +12,16 @@ export const api = axios.create({
   timeout: 60_000,
 });
 
+/**
+ * For the calls where InventDB's model writes something before it answers —
+ * a view's layout, a report widget, a workflow fix. One layout takes about a
+ * minute and the designer may try up to three times when a draft does not
+ * render, so these wait as long as the load balancer keeps a quiet request
+ * open (600 s). The backend's own limit for each model call
+ * (INVENTDB_AI_TIMEOUT, 300 s) is below it, so its message arrives first.
+ */
+export const AI_TIMEOUT_MS = 600_000;
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }

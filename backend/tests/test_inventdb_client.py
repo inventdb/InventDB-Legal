@@ -127,7 +127,7 @@ def test_a_transport_failure_becomes_a_502_naming_the_instance(db, fake):
 
 @pytest.mark.parametrize(
     "exc_type",
-    [requests.Timeout, requests.ConnectionError, requests.TooManyRedirects],
+    [requests.ConnectionError, requests.TooManyRedirects],
 )
 def test_every_requests_failure_mode_maps_to_502(db, fake, exc_type):
     fake.on("GET", "/api/auth/me", error=exc_type("boom"))
@@ -136,8 +136,40 @@ def test_every_requests_failure_mode_maps_to_502(db, fake, exc_type):
     assert exc.value.status_code == 502
 
 
-def test_the_configured_timeout_is_applied(db):
+@pytest.mark.parametrize("exc_type", [requests.Timeout, requests.ReadTimeout])
+def test_a_slow_answer_is_a_504_that_says_so_not_could_not_reach(db, fake, exc_type):
+    # InventDB was reached and is still working: "Could not reach InventDB"
+    # (with requests' pool repr) sent people looking for an outage.
+    fake.on("GET", "/api/auth/me", error=exc_type("Read timed out. (read timeout=5.0)"))
+    with pytest.raises(ApiError) as exc:
+        db.me()
+    assert exc.value.status_code == 504
+    assert str(exc.value.detail) == (
+        "InventDB took longer than 5 s to answer \u2014 try again in a moment"
+    )
+
+
+def test_the_configured_timeout_is_applied(db, fake):
     assert db.timeout == 5.0  # INVENTDB_TIMEOUT, pinned in conftest
+    db.me()
+    assert fake.calls[0].timeout == 5.0
+
+
+def test_ai_generation_gets_the_longer_ai_timeout(db, fake):
+    # Designing a view or fixing a workflow is a model call that routinely runs
+    # past the ordinary 30 s; it has its own limit (INVENTDB_AI_TIMEOUT).
+    assert db.ai_timeout == 90.0  # pinned in conftest
+    db.generate_view_layout({"type_name": "legal.court_calendar", "prompt": "a calendar"})
+    db.fix_workflow_from_run("wf1", "run1")
+    assert [c.timeout for c in fake.calls] == [90.0, 90.0]
+
+
+def test_a_slow_ai_answer_names_the_ai_limit(db, fake):
+    fake.on("POST", "/api/saved-views/generate-layout", error=requests.ReadTimeout("slow"))
+    with pytest.raises(ApiError) as exc:
+        db.generate_view_layout({"type_name": "legal.court_calendar", "prompt": "a calendar"})
+    assert exc.value.status_code == 504
+    assert "longer than 90 s" in str(exc.value.detail)
 
 
 # ===========================================================================

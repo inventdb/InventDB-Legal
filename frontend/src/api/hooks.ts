@@ -5,7 +5,7 @@ import {
   type UseQueryOptions,
 } from "@tanstack/react-query";
 
-import { api } from "./client";
+import { AI_TIMEOUT_MS, api } from "./client";
 import type {
   AppNotification,
   BulkDeleteResult,
@@ -546,7 +546,7 @@ export function useCancelRun() {
 export function useFixFromRun() {
   return useMutation<WorkflowFix, unknown, { id: string; runId: string }>({
     mutationFn: async ({ id, runId }) => {
-      const { data } = await api.post<WorkflowFix>(`/workflows/${id}/fix-from-run/${runId}`, {});
+      const { data } = await api.post<WorkflowFix>(`/workflows/${id}/fix-from-run/${runId}`, {}, { timeout: AI_TIMEOUT_MS });
       return data;
     },
   });

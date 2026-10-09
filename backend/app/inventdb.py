@@ -63,6 +63,7 @@ class InventDBClient:
         self.app = settings.inventdb_app
         self.timeout = settings.inventdb_timeout
         self.stream_idle_timeout = settings.inventdb_stream_timeout
+        self.ai_timeout = settings.inventdb_ai_timeout
         self.token = token
 
     # ------------------------------------------------------------------ core
@@ -82,6 +83,7 @@ class InventDBClient:
         auth: bool = True,
         json: Any = None,
         params: Optional[dict[str, Any]] = None,
+        timeout: Optional[float] = None,
     ) -> Any:
         url = f"{self.base_url}{path}"
         try:
@@ -91,8 +93,14 @@ class InventDBClient:
                 headers=self._headers(auth=auth),
                 json=json,
                 params=params,
-                timeout=self.timeout,
+                timeout=timeout or self.timeout,
             )
+        except requests.Timeout as exc:
+            # Said plainly: the instance is up, the answer is slow. The
+            # connection-pool text means nothing to the person who clicked.
+            raise ApiError(
+                504, f"InventDB took longer than {int(timeout or self.timeout)} s to answer — try again in a moment"
+            ) from exc
         except requests.RequestException as exc:
             raise ApiError(
                 502, f"Could not reach InventDB at {self.base_url}: {exc}"
@@ -695,7 +703,11 @@ class InventDBClient:
         Unlike the rest of this client, the reply is *not* wrapped in the
         ``{ok, data}`` envelope, so it is returned as-is.
         """
-        return self._request("POST", "/api/saved-views/generate-layout", json=body)
+        # The model writes the whole layout before anything comes back: about
+        # a minute for a real design, so it gets the AI budget, not the 30 s.
+        return self._request(
+            "POST", "/api/saved-views/generate-layout", json=body, timeout=self.ai_timeout
+        )
 
     def render_view_layout(self, body: dict[str, Any]) -> Any:
         """Render one page of a custom layout.
@@ -873,7 +885,9 @@ class InventDBClient:
         """
         wid = _safe_id(workflow_id, "workflow id")
         rid = _safe_id(run_id, "run id")
-        return self._request("POST", f"/api/workflows/{wid}/fix-from-run/{rid}", json={})
+        return self._request(
+            "POST", f"/api/workflows/{wid}/fix-from-run/{rid}", json={}, timeout=self.ai_timeout
+        )
 
     def rollback_workflow(self, workflow_id: str, version: int) -> Any:
         """Restore an earlier definition. This mints a *new* latest version
