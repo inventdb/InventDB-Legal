@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Documents are binary: never let text=auto normalise a PDF that happens to look like text.
+*.pdf binary
