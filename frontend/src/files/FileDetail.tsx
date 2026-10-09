@@ -28,6 +28,7 @@ import {
 } from "../api/hooks";
 import type { FileRow } from "../types";
 import { AttachPanel, AttachedTo } from "./AttachPanel";
+import { PdfPreview } from "./PdfPreview";
 import {
   ext,
   fileHome,
@@ -67,7 +68,8 @@ function Preview({ home, file }: { home: FileHome; file: FileRow }) {
     let current: string | null = null;
     setUrl(null);
     setError(null);
-    if (!isPreviewable(contentType, name)) return;
+    // A PDF is drawn by PdfPreview from the bytes; it needs no object URL.
+    if (!isPreviewable(contentType, name) || isPdf(contentType, name)) return;
 
     fileObjectUrl(home)
       .then((next) => {
@@ -95,17 +97,18 @@ function Preview({ home, file }: { home: FileHome; file: FileRow }) {
       />
     );
   }
+  if (isPdf(contentType, name)) {
+    // Drawn, not framed: see PdfPreview for why a frame cannot show it.
+    return <PdfPreview home={home} name={name} />;
+  }
   if (error) return <Alert kind="error">{error}</Alert>;
   if (!url) return <Spinner />;
 
   if (isImage(contentType)) {
     return <img className="fx-preview-img" src={url} alt={name || "Preview"} />;
   }
-  if (isPdf(contentType, name)) {
-    // Sandboxed: a PDF is a document from outside this app, and it has no
-    // business reaching the page that frames it.
-    return <iframe className="fx-preview-frame" src={url} title={name || "Preview"} sandbox="" />;
-  }
+  // Sandboxed: text is a document from outside this app, and it has no
+  // business reaching the page that frames it.
   return <iframe className="fx-preview-frame" src={url} title={name || "Preview"} sandbox="" />;
 }
 

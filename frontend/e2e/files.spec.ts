@@ -149,6 +149,27 @@ test.describe("Files", () => {
     await expect(modal).toContainText("application/pdf");
   });
 
+  test("previews a PDF by drawing its pages, not by framing it", async ({ page }) => {
+    // Chrome will not run its PDF viewer in a sandboxed frame — it shows "This
+    // page has been blocked by Chrome" — so the preview draws the pages itself.
+    await rows(page).filter({ hasText: "signed-lease.pdf" }).click();
+    const modal = dialog(page);
+
+    const pageOne = modal.locator("canvas.fx-pdf-page").first();
+    await expect(pageOne).toBeVisible();
+    await expect(pageOne).toHaveAttribute("aria-label", "signed-lease.pdf, page 1 of 1");
+    await expect(modal.locator("iframe")).toHaveCount(0);
+
+    // Drawn, not an empty white sheet: the page carries the document's text.
+    const ink = await pageOne.evaluate((c: HTMLCanvasElement) => {
+      const d = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
+      let dark = 0;
+      for (let p = 0; p < d.length; p += 4) if (d[p] < 128) dark++;
+      return dark;
+    });
+    expect(ink, "page 1 was drawn blank").toBeGreaterThan(50);
+  });
+
   test("shows the text extracted from a file", async ({ page }) => {
     await rows(page).filter({ hasText: "signed-lease.pdf" }).click();
     await dialog(page).getByRole("tab", { name: "Extracted text" }).click();

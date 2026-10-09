@@ -606,6 +606,29 @@
   border: none;
   background: var(--surface);
 }
+/* A PDF drawn page by page: the same 60vh window, scrolling through the pages. */
+.fx-pdf {
+  width: 100%;
+  height: 60vh;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+.fx-pdf-pages {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  justify-items: center;
+}
+.fx-pdf-page {
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
 
 .fx-info {
   margin: 0;
@@ -691,7 +714,8 @@
   .fx-detail-end {
     margin-left: 0;
   }
-  .fx-preview-frame {
+  .fx-preview-frame,
+  .fx-pdf {
     height: 50vh;
   }
 }

@@ -933,3 +933,9 @@ export async function fileObjectUrl(
   const { data } = await api.get(path, { responseType: "blob" });
   return URL.createObjectURL(data as Blob);
 }
+
+/** A file's bytes, for previews that draw the document themselves. */
+export async function fileBytes(home: FileHome): Promise<ArrayBuffer> {
+  const { data } = await api.get(`${filePath(home)}/preview`, { responseType: "arraybuffer" });
+  return data as ArrayBuffer;
+}

@@ -92,6 +92,33 @@ function json(route: Route, body: unknown, status = 200) {
   });
 }
 
+/**
+ * A real one-page PDF carrying the file's text (its first line), with the
+ * cross-reference offsets computed so a strict reader such as PDF.js opens it.
+ */
+function onePagePdf(text: string): Buffer {
+  const line = (text.split("\n")[0] || "MOCK DOCUMENT").replace(/[()\\]/g, "").slice(0, 60);
+  const stream = `BT /F1 18 Tf 72 720 Td (${line}) Tj ET`;
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets: number[] = [];
+  objects.forEach((body, i) => {
+    offsets.push(pdf.length);
+    pdf += `${i + 1} 0 obj\n${body}\nendobj\n`;
+  });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  pdf += offsets.map((o) => `${String(o).padStart(10, "0")} 00000 n \n`).join("");
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(pdf, "latin1");
+}
+
 function compare(a: unknown, b: unknown): number {
   const an = typeof a === "number" ? a : Number(a);
   const bn = typeof b === "number" ? b : Number(b);
@@ -495,11 +522,12 @@ export async function installMockApi(
         return json(route, { text: fileText[attachmentId] ?? "" });
       }
       if (fourth === "download" || fourth === "preview" || fourth === "thumbnail") {
-        // Real bytes, so the detail panel's blob handling runs for real.
+        // Real bytes, so the detail panel's blob handling runs for real — and a
+        // real PDF, so the preview has a page to draw.
         return route.fulfill({
           status: 200,
           contentType: fourth === "thumbnail" ? "image/jpeg" : String(file?.content_type ?? "application/pdf"),
-          body: Buffer.from("%PDF-1.4 mock bytes"),
+          body: fourth === "thumbnail" ? Buffer.from("%PDF-1.4 mock bytes") : onePagePdf(fileText[attachmentId] ?? "MOCK DOCUMENT"),
         });
       }
       if (fourth === "versions") {
