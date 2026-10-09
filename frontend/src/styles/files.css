@@ -788,3 +788,10 @@
 .fx-attached-link:hover {
   text-decoration: underline;
 }
+
+/* A document filed under a matter or lead: a link to open it. */
+.fx-filed-under {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}

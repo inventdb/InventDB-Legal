@@ -11,7 +11,7 @@ from __future__ import annotations
 import pytest
 
 from app.errors import ApiError
-from app.sqlutil import LIKE_ESCAPE, ident, like_literal, sql_literal
+from app.sqlutil import LIKE_ESCAPE, count_statement, ident, like_literal, sql_literal
 
 
 # ===========================================================================
@@ -321,3 +321,45 @@ def test_like_escape_declares_the_backslash():
     by :func:`like_literal` is read as a literal backslash instead.
     """
     assert LIKE_ESCAPE == r" ESCAPE '\'"
+
+
+# ===========================================================================
+# count_statement: counting what a designed view's query returns
+# ===========================================================================
+
+
+@pytest.mark.parametrize(
+    "sql,expected",
+    [
+        # A designed view joins (a matter card with its client): count the join.
+        (
+            "SELECT m.*, c.email AS client_email FROM legal.matters m "
+            "JOIN legal.clients c ON m.client_id = c.client_id ORDER BY m.date_opened DESC",
+            "SELECT COUNT(*) AS c FROM legal.matters m JOIN legal.clients c ON m.client_id = c.client_id",
+        ),
+        (
+            "select * from legal.invoices where status = 'Open' limit 10 offset 20",
+            "SELECT COUNT(*) AS c from legal.invoices where status = 'Open'",
+        ),
+        # Keywords inside strings, quoted names and subqueries are not clauses.
+        (
+            "SELECT * FROM legal.time_entries WHERE narrative = 'order by me' ORDER BY date",
+            "SELECT COUNT(*) AS c FROM legal.time_entries WHERE narrative = 'order by me'",
+        ),
+        (
+            "SELECT (SELECT COUNT(*) FROM legal.invoices) AS n, matter_caption FROM legal.matters",
+            "SELECT COUNT(*) AS c FROM legal.matters",
+        ),
+        ('SELECT "from" FROM legal.t WHERE "order by" = 1', 'SELECT COUNT(*) AS c FROM legal.t WHERE "order by" = 1'),
+        ("SELECT fromage, selection FROM legal.cheese;", "SELECT COUNT(*) AS c FROM legal.cheese"),
+        # Where a row count is not the result's count: unknown, not wrong.
+        ("SELECT DISTINCT practice_area FROM legal.matters", None),
+        ("SELECT practice_area, COUNT(*) FROM legal.matters GROUP BY practice_area", None),
+        ("WITH x AS (SELECT 1) SELECT * FROM x", None),
+        ("SELECT * FROM legal.a UNION SELECT * FROM legal.b", None),
+        ("DELETE FROM legal.invoices", None),
+        ("", None),
+    ],
+)
+def test_count_statement(sql, expected):
+    assert count_statement(sql) == expected

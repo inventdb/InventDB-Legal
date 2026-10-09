@@ -1411,7 +1411,7 @@ table.data tbody tr:hover {
   position: fixed;
   inset: 0;
   background: rgba(32, 30, 33, 0.55);
-  z-index: 60;
+  z-index: 320; /* above the drill-down panel (300): a file opened from it */
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -1663,7 +1663,7 @@ table.data tbody tr:hover {
   position: fixed;
   bottom: 22px;
   right: 22px;
-  z-index: 80;
+  z-index: 340; /* above dialogs and the drill-down panel */
   display: flex;
   flex-direction: column;
   gap: 10px;

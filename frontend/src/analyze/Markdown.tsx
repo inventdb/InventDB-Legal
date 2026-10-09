@@ -9,12 +9,17 @@
  * `skipTables` drops markdown tables: when the same rows are already on screen
  * as an interactive grid, the model's restated copy is pure duplication.
  *
+ * A table row that carries a record number (MT-2599, INV-2026-1562) opens that
+ * record in the drill-down panel, like a row of any other grid.
+ *
  * `cites` turns the file-citation markers an answer from documents carries
  * (`[S3]`, `[S1, S4]`, `[S1/S5]`) into small numbers that open the cited file.
  * Without it they stay as written.
  */
 import type { ReactNode } from "react";
 import { ScrollX } from "../components/ScrollX";
+import { useOptionalDrill } from "../drill/DrillContext";
+import { rowFrame } from "../drill/keys";
 
 /** A file citation an answer refers to by key (`[S3]`): the number shown, the file and the quoted words. */
 export interface Cite {
@@ -98,6 +103,7 @@ export function Markdown({
   skipTables?: boolean;
   cites?: Cites;
 }) {
+  const drill = useOptionalDrill();
   const il = (t: string) => inline(t, cites);
   const lines = text.replace(/\r/g, "").split("\n");
   const blocks: ReactNode[] = [];
@@ -136,6 +142,10 @@ export function Markdown({
         rows.push(cells);
         i++;
       }
+      // A row about one record (it carries a record number, MT-2599) opens
+      // that record in the drill-down panel, like a row of any other grid.
+      const targets = rows.map((r) => (drill ? rowFrame(r) : null));
+      const anyTarget = targets.some(Boolean);
       blocks.push(
         <ScrollX className="an-table-wrap" key={key++}>
           <table className="an-table">
@@ -144,16 +154,29 @@ export function Markdown({
                 {header.map((h, hi) => (
                   <th key={hi}>{il(h)}</th>
                 ))}
+                {anyTarget && <th aria-label="Open" />}
               </tr>
             </thead>
             <tbody>
-              {rows.map((r, ri) => (
-                <tr key={ri}>
-                  {r.map((c, ci) => (
-                    <td key={ci}>{il(c)}</td>
-                  ))}
-                </tr>
-              ))}
+              {rows.map((r, ri) => {
+                const target = targets[ri];
+                const open = target ? () => drill!.open(target) : undefined;
+                return (
+                  <tr
+                    key={ri}
+                    className={open ? "is-clickable" : undefined}
+                    tabIndex={open ? 0 : undefined}
+                    title={open && target?.match ? `Open ${String(target.match.value)}` : undefined}
+                    onClick={open}
+                    onKeyDown={open ? (e) => e.key === "Enter" && open() : undefined}
+                  >
+                    {r.map((c, ci) => (
+                      <td key={ci}>{il(c)}</td>
+                    ))}
+                    {anyTarget && <td className="an-row-open">{open ? "›" : ""}</td>}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </ScrollX>

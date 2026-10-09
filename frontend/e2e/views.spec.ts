@@ -1,4 +1,4 @@
-import { MODULES, expect, rows, test } from "./fixtures";
+import { MODULES, designedLayout, expect, rows, test } from "./fixtures";
 
 /**
  * Saved views — the named browse states at the head of every module.
@@ -297,6 +297,131 @@ test.describe("New view — the designer", () => {
     // The layout replaces the grid — this view is not a narrowed table.
     await expect(page.locator(".custom-view iframe")).toBeVisible();
     await expect(page.locator("table.data")).toHaveCount(0);
+  });
+
+  test("a card in a custom view opens its record, read-only, in the panel", async ({ page }) => {
+    await page.goto("/matters");
+    await page.locator(trigger).click();
+    await page.getByRole("button", { name: "New view" }).click();
+    await page.getByLabel("Describe the view").fill("a card per matter");
+    await page.getByRole("button", { name: "Design view" }).click();
+    await page.locator("#designed-view-name").fill("Matter cards");
+    await page.getByRole("button", { name: "Save view" }).click();
+
+    // The cards are drawn by the engine inside a frame that runs no scripts;
+    // clicking one used to do nothing at all.
+    const card = page.frameLocator(".custom-view iframe").locator(".vk-card").first();
+    await expect(card).toHaveAttribute("data-record-id", "mt-1");
+    await expect(card).toHaveAttribute("role", "button");
+    await card.click();
+    await expect(page.getByRole("dialog", { name: "Matter details" })).toBeVisible();
+    await expect(page.locator("aside.drill-panel").getByRole("heading", { level: 2 })).toHaveText(
+      "Pineda v. Bright Path"
+    );
+    await expect(page.locator("#f-matter_caption")).toHaveCount(0); // viewed, not edited
+
+    // And from the keyboard.
+    await page.keyboard.press("Escape");
+    await page.frameLocator(".custom-view iframe").locator(".vk-card").nth(1).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("aside.drill-panel").getByRole("heading", { level: 2 })).toHaveText(
+      "In re Marriage of Chen"
+    );
+  });
+
+  test("a custom view whose total is unknown says so rather than '0 records'", async ({ page }) => {
+    // The server sends no total for a query it cannot count (a GROUP BY view).
+    await page.route(/\/api\/views\/matters\/render$/, (route) =>
+      route.fulfill({
+        json: { html: designedLayout("matters", 3, 0, ["mt-1", "mt-2", "mt-3"]), total: null },
+      })
+    );
+    await page.goto("/matters");
+    await page.locator(trigger).click();
+    await page.getByRole("button", { name: "New view" }).click();
+    await page.getByLabel("Describe the view").fill("a card per matter");
+    await page.getByRole("button", { name: "Design view" }).click();
+    await page.locator("#designed-view-name").fill("Matter cards");
+    await page.getByRole("button", { name: "Save view" }).click();
+    await expect(page.locator(".custom-view iframe")).toBeVisible();
+    await expect(page.getByText(/0 records/)).toHaveCount(0);
+  });
+
+  test("pressing on a card's photo with a little hand movement opens it, and Esc still closes it", async ({ page }) => {
+    // A card view can draw a photo per record. Holding the button on it and
+    // moving a few pixels started the browser's native image drag inside the
+    // sandboxed frame, and the click left keyboard focus in the frame, so Esc
+    // never reached the panel — the page looked stuck.
+    const photo = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
+    const card = (id: string, caption: string) =>
+      `<div class="vk-card" data-record-id="${id}"><img src="${photo}" style="width:100%;height:180px;display:block"><div class="vk-title">${caption}</div></div>`;
+    await page.route(/\/api\/views\/matters\/render$/, (route) =>
+      route.fulfill({
+        json: {
+          html: `<html><body><div class="vk-grid">${card("mt-1", "Pineda v. Bright Path")}${card("mt-2", "In re Marriage of Chen")}</div></body></html>`,
+          total: 2,
+        },
+      })
+    );
+    await page.goto("/matters");
+    await page.locator(trigger).click();
+    await page.getByRole("button", { name: "New view" }).click();
+    await page.getByLabel("Describe the view").fill("a card per matter");
+    await page.getByRole("button", { name: "Design view" }).click();
+    await page.locator("#designed-view-name").fill("Matter cards");
+    await page.getByRole("button", { name: "Save view" }).click();
+
+    const img = page.frameLocator(".custom-view iframe").locator("[data-record-id] img").first();
+    await expect(img).toHaveAttribute("draggable", "false");
+    const box = (await img.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    // Raw input, as a real mouse sends it. Playwright's own mouse.down/move
+    // intercepts drags and waits on the frame, which is not what a user does.
+    const cdp = await page.context().newCDPSession(page);
+    const mouse = (type: "mouseMoved" | "mousePressed" | "mouseReleased", px: number, py: number, buttons: number) =>
+      cdp.send("Input.dispatchMouseEvent", { type, x: px, y: py, button: "left", buttons, clickCount: 1 });
+    await mouse("mouseMoved", x, y, 0);
+    await mouse("mousePressed", x, y, 1);
+    for (let i = 1; i <= 3; i++) await mouse("mouseMoved", x + 2 * i, y + i, 1);
+    await mouse("mouseReleased", x + 6, y + 3, 0);
+
+    const panel = page.getByRole("dialog", { name: "Matter details" });
+    await expect(panel).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("aside.drill-panel").getByRole("heading", { level: 2 })).toHaveText(
+      "Pineda v. Bright Path"
+    );
+    // Focus has left the frame for the panel, so the keyboard works again.
+    await expect(page.locator("aside.drill-panel")).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    // And the page is still alive.
+    await page.locator("nav.nav").getByRole("link", { name: "Clients", exact: true }).click();
+    await expect(page).toHaveURL(/\/clients/);
+  });
+
+  test("Esc pressed inside a designed view's frame still reaches the page", async ({ page }) => {
+    await page.route(/\/api\/views\/matters\/render$/, (route) =>
+      route.fulfill({
+        json: { html: designedLayout("matters", 3, 0, ["mt-1", "mt-2", "mt-3"]), total: 3 },
+      })
+    );
+    await page.goto("/matters");
+    await page.locator(trigger).click();
+    await page.getByRole("button", { name: "New view" }).click();
+    await page.getByLabel("Describe the view").fill("a card per matter");
+    await page.getByRole("button", { name: "Design view" }).click();
+    await page.locator("#designed-view-name").fill("Matter cards");
+    await page.getByRole("button", { name: "Save view" }).click();
+
+    const frame = page.frameLocator(".custom-view iframe");
+    await frame.locator("[data-record-id]").first().click();
+    const panel = page.getByRole("dialog", { name: "Matter details" });
+    await expect(panel).toBeVisible();
+    // Put focus back inside the frame, the way a second click there would.
+    await frame.locator("[data-record-id]").nth(1).focus();
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
   });
 
   test("switching away from a custom view brings the table back", async ({ page, store }) => {

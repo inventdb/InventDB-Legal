@@ -54,6 +54,7 @@ import {
 import { Alert, EmptyState, Spinner } from "../components/ui";
 import { ConfirmDialog } from "../components/Modal";
 import { ReportFrame, type ReportFrameHandle } from "../components/ReportFrame";
+import { useOptionalDrill } from "../drill/DrillContext";
 import { useToast } from "../components/Toast";
 import { formatDate } from "../utils/format";
 import type { ReportParameter, ReportSummary } from "../types";
@@ -656,6 +657,8 @@ function TemplateSheet({
 }) {
   const detail = useReportTemplate(id);
   const frame = useRef<ReportFrameHandle>(null);
+  // A row about one record (it carries MT-2599, INV-2026-1562) opens it.
+  const drill = useOptionalDrill();
 
   // `values` is what the form holds; `applied` is the parameter set the current
   // render belongs to. Keeping them apart stops a text input from firing a
@@ -781,7 +784,12 @@ function TemplateSheet({
       ) : render.data?.html ? (
         <>
           <div className={`report-paper ${refreshing ? "is-refreshing" : ""}`}>
-            <ReportFrame ref={frame} html={render.data.html} title={name} />
+            <ReportFrame
+              ref={frame}
+              html={render.data.html}
+              title={name}
+              onRecordNumber={drill ? (f) => drill.open(f) : undefined}
+            />
           </div>
           <p className="report-rendered-note">
             {refreshing ? (
@@ -814,6 +822,7 @@ function TemplateSheet({
 function SnapshotSheet({ item }: { item: ReportSnapshot }) {
   const snapshot = useSnapshotHtml(item);
   const frame = useRef<ReportFrameHandle>(null);
+  const drill = useOptionalDrill();
 
   return (
     <>
@@ -840,7 +849,12 @@ function SnapshotSheet({ item }: { item: ReportSnapshot }) {
       ) : (
         <>
           <div className="report-paper">
-            <ReportFrame ref={frame} html={snapshot.data.html} title={item.name} />
+            <ReportFrame
+              ref={frame}
+              html={snapshot.data.html}
+              title={item.name}
+              onRecordNumber={drill ? (f) => drill.open(f) : undefined}
+            />
           </div>
           <p className="report-rendered-note">
             Saved snapshot · figures frozen

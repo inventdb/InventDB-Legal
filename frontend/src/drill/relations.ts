@@ -1,0 +1,84 @@
+/**
+ * How the Legal modules point at each other — the graph the drill-down panel
+ * walks.
+ *
+ * It is derived from the field config rather than written out a second time:
+ * every `ref` field already says "this column holds the business key of a record
+ * in that module" (a time entry's `matter_id` is a matter's `matter_id`). The
+ * panel uses an edge in both directions — as a link UP from the record that
+ * holds it (this time entry's matter) and as a grid DOWN from the record it
+ * points at (this matter's time entries).
+ */
+import { ENTITIES, ENTITY_BY_NAME, type EntityConfig, type FieldDef } from "../config/entities";
+import { formatCell } from "../utils/format";
+
+export interface Relation {
+  /** Module holding the pointer (the child). */
+  from: string;
+  /** Column on `from` that holds the pointer. */
+  field: string;
+  /** Module pointed at (the parent). */
+  to: string;
+  /** Column on `to` the pointer matches — the parent's business key by default. */
+  toField: string;
+  /** Label for the field on the child, e.g. "Matter". */
+  label: string;
+}
+
+/** Links that match on a name rather than a key. Legal's data links every
+ *  module by key, so there are none; one would go here, e.g.
+ *  `{ from, field, to, toField: "name", label }`. */
+const SOFT_RELATIONS: Relation[] = [];
+
+export const RELATIONS: Relation[] = [
+  ...ENTITIES.flatMap((cfg) =>
+    cfg.fields
+      .filter((f) => f.ref && ENTITY_BY_NAME[f.ref])
+      .map<Relation>((f) => ({
+        from: cfg.name,
+        field: f.name,
+        to: f.ref as string,
+        toField: ENTITY_BY_NAME[f.ref as string].key,
+        label: f.label,
+      }))
+  ),
+  ...SOFT_RELATIONS,
+];
+
+/** Links up from a record of `entity`: the records it points at. */
+export function parentsOf(entity: string): Relation[] {
+  return RELATIONS.filter((r) => r.from === entity);
+}
+
+/**
+ * Grids down from a record of `entity`: every module that points at it, in the
+ * order the modules appear in the sidebar so the panel reads predictably.
+ */
+export function childrenOf(entity: string): Relation[] {
+  const order = ENTITIES.map((e) => e.name);
+  return RELATIONS.filter((r) => r.to === entity).sort(
+    (a, b) => order.indexOf(a.from) - order.indexOf(b.from)
+  );
+}
+
+/** The relation behind a field on a record, if the field is a pointer. */
+export function relationFor(entity: string, field: string): Relation | undefined {
+  return RELATIONS.find((r) => r.from === entity && r.field === field);
+}
+
+/** Section heading for a child grid: "Invoices" — or, when one module points at
+ *  the same parent through two fields, "Matters · by <field>". */
+export function childHeading(rel: Relation, cfg: EntityConfig | undefined): string {
+  const plural = cfg?.labelPlural ?? rel.from;
+  const siblings = RELATIONS.filter((r) => r.to === rel.to && r.from === rel.from);
+  return siblings.length > 1 ? `${plural} · by ${rel.label.toLowerCase()}` : plural;
+}
+
+/** A field's value as the panel shows it. A year is a label, not a quantity:
+ *  "1992", never "1,992". */
+export function fieldText(field: FieldDef, value: unknown): string {
+  if (field.type === "number" && /year/i.test(field.name) && value != null && value !== "") {
+    return String(value);
+  }
+  return formatCell(value, field.type);
+}

@@ -979,7 +979,8 @@ export async function installMockApi(
         const pg = Number(body.page) >= 0 ? Number(body.page) : 0;
         const total = 120;
         const rows = Math.max(0, Math.min(size, total - pg * size));
-        return json(route, { html: designedLayout(entity, rows, pg), total });
+        const ids = (store[entity] ?? []).slice(pg * size, pg * size + rows).map((r) => String(r._id));
+        return json(route, { html: designedLayout(entity, rows, pg, ids), total });
       }
 
       if (method === "POST") {
@@ -1028,6 +1029,65 @@ export async function installMockApi(
         return json(route, { ok: true, deleted: target });
       }
 
+      return json(route, { error: "Not found" }, 404);
+    }
+
+    // ---- /api/drill/* ------------------------------------------------------
+    // The drill-down panel. The list honours `filters` exactly and the plain
+    // `col = 'value'` / `col = 123` terms of `where` (enough for a spec to
+    // assert WHICH records a click opened; anything fancier is ignored). Access
+    // defaults to an editor — a spec plays a reader with its own page.route.
+    if (head === "drill") {
+      const [entity, id, action] = rest;
+      const rowsOf = store[entity];
+      if (!rowsOf) return json(route, { error: `Unknown entity: ${entity}` }, 404);
+      if (method === "GET" && id && action === "access") {
+        return rowsOf.some((r) => r._id === id)
+          ? json(route, { can_view: true, can_edit: true, reason: "Your superadmin role can change any record.", row_rules: "bypassed" })
+          : json(route, { can_view: false, can_edit: false, reason: "This record is not visible to you.", row_rules: "n/a" });
+      }
+      if (method === "GET" && id && action === "files") {
+        // As the backend: attached to the record, or filed in a folder that
+        // starts with its matter / lead number ("…/MT-2018 Pineda v. …/").
+        const rec = rowsOf.find((r) => r._id === id);
+        const number = rec ? String(rec.matter_id ?? rec.lead_id ?? "") : "";
+        const filedIn = (f: Rec) =>
+          !!number && String(f.folder_path ?? "").split("/").some((seg) => seg === number || seg.startsWith(`${number} `));
+        const listed = files
+          .filter((f) => (f.record_type === entity && f.record_id === id) || filedIn(f))
+          .map((f) => ({ ...f, filed_under: f.record_type === entity && f.record_id === id ? null : number }));
+        return json(route, { files: listed, numbers: number ? [number] : [] });
+      }
+      if (method === "POST" && !id) {
+        const same = (a: unknown, b: unknown) =>
+          String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
+        const filters = (body.filters ?? {}) as Record<string, unknown>;
+        const terms: [string, string][] = [];
+        const re = /(?:[A-Za-z_]\w*\.)?([A-Za-z_]\w*)\s*=\s*(?:'((?:[^']|'')*)'|(-?\d+(?:\.\d+)?))/g;
+        for (const m of String(body.where ?? "").matchAll(re)) {
+          terms.push([m[1], (m[2] ?? m[3]).replace(/''/g, "'")]);
+        }
+        let matched = rowsOf.filter(
+          (r) =>
+            Object.entries(filters).every(([k, v]) => (v === null ? r[k] == null : same(r[k], v))) &&
+            terms.every(([k, v]) => same(r[k], v))
+        );
+        const orderBy = typeof body.order_by === "string" ? body.order_by : null;
+        if (orderBy) {
+          const dir = body.order_dir === "desc" ? -1 : 1;
+          matched = [...matched].sort((a, b) =>
+            String(a[orderBy] ?? "").localeCompare(String(b[orderBy] ?? ""), undefined, { numeric: true }) * dir
+          );
+        }
+        const limit = Number(body.limit ?? 10);
+        const offset = Number(body.offset ?? 0);
+        return json(route, {
+          items: matched.slice(offset, offset + limit),
+          total: matched.length,
+          limit,
+          offset,
+        });
+      }
       return json(route, { error: "Not found" }, 404);
     }
 

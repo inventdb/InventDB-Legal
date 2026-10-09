@@ -29,6 +29,9 @@ import {
 import type { FileRow } from "../types";
 import { AttachPanel, AttachedTo } from "./AttachPanel";
 import { PdfPreview } from "./PdfPreview";
+import { useOptionalDrill } from "../drill/DrillContext";
+import { recordFrame } from "../drill/keys";
+import { ENTITY_BY_NAME } from "../config/entities";
 import {
   ext,
   fileHome,
@@ -172,6 +175,21 @@ export function FileDetail({
   }
 
   const attached = !!recordId && recordId !== VAULT;
+  // The record a file is filed under: the folder named for it ("MT-2599 Estate
+  // of …", "LD-3009 Baek, Eun-Ji"), deepest first.
+  const drill = useOptionalDrill();
+  const filedUnder = String(file.folder_path || "")
+    .split("/")
+    .reverse()
+    .map((seg) => recordFrame(seg))
+    .find(Boolean);
+  const openRecord = (frame: Parameters<NonNullable<typeof drill>["open"]>[0]) => {
+    onClose();
+    // Opened from inside the drill-down panel: one level deeper on the same
+    // path. From the Files room: a fresh panel.
+    if (drill?.stack.length) drill.push(frame);
+    else drill?.open(frame);
+  };
   const rows: [string, string][] = [
     ["Type", file.content_type || "—"],
     ["Size", fileSizeLabel(fileSize(file))],
@@ -255,6 +273,10 @@ export function FileDetail({
                   type={type}
                   recordId={recordId}
                   onOpenRecord={() => {
+                    if (drill && ENTITY_BY_NAME[type]) {
+                      openRecord({ kind: "record", entity: type, id: recordId });
+                      return;
+                    }
                     onClose();
                     navigate(`/${type}`);
                   }}
@@ -268,6 +290,14 @@ export function FileDetail({
                   // here too would just say the same thing twice.
                   onAttached={onClose}
                 />
+              )}
+              {drill && filedUnder?.match && (
+                <p className="fx-filed-under">
+                  Filed under{" "}
+                  <button type="button" className="drill-link" onClick={() => openRecord(filedUnder)}>
+                    {ENTITY_BY_NAME[filedUnder.entity]?.label ?? filedUnder.entity} {String(filedUnder.match.value)} ›
+                  </button>
+                </p>
               )}
               <dl className="fx-info">
                 {rows.map(([k, v]) => (

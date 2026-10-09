@@ -696,6 +696,44 @@ def test_render_pages_the_layout_upstream(api, fake):
     assert "LIMIT" not in sent["baseSql"].upper()
 
 
+def test_render_counts_a_joined_view_the_server_could_not(api, fake):
+    """InventDB returns a total only for single-table queries. A designed card
+    view joins (a matter with its client), so its list read "0 records" over a
+    page of cards and offered no pager. The app counts the same rows itself."""
+    fake.on("POST", "/api/saved-views/render-layout", {"html": "<div>cards</div>", "total": None})
+    fake.on_sql("COUNT(*)", rows=[{"c": 57}])
+    base = (
+        "SELECT m.*, c.email AS client_email FROM legal.matters m "
+        "JOIN legal.clients c ON m.client_id = c.client_id ORDER BY m.date_opened DESC"
+    )
+
+    body = api.post(
+        "/api/views/matters/render", json={"template_id": "tpl-1", "base_sql": base}
+    ).get_json()
+
+    assert body["total"] == 57
+    assert fake.sql_log == [
+        "SELECT COUNT(*) AS c FROM legal.matters m JOIN legal.clients c ON m.client_id = c.client_id"
+    ]
+
+
+def test_render_trusts_the_server_total_when_there_is_one(api, fake):
+    fake.on("POST", "/api/saved-views/render-layout", {"html": "<div>x</div>", "total": 9})
+    body = api.post("/api/views/matters/render", json={"template_id": "tpl-1"}).get_json()
+    assert body["total"] == 9
+    assert fake.sql_log == []
+
+
+def test_render_leaves_the_total_unknown_when_it_cannot_be_counted(api, fake):
+    fake.on("POST", "/api/saved-views/render-layout", {"html": "<div>x</div>", "total": None})
+    fake.on_sql("COUNT(*)", status=400, payload={"error": "unsupported"})
+    body = api.post(
+        "/api/views/matters/render",
+        json={"template_id": "tpl-1", "base_sql": "SELECT * FROM legal.matters m JOIN legal.clients c ON 1=1"},
+    ).get_json()
+    assert body["total"] is None
+
+
 def test_render_needs_a_template(api, fake):
     resp = api.post("/api/views/matters/render", json={"page": 0})
 

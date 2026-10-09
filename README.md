@@ -129,6 +129,7 @@ run *is* a workflow, mid-flight.
 | | |
 |---|---|
 | 🪄 **Describe it** | Say what a record is in plain English and the form fills itself. It proposes, you commit — nothing saves until you press Save |
+| 🧭 **Drill down** | Click any record, result row, chart mark, report row or designed-view card: one right-hand panel opens it **read-only** — its fields, links up to what it points at (its client, its attorney), its **files** (attached to it, or filed under its number in the firm's folder tree), and a paged grid of every module that points at it (a matter's time, costs, invoices, trust ledger, docket…), each one level deeper. The breadcrumb names every level by its number (*Matter MT-2599 › Client CL-1037*) and jumps straight back to any of them; Back and Esc step out one at a time. A grouped row, bar, slice or KPI lists the records *behind* the number. A table with no query behind it — in an answer, in a report — opens the record a row's number names. Edit appears only when you may change that record |
 | 🔎 **Search & filter** | On every module, pushed into InventDB as an `OR` of `LIKE`s so it searches the table rather than the page |
 | 📑 **Pagination** | Server-side — the table fetches a page, not the whole set |
 | 🌓 **Dark & light** | Auto-detects system preference, including native `<select>` menus |
@@ -295,9 +296,9 @@ docker run -p 8010:8010 -e INVENTDB_BASE_URL=https://<slug>.cloud.inventdb.com i
 
 | Suite | Command | Expected |
 |---|---|---|
-| Back end + contract | `cd backend && python -m pytest` | **1171 passed, 6 xfailed** |
+| Back end + contract | `cd backend && python -m pytest` | **1248 passed, 6 xfailed** |
 | Types | `cd frontend && npm run typecheck` | 0 errors |
-| End-to-end | `cd frontend && npx playwright test` | **544 passed, 26 files** |
+| End-to-end | `cd frontend && npx playwright test` | **591 passed, 27 files** |
 
 - The backend suite ships a **fake InventDB**, so it needs no network, no secrets and no live instance.
 - The E2E suite mocks `/api` in the browser and starts its own Vite server — no backend required.
@@ -392,6 +393,14 @@ All endpoints live under `/api`. Data routes require a bearer token from the log
 | `GET/PUT/DELETE` | `/api/settings/connection` | Read, change or reset the instance |
 | `GET` | `/api/meta/entities` · `/types` · `/relationships` | Metadata |
 | `POST` | `/api/meta/sql` | Read-only `SELECT` passthrough |
+
+### Drill-down panel
+
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/api/drill/<entity>` | One page of the records behind a figure: the query's own `WHERE` (one read-only condition) plus equality `filters` |
+| `GET` | `/api/drill/<entity>/<id>/access` | May the caller change this record — readable under their token, then an admin role or a write grant |
+| `GET` | `/api/drill/<entity>/<id>/files` | The record's files: attached to it, or filed in a folder named for its number (a matter's, a lead's; a client's matters'; an invoice's matter, by its number in the name) |
 
 </details>
 
