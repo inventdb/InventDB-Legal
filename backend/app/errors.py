@@ -2,7 +2,38 @@
 
 from __future__ import annotations
 
+import re
+from http import HTTPStatus
 from typing import Any
+
+# A body that is a web page rather than a message: a proxy's or web server's
+# stock error page (`<html><head><title>403 Forbidden</title>…`).
+_MARKUP = re.compile(r"^\s*<|<html|<body|<!doctype", re.IGNORECASE)
+
+
+def status_message(status: int) -> str:
+    """Say an HTTP status in words, for an InventDB error that carried none."""
+    try:
+        phrase = HTTPStatus(status).phrase
+    except ValueError:
+        phrase = "Error"
+    message = f"InventDB answered {status} {phrase}"
+    if status >= 500:
+        message += " — try again in a moment"
+    return message
+
+
+def upstream_detail(status: int, text: str | None) -> str:
+    """The message for an InventDB error whose body is not JSON.
+
+    A short plain-text body is kept, since it is usually the reason. A web
+    page is not: shown in an alert it is a wall of tags, so the status is said
+    in words instead.
+    """
+    body = (text or "").strip()
+    if body and len(body) <= 300 and not _MARKUP.search(body):
+        return body
+    return status_message(status)
 
 
 class ApiError(Exception):

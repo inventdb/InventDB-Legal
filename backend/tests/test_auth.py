@@ -96,6 +96,45 @@ def test_an_unreachable_instance_is_a_502(api, fake):
     assert "inventdb.test" in resp.get_json()["error"]
 
 
+NGINX_403 = (
+    "<html>\r\n<head><title>403 Forbidden</title></head>\r\n<body>\r\n"
+    "<center><h1>403 Forbidden</h1></center>\r\n</body>\r\n</html>\r\n"
+)
+
+
+@pytest.mark.parametrize("status", [401, 403])
+def test_a_web_page_instead_of_inventdb_points_at_the_connection_setting(api, fake, status):
+    """The `your-slug` placeholder address answers every request with a stock
+    403 page. That page was shown verbatim on the sign-in card; it is not a
+    wrong password, so the message says where the address is set."""
+    fake.on("POST", "/api/auth/login", raw=NGINX_403, status=status)
+
+    resp = api.post("/api/auth/login", json={"username": "u", "password": "wrong"})
+
+    error = resp.get_json()["error"]
+    assert resp.status_code == 502
+    assert "<" not in error
+    assert "inventdb.test" in error
+    assert "Settings → InventDB Connection" in error
+
+
+def test_a_web_page_error_elsewhere_is_said_as_its_status(api, fake):
+    fake.on(
+        "GET", "/api/auth/me", raw="<html><body><h1>502 Bad Gateway</h1></body></html>", status=502
+    )
+
+    resp = api.get("/api/auth/me")
+
+    assert resp.status_code == 502
+    assert resp.get_json()["error"] == "InventDB answered 502 Bad Gateway — try again in a moment"
+
+
+def test_a_short_plain_text_error_is_kept(api, fake):
+    fake.on("GET", "/api/auth/me", raw="Token expired", status=401)
+
+    assert api.get("/api/auth/me").get_json()["error"] == "Token expired"
+
+
 # ===========================================================================
 # Current user
 # ===========================================================================

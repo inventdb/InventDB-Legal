@@ -26,7 +26,7 @@ from flask import Blueprint, Response, jsonify, request, stream_with_context
 
 from .. import clock
 from ..context import authed_client
-from ..errors import ApiError
+from ..errors import ApiError, upstream_detail
 from ..inventdb import InventDBClient, _safe_ident
 from ..sqlutil import sql_literal
 
@@ -350,7 +350,7 @@ def edit_report_template(template_id: str):
             detail = upstream.json()
             detail = detail.get("error") or detail.get("detail") or detail
         except ValueError:
-            detail = upstream.text or f"InventDB returned {upstream.status_code}"
+            detail = upstream_detail(upstream.status_code, upstream.text)
         finally:
             upstream.close()
         raise ApiError(upstream.status_code, detail)

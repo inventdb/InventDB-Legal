@@ -14,7 +14,7 @@ from typing import Any, Optional
 import requests
 
 from .config import get_settings
-from .errors import ApiError
+from .errors import ApiError, status_message, upstream_detail
 
 _IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 # Record ids are server-minted UUIDs, so they carry hyphens that _IDENT_RE
@@ -123,7 +123,7 @@ class InventDBClient:
                 if isinstance(issues, list) and issues:
                     extra["issues"] = issues
             except (ValueError, AttributeError):
-                detail = resp.text or f"InventDB returned {resp.status_code}"
+                detail = upstream_detail(resp.status_code, resp.text)
             raise ApiError(resp.status_code, detail, extra)
         if not resp.content:
             return None
@@ -134,12 +134,28 @@ class InventDBClient:
 
     # ------------------------------------------------------------------ auth
     def login(self, username: str, password: str) -> dict[str, Any]:
-        return self._request(
-            "POST",
-            "/api/auth/login",
-            auth=False,
-            json={"username": username, "password": password},
-        )
+        try:
+            return self._request(
+                "POST",
+                "/api/auth/login",
+                auth=False,
+                json={"username": username, "password": password},
+            )
+        except ApiError as exc:
+            # InventDB rejects a wrong password with its own JSON message,
+            # which is kept. A bare 401/403 web page is not InventDB talking:
+            # the address points somewhere else (the `your-slug` placeholder
+            # answers every request that way), so say where to fix it.
+            if exc.status_code in (401, 403) and exc.detail == status_message(
+                exc.status_code
+            ):
+                raise ApiError(
+                    502,
+                    f"{self.base_url} is not answering as an InventDB instance "
+                    f"({exc.status_code}). Check the address in "
+                    "Settings → InventDB Connection.",
+                ) from exc
+            raise
 
     def me(self) -> dict[str, Any]:
         return self._request("GET", "/api/auth/me", params={"app": self.app})
@@ -407,7 +423,7 @@ class InventDBClient:
         except requests.RequestException as exc:
             raise ApiError(502, f"Could not reach InventDB: {exc}") from exc
         if resp.status_code >= 400:
-            raise ApiError(resp.status_code, resp.text or "Could not load the report")
+            raise ApiError(resp.status_code, upstream_detail(resp.status_code, resp.text))
         return resp.text
 
     def delete_attachment(
@@ -577,7 +593,7 @@ class InventDBClient:
         except requests.RequestException as exc:
             raise ApiError(502, f"Could not reach InventDB: {exc}") from exc
         if resp.status_code >= 400:
-            detail = resp.text or f"InventDB returned {resp.status_code}"
+            detail = upstream_detail(resp.status_code, resp.text)
             resp.close()
             raise ApiError(resp.status_code, detail)
         return resp

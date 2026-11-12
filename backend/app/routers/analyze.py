@@ -33,7 +33,7 @@ from typing import Any
 from flask import Blueprint, Response, jsonify, request, stream_with_context
 
 from ..context import authed_client
-from ..errors import ApiError
+from ..errors import ApiError, upstream_detail
 
 bp = Blueprint("analyze", __name__, url_prefix="/api/analyze")
 
@@ -120,7 +120,7 @@ def chat_stream():
             detail = upstream.json()
             detail = detail.get("error") or detail.get("detail") or detail
         except ValueError:
-            detail = upstream.text or f"InventDB returned {upstream.status_code}"
+            detail = upstream_detail(upstream.status_code, upstream.text)
         finally:
             upstream.close()
         raise ApiError(upstream.status_code, detail)

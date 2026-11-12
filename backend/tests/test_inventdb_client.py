@@ -216,18 +216,27 @@ def test_the_upstream_status_is_preserved(db, fake, status):
     assert exc.value.status_code == status
 
 
-def test_a_non_json_error_body_falls_back_to_the_raw_text(db, fake):
+def test_a_web_page_error_body_is_said_as_its_status(db, fake):
+    """A proxy's stock error page is markup, not a message; shown as-is it
+    fills the alert with tags."""
     fake.on("GET", "/api/auth/me", raw="<html>502 Bad Gateway</html>", status=502)
     with pytest.raises(ApiError) as exc:
         db.me()
-    assert exc.value.detail == "<html>502 Bad Gateway</html>"
+    assert exc.value.detail == "InventDB answered 502 Bad Gateway — try again in a moment"
+
+
+def test_a_short_plain_text_error_body_is_kept(db, fake):
+    fake.on("GET", "/api/auth/me", raw="Token expired", status=401)
+    with pytest.raises(ApiError) as exc:
+        db.me()
+    assert exc.value.detail == "Token expired"
 
 
 def test_an_empty_error_body_falls_back_to_the_status_code(db, fake):
     fake.on("GET", "/api/auth/me", raw="", status=503)
     with pytest.raises(ApiError) as exc:
         db.me()
-    assert exc.value.detail == "InventDB returned 503"
+    assert exc.value.detail == "InventDB answered 503 Service Unavailable — try again in a moment"
 
 
 def test_a_json_array_error_body_still_surfaces_the_upstream_status(db, fake):
