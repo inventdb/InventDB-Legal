@@ -1,21 +1,22 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
-import { ArrowRight, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowRight, ExternalLink, Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
 import { BrandLockup } from "../components/BrandLockup";
 import { FIRM_FEATURES, FirmScene } from "../components/FirmScene";
 import { Alert } from "../components/ui";
+import { useTheme } from "../theme/ThemeContext";
 
 // InventDB is the identity provider, so new users register their workspace
 // there rather than in this app.
 const INVENTDB_URL = "https://www.inventdb.com";
 
 /**
- * The login sheet: one full-screen drawing of the firm in section, with the
- * practice on its floors. The building drafts itself, the floors light from
- * the lobby up, and a leader runs out of the lobby to the sign-in sheet,
- * which arrives last. Layout and timing are in the Login block of global.css.
+ * The login page: one full-screen scene of the firm — by day in light mode,
+ * by night in dark — with the practice on its floors. The building draws itself, the floors light from the lobby
+ * up, and a line runs out of the lobby to the sign-in sheet, which arrives
+ * last. Layout and timing are in the Login block of global.css.
  */
 export default function Login() {
   const { user, token, login, loading } = useAuth();
@@ -24,6 +25,7 @@ export default function Login() {
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const { theme, toggle } = useTheme();
 
   // Depth: the pointer's position, as -1…1 on each axis, drives the drawing's
   // parallax layers (see `.firm .px` in firm.css). Skipped for reduced motion
@@ -62,17 +64,30 @@ export default function Login() {
 
   return (
     <div className="login-page" ref={pageRef}>
+      {/* Light mode draws the firm by day, dark mode by night. */}
       <div className="login-scene">
-        <FirmScene variant="hero" sky="evening" />
+        <FirmScene variant="hero" sky={theme === "dark" ? "evening" : "afternoon"} />
       </div>
+
+      <button
+        type="button"
+        className="login-theme"
+        onClick={toggle}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        title={theme === "dark" ? "Light mode" : "Dark mode"}
+      >
+        {theme === "dark" ? <Sun key="sun" size={17} /> : <Moon key="moon" size={17} />}
+      </button>
 
       <header className="login-hero">
         <BrandLockup className="hero-badge" size="lg" />
         <div className="login-story">
-          <div className="login-annot">Section A–A · the practice, floor by floor</div>
-          <h1>Legal practice, modernised.</h1>
+          {/* Two deliberate lines on desktop; one line on a phone. */}
+          <h1>
+            <span>Legal practice,</span> <span>modernised.</span>
+          </h1>
           <p>
-            Every matter the firm holds, on one floor plan — built on the InventDB SOAR
+            Every part of the practice, under one roof — built on the InventDB SOAR
             database.
           </p>
           {/* The drawing is decorative to assistive tech, so what each floor
@@ -88,7 +103,7 @@ export default function Login() {
       <section className="login-form-wrap" aria-label="Sign in">
         <div className="login-sheet">
           <div className="ls-annot">
-            <span>G</span> Front desk
+            <span>G</span> Reception
           </div>
           <div className="lc-head">
             <h2>Welcome back</h2>
@@ -152,20 +167,10 @@ export default function Login() {
         </div>
       </section>
 
-      {/* The sheet's title block, as on any drawing. */}
       <footer className="hero-foot">
-        <div className="tb-cell">
-          <span>Project</span>
-          InventDB Legal
-        </div>
-        <div className="tb-cell">
-          <span>System</span>
-          {"Powered by InventDB SOAR — secure & real-time"}
-        </div>
-        <div className="tb-cell">
-          <span>Access</span>
-          Authentication is handled directly by InventDB
-        </div>
+        <span>InventDB Legal</span>
+        <span>{"Powered by InventDB SOAR — secure & real-time"}</span>
+        <span>Authentication is handled directly by InventDB</span>
       </footer>
     </div>
   );

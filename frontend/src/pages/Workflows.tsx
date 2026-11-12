@@ -181,7 +181,6 @@ export default function Workflows() {
     <div className="content">
       <div className="page-head">
         <div className="titles">
-          <h2>Workflows</h2>
           <p>
             Automations that run against your practice — scheduled reports, alerts and data
             actions — with their live execution history. They run on InventDB SOAR’s engine,

@@ -687,7 +687,6 @@ export default function ImportPage() {
       <div className="content">
         <div className="page-head">
           <div className="titles">
-            <h2>Import</h2>
             <p>
               Bring in data from a spreadsheet (CSV or Excel). Every sheet, an adjustable
               header row, per-column types, and a typed preview before anything is written.
@@ -786,7 +785,6 @@ export default function ImportPage() {
     <div className="content import-room">
       <div className="page-head">
         <div className="titles">
-          <h2>Import</h2>
           <p>
             Map each column to a field and choose the type — no assistant needed. Query it
             straight after in <b>Analyze</b>.

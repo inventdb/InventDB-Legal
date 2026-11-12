@@ -4,6 +4,7 @@ import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
   ArrowUp,
+  BookOpen,
   CalendarDays,
   ChevronFirst,
   ChevronLast,
@@ -26,13 +27,13 @@ import {
 } from "../config/entities";
 import type { Record as Rec } from "../types";
 import { formatCell } from "../utils/format";
-import { Icon } from "../components/Icon";
 import { EntityForm } from "../components/EntityForm";
 import { ConfirmDialog, Modal } from "../components/Modal";
 import { useReferences } from "../components/references";
 import { ScrollX } from "../components/ScrollX";
 import { useToast } from "../components/Toast";
 import { useDrill } from "../drill/DrillContext";
+import { RecordPaper } from "../drill/RecordPaper";
 import { Alert, Badge, EmptyState, Spinner } from "../components/ui";
 import { ViewSwitcher } from "../views/ViewSwitcher";
 import { ViewDesigner, type DesignedView } from "../views/ViewDesigner";
@@ -51,6 +52,31 @@ import {
 /** Rows per page. 50 fills a desktop pane without over-fetching on a phone. */
 const DEFAULT_PAGE_SIZE = 50;
 const PAGE_SIZES = [25, 50, 100, 200];
+
+/**
+ * How a module is read. The casebook INDEX (records as cards, the chosen one
+ * open as a page beside them) is where a module opens; the LEDGER is the table,
+ * for scanning and sorting many rows; a module whose records happen on a day
+ * can also be read as a CALENDAR. The choice lives in the URL so a reload or a
+ * shared link keeps it, and the last choice is remembered per module.
+ */
+type Layout = "index" | "ledger" | "calendar";
+const layoutKey = (entity: string) => `legal.view.${entity}`;
+
+function rememberedLayout(entity: string): Layout | null {
+  try {
+    const v = localStorage.getItem(layoutKey(entity));
+    return v === "index" || v === "ledger" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Money and quantities read down a column, so they align right in figures. */
+const isAmount = (f: FieldDef) => f.type === "currency" || (f.type === "number" && !/year|bar_number/i.test(f.name));
+
+/** True on a phone, where the index and the page are two screens. */
+const onPhone = () => !!window.matchMedia?.("(max-width: 720px)").matches;
 
 export default function EntityListPage() {
   const { entity = "" } = useParams();
@@ -81,6 +107,20 @@ function EntityModule({ config }: { config: EntityConfig }) {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
+  // The index: which record is open on the page beside it — and, on a phone,
+  // where the index and the page are two screens, whether the page is showing.
+  const [selId, setSelId] = useState<string | null>(null);
+  const [showPage, setShowPage] = useState(false);
+  // The index can be narrowed by status, when the module has a short list of
+  // them. Filtered by the server, like the search, so the count stays true.
+  const statusField = useMemo(
+    () =>
+      config.fields.find((f) => f.badge && f.options && f.options.length > 1 && f.options.length <= 8) ??
+      null,
+    [config]
+  );
+  const [status, setStatus] = useState<string | null>(null);
+
   // --- Saved views -------------------------------------------------------
   // `null` means the unfiltered "All <module>" list. A view is only ever the
   // *source* of the search and sort below — once applied it stops being
@@ -104,27 +144,40 @@ function EntityModule({ config }: { config: EntityConfig }) {
   const activeView = (views.data ?? []).find((v) => v.id === activeViewId) ?? null;
   const customView = activeView?.mode === "custom" ? activeView : null;
 
-  // A module with a calendar can also be read by month. Which way, and which
-  // month, live in the URL, so a reload or a shared link keeps them.
-  const calendarOn = !!config.calendar && params.get("view") === "calendar";
+  // Index, ledger or calendar — and which month — live in the URL, so a
+  // reload or a shared link keeps them.
+  const asked = params.get("view");
+  const layout: Layout =
+    asked === "calendar" && config.calendar
+      ? "calendar"
+      : asked === "ledger" || asked === "index"
+      ? asked
+      : rememberedLayout(config.name) ?? "index";
+  const calendarOn = layout === "calendar";
+  const indexOn = layout === "index" && !customView;
   const calMonth = useMemo(() => {
     const now = new Date();
     return parseMonth(params.get("month")) ?? { y: now.getFullYear(), m: now.getMonth() };
   }, [params]);
   const [calCount, setCalCount] = useState<number | null>(null);
-  const setLayout = (calendar: boolean) =>
+  const setLayout = (to: Layout) => {
+    if (to !== "calendar") {
+      try {
+        localStorage.setItem(layoutKey(config.name), to);
+      } catch {
+        /* a private window: the URL still carries the choice */
+      }
+    }
     setParams(
       (prev) => {
         const next = new URLSearchParams(prev);
-        if (calendar) next.set("view", "calendar");
-        else {
-          next.delete("view");
-          next.delete("month");
-        }
+        next.set("view", to);
+        if (to !== "calendar") next.delete("month");
         return next;
       },
       { replace: true }
     );
+  };
   const setCalMonth = (m: { y: number; m: number }) =>
     setParams(
       (prev) => {
@@ -137,7 +190,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
 
   function applyView(view: SavedView) {
     // A designed view draws its own layout, so it is a table-side view.
-    if (view.mode === "custom" && calendarOn) setLayout(false);
+    if (view.mode === "custom" && calendarOn) setLayout("index");
     setDesigning(false);
     setActiveViewId(view.id);
     setRawSearch(view.search);
@@ -261,6 +314,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
       order_dir: sort.dir,
       limit: pageSize,
       offset: page * pageSize,
+      ...(indexOn && statusField && status ? { [statusField.name]: status } : {}),
     },
     // Hold the previous page on screen while the next one loads, so paging
     // doesn't flash the empty state and collapse the table's height.
@@ -284,6 +338,15 @@ function EntityModule({ config }: { config: EntityConfig }) {
     [tableFields]
   );
   const { labels } = useReferences(refEntities);
+  // What a card in the index says under its title: the first few columns that
+  // are not already its number, its title or its status.
+  const metaFields = useMemo(
+    () =>
+      tableFields
+        .filter((f) => !f.badge && f.name !== config.key && !config.titleFields.includes(f.name))
+        .slice(0, 3),
+    [tableFields, config]
+  );
 
   const items = list.data?.items ?? [];
   // Both surfaces page the same way; only the source of the count differs.
@@ -317,12 +380,35 @@ function EntityModule({ config }: { config: EntityConfig }) {
   useEffect(() => {
     if (!focusId || focusedOnce.current === focusId) return;
     focusedOnce.current = focusId;
-    drill.open({ kind: "record", entity: config.name, id: focusId });
+    // In the casebook the record opens on its own page, beside the index; in
+    // the ledger (or a designed view) it opens in the panel over the list.
+    if (indexOn) {
+      setSelId(focusId);
+      setShowPage(true);
+    } else {
+      drill.open({ kind: "record", entity: config.name, id: focusId });
+    }
     const next = new URLSearchParams(params);
     next.delete("focus");
     setParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusId]);
+
+  // The index opens on its first record, so the page beside it is never blank
+  // while there is something to show. A phone stays on the index until a
+  // card is chosen.
+  useEffect(() => {
+    if (!indexOn || selId != null || items.length === 0) return;
+    const first = items[0]._id;
+    if (first != null) setSelId(String(first));
+  }, [indexOn, selId, items]);
+
+  const pickRecord = (record: Rec) => {
+    if (record._id == null) return;
+    setSelId(String(record._id));
+    setShowPage(true);
+    if (onPhone()) window.scrollTo({ top: 0 });
+  };
 
   /** A row opens its record read-only; Edit is a deliberate second step. */
   const openRecord = (record: Rec) => {
@@ -354,9 +440,16 @@ function EntityModule({ config }: { config: EntityConfig }) {
     try {
       if (editing?._id) {
         await update.mutateAsync({ id: String(editing._id), payload: values });
+        // The page beside the index reads the record through the drill query.
+        await qc.invalidateQueries({ queryKey: ["drill"] });
         toast.success(`${config.label} updated`);
       } else {
-        await create.mutateAsync(values);
+        const made = (await create.mutateAsync(values)) as Rec | undefined;
+        // A new record opens on its page, so you see what you just filed.
+        if (indexOn && made?._id != null) {
+          setSelId(String(made._id));
+          setShowPage(true);
+        }
         toast.success(`${config.label} created`);
       }
       setModalOpen(false);
@@ -371,6 +464,10 @@ function EntityModule({ config }: { config: EntityConfig }) {
     try {
       await del.mutateAsync(String(deleting._id));
       toast.success(`${config.label} deleted`);
+      if (String(deleting._id) === selId) {
+        setSelId(null);
+        setShowPage(false);
+      }
       setDeleting(null);
     } catch (err) {
       toast.error(errorMessage(err));
@@ -399,13 +496,15 @@ function EntityModule({ config }: { config: EntityConfig }) {
     // view is not a table — it is a document, and it has to be allowed to run
     // past the fold and let the page scroll. Locking the page around it clipped
     // everything below the first screen with nothing to scroll.
-    <div className={`content${customView || designing || calendarOn ? "" : " content-fill"}${calendarOn ? " is-calendar" : ""}`}>
+    <div
+      className={`content${
+        customView || designing || calendarOn || indexOn ? "" : " content-fill"
+      }${calendarOn ? " is-calendar" : ""}${indexOn ? " is-index" : ""}${
+        indexOn && showPage ? " is-reading" : ""
+      }`}
+    >
       <div className="page-head">
-        <div className="stat-ico" style={{ width: 40, height: 40 }}>
-          <Icon name={config.icon} size={20} />
-        </div>
         <div className="titles">
-          <h2>{config.labelPlural}</h2>
           <p>
             Manage your {config.labelPlural.toLowerCase()} — create, edit and track
             records stored in InventDB.
@@ -457,23 +556,37 @@ function EntityModule({ config }: { config: EntityConfig }) {
             onChange={(e) => setRawSearch(e.target.value)}
           />
         </div>
-        {config.calendar && (
-          <div className="view-mode" role="group" aria-label="Show as">
-            <button type="button" aria-pressed={!calendarOn} onClick={() => setLayout(false)}>
-              <Table2 size={15} aria-hidden /> Table
-            </button>
+        <div className="cb-seg" role="group" aria-label="Show as">
+          <button
+            type="button"
+            aria-pressed={layout === "index"}
+            title="Records as an index, the chosen one open beside it"
+            onClick={() => setLayout("index")}
+          >
+            <BookOpen size={15} aria-hidden /> Index
+          </button>
+          <button
+            type="button"
+            aria-pressed={layout === "ledger"}
+            title="Records as a table"
+            onClick={() => setLayout("ledger")}
+          >
+            <Table2 size={15} aria-hidden /> Ledger
+          </button>
+          {config.calendar && (
             <button
               type="button"
               aria-pressed={calendarOn}
+              title="Records by day, a month at a time"
               onClick={() => {
                 if (customView) applyAllView();
-                setLayout(true);
+                setLayout("calendar");
               }}
             >
               <CalendarDays size={15} aria-hidden /> Calendar
             </button>
-          </div>
-        )}
+          )}
+        </div>
         <span className="count-pill">
           {calendarOn
             ? calCount == null
@@ -589,10 +702,121 @@ function EntityModule({ config }: { config: EntityConfig }) {
         )
       ) : list.isLoading ? (
         <Spinner />
+      ) : indexOn && (items.length > 0 || status) ? (
+        <div className={`cb-book ${showPage ? "show-detail" : "show-list"}`}>
+          <section className="cb-index" aria-label={`${config.labelPlural} index`}>
+            {statusField && (
+              <div className="cb-chips" role="group" aria-label={statusField.label}>
+                {[null, ...(statusField.options ?? [])].map((opt) => (
+                  <button
+                    key={opt ?? "all"}
+                    type="button"
+                    className="cb-chip"
+                    aria-pressed={status === opt}
+                    onClick={() => {
+                      setStatus(opt);
+                      setPage(0);
+                    }}
+                  >
+                    {opt ?? "All"}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className={`cb-index-list${list.isFetching ? " is-paging" : ""}`}>
+              {items.length === 0 && (
+                <p className="cb-faint" style={{ padding: "12px 0" }}>
+                  Nothing in the index matches.
+                </p>
+              )}
+              {items.map((record, idx) => {
+                const id = record._id != null ? String(record._id) : null;
+                const statusValue = statusField ? record[statusField.name] : undefined;
+                const firstBadge = config.fields.find((f) => f.badge);
+                return (
+                  <button
+                    key={id ?? idx}
+                    type="button"
+                    className="cb-card"
+                    aria-current={id === selId ? "true" : undefined}
+                    onClick={() => pickRecord(record)}
+                  >
+                    <span className="no">
+                      <span>{config.hideKeyColumn ? "" : String(record[config.key] ?? "")}</span>
+                      {statusField ? (
+                        statusValue != null && statusValue !== "" && <Badge value={statusValue} />
+                      ) : (
+                        firstBadge && <Badge value={record[firstBadge.name]} />
+                      )}
+                    </span>
+                    <span className="cap">{recordTitle(config, record)}</span>
+                    {metaFields.length > 0 && (
+                      <span className="meta">
+                        {metaFields.map((f) =>
+                          record[f.name] == null || record[f.name] === "" ? null : (
+                            <span key={f.name} title={f.label}>
+                              {renderCell(record, f)}
+                            </span>
+                          )
+                        )}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="cb-index-pager">
+              <span aria-live="polite">
+                {firstRow.toLocaleString()}–{lastRow.toLocaleString()} of {total.toLocaleString()}
+              </span>
+              {pageCount > 1 && (
+                <span>
+                  <button
+                    type="button"
+                    className="btn-icon"
+                    aria-label="Previous page"
+                    disabled={page === 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-icon"
+                    aria-label="Next page"
+                    disabled={page >= pageCount - 1}
+                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </span>
+              )}
+            </div>
+          </section>
+          {selId ? (
+            <RecordPaper
+              key={selId}
+              entity={config.name}
+              id={selId}
+              onEdit={openEdit}
+              onDelete={setDeleting}
+              onBack={() => setShowPage(false)}
+            />
+          ) : (
+            <article className="cb-paper">
+              <div className="cb-margin" aria-hidden />
+              <div className="cb-pbody">
+                <div className="cb-blank">
+                  <h2>Nothing open</h2>
+                  <p>Choose a record from the index to read it here.</p>
+                </div>
+              </div>
+            </article>
+          )}
+        </div>
       ) : items.length === 0 ? (
         <div className="card">
           <EmptyState
-            icon={<Icon name={config.icon} size={26} />}
             title={q ? "No matching records" : `No ${config.labelPlural.toLowerCase()} yet`}
             message={
               q
@@ -615,7 +839,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
               <tr>
                 {!config.hideKeyColumn && <th className="no-sort">{config.key}</th>}
                 {tableFields.map((f) => (
-                  <th key={f.name} onClick={() => toggleSort(f.name)}>
+                  <th key={f.name} className={isAmount(f) ? "cb-amt" : undefined} onClick={() => toggleSort(f.name)}>
                     <span className="th-sort">
                       {f.label}
                       {sort.field === f.name &&
@@ -645,12 +869,14 @@ function EntityModule({ config }: { config: EntityConfig }) {
                   }}
                 >
                   {!config.hideKeyColumn && (
-                    <td style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5, color: "var(--text-muted)" }}>
+                    <td className="cb-key" data-label={config.key}>
                       {String(record[config.key] ?? "—")}
                     </td>
                   )}
                   {tableFields.map((f) => (
-                    <td key={f.name}>{renderCell(record, f)}</td>
+                    <td key={f.name} data-label={f.label} className={isAmount(f) ? "cb-amt" : undefined}>
+                      {renderCell(record, f)}
+                    </td>
                   ))}
                   <td onClick={(e) => e.stopPropagation()}>
                     <div className="row-actions">
@@ -680,7 +906,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
       {/* Gated on the RESULT, not on `items`: a custom view is rendered by the
           engine and never fills `items`, so keying off it left the pager
           appearing only when stale table rows happened to still be in cache. */}
-      {total > 0 && !calendarOn && (
+      {total > 0 && !calendarOn && !indexOn && (
         <nav className="pager" aria-label={`${config.labelPlural} pagination`}>
           <p className="pager-status" aria-live="polite">
             Showing <b>{firstRow.toLocaleString()}</b>–<b>{lastRow.toLocaleString()}</b> of{" "}

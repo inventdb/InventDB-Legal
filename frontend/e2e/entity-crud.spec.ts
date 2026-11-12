@@ -1,4 +1,7 @@
-import { dialog, expect, field, row, rows, test } from "./fixtures";
+import { dialog, expect, field, row, rows, test, preferLedger, openSection } from "./fixtures";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 test.describe("Create", () => {
   test.beforeEach(async ({ page }) => {
@@ -268,12 +271,12 @@ test.describe("Modal behaviour", () => {
     await field(page, "matter_caption").fill("Scratch value");
     await page.keyboard.press("Escape");
 
-    await page.locator("nav.nav").getByRole("link", { name: "Clients", exact: true }).click();
+    await openSection(page, "Clients");
     await page.getByRole("button", { name: "New Client" }).click();
     await expect(field(page, "client_name")).toHaveValue("");
 
     await page.keyboard.press("Escape");
-    await page.locator("nav.nav").getByRole("link", { name: "Matters", exact: true }).click();
+    await openSection(page, "Matters");
     await page.getByRole("button", { name: "New Matter" }).click();
     await expect(field(page, "matter_caption")).toHaveValue("");
   });

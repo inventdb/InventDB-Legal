@@ -4,34 +4,6 @@
    ========================================================================== */
 
 /* ---- Table | Calendar --------------------------------------------------- */
-.view-mode {
-  display: inline-flex;
-  padding: 3px;
-  gap: 2px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-}
-.view-mode button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: none;
-  color: var(--text-faint);
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-}
-.view-mode button[aria-pressed="true"] {
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-weight: 600;
-}
-.view-mode button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
-
 /* ---- The calendar card ------------------------------------------------- */
 .cal {
   background: var(--surface);
@@ -58,8 +30,11 @@
   margin: 0 6px;
   min-width: 9.5em;
   text-align: center;
-  font-size: 17px;
-  font-weight: 600;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums;
 }
 .cal-legend {
   margin: 0 0 0 auto;
@@ -124,17 +99,23 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: none;
-  color: var(--text-muted);
+  color: var(--text);
   font: inherit;
-  font-size: 12.5px;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-variant-numeric: lining-nums;
   line-height: 26px;
   text-align: center;
 }
 button.cal-date { cursor: pointer; }
 button.cal-date:hover { background: var(--neutral-soft); }
+/* Today: the sunflower rule across the top of the day, as a folder tab
+   marks the open floor — one of sunflower's few jobs. */
+.cal-day.is-today {
+  box-shadow: inset 0 3px 0 var(--accent);
+}
 .cal-day.is-today .cal-date {
-  background: var(--accent); /* today is one of sunflower's few jobs */
-  color: var(--on-accent);
+  color: var(--accent-ink);
   font-weight: 600;
 }
 
@@ -276,6 +257,6 @@ button.cal-date:hover { background: var(--neutral-soft); }
   .content.is-calendar .toolbar .count-pill { display: none; }
   .content.is-calendar .page-head { margin-bottom: 10px; }
   .content.is-calendar .toolbar { gap: 8px; }
-  .content.is-calendar .view-mode { flex: 1; }
-  .content.is-calendar .view-mode button { flex: 1; justify-content: center; }
+  .content.is-calendar .cb-seg { flex: 1; }
+  .content.is-calendar .cb-seg button { flex: 1; justify-content: center; }
 }

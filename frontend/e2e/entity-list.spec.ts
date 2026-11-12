@@ -1,4 +1,7 @@
-import { MODULES, expect, rows, test } from "./fixtures";
+import { MODULES, expect, rows, test, preferLedger } from "./fixtures";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * Every module is one generic component driven by `config/entities.ts`, so
@@ -10,8 +13,10 @@ test.describe("Entity modules", () => {
     test(`${plural} lists its records`, async ({ page, store }) => {
       await page.goto(`/${name}`);
 
+      // One title per page, set by the frame; the page's own head no longer
+      // repeats it.
       await expect(page.getByRole("heading", { name: plural, level: 1 })).toBeVisible();
-      await expect(page.getByRole("heading", { name: plural, level: 2 })).toBeVisible();
+      await expect(page.getByRole("heading", { name: plural, level: 2 })).toHaveCount(0);
 
       await expect(page.locator(".count-pill")).toHaveText(`${store[name].length} records`);
       await expect(rows(page)).toHaveCount(store[name].length);

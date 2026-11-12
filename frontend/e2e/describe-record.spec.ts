@@ -1,15 +1,7 @@
-import {
-  DESCRIBE_FENCED_STEPS,
-  DESCRIBE_MATTER_STEPS,
-  DESCRIBE_UNRESOLVED_STEPS,
-  MODULES,
-  dialog,
-  expect,
-  field,
-  row,
-  sseBody,
-  test,
-} from "./fixtures";
+import { DESCRIBE_FENCED_STEPS, DESCRIBE_MATTER_STEPS, DESCRIBE_UNRESOLVED_STEPS, MODULES, dialog, expect, field, row, sseBody, test, preferLedger } from "./fixtures";
+
+// These read rows from the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * "Describe it" — plain English into a New <type> form.

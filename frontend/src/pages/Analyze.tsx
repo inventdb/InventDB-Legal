@@ -685,7 +685,6 @@ export default function Analyze() {
     <div className="content an-room">
       <div className="page-head">
         <div className="titles">
-          <h2>Analyze</h2>
           <p>
             Ask about your practice in plain language. The assistant answers from
             your data and shows the query it used, so you can check it. It only

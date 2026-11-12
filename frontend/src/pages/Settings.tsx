@@ -32,7 +32,6 @@ export default function Settings() {
     <div className="content">
       <div className="page-head">
         <div className="titles">
-          <h2>Settings</h2>
           <p>Account, appearance, connection and data management.</p>
         </div>
       </div>

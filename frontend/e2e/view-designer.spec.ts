@@ -1,5 +1,8 @@
-import { expect, test } from "./fixtures";
+import { expect, test, preferLedger } from "./fixtures";
 import type { Page } from "@playwright/test";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * Designed views, end to end, on every module.

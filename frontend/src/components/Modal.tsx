@@ -8,6 +8,7 @@ export function Modal({
   children,
   footer,
   narrow,
+  wide,
   hideTitle,
 }: {
   title: string;
@@ -15,6 +16,8 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
   narrow?: boolean;
+  /** A sheet with room for a document or a console beside its controls. */
+  wide?: boolean;
   /**
    * Keep `title` as the dialog's accessible name but do not draw it.
    *
@@ -45,7 +48,7 @@ export function Modal({
   return createPortal(
     <div className="modal-backdrop" onMouseDown={onClose}>
       <div
-        className={`modal ${narrow ? "narrow" : ""}`}
+        className={`modal${narrow ? " narrow" : ""}${wide ? " wide" : ""}`}
         onMouseDown={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

@@ -8,6 +8,9 @@ import { AuthProvider } from "./auth/AuthContext";
 import { ThemeProvider } from "./theme/ThemeContext";
 import { ToastProvider } from "./components/Toast";
 import "./styles/global.css";
+// The casebook skin defines the shared components; module sheets come after
+// it so a module can still refine them, as they did over global.css.
+import "./styles/casebook.css";
 import "./styles/analyze.css";
 import "./styles/notifications.css";
 import "./styles/reports.css";

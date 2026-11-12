@@ -1,6 +1,9 @@
 import type { Page, Route } from "@playwright/test";
 
-import { expect, test } from "./fixtures";
+import { expect, test, preferLedger } from "./fixtures";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * The sideways-scroll rail (`ScrollX`).

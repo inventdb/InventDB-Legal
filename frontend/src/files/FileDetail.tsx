@@ -202,7 +202,7 @@ export function FileDetail({
 
   return (
     <>
-      <Modal title={name} onClose={onClose}>
+      <Modal title={name} onClose={onClose} wide>
         <div className="fx-detail">
           {error && <Alert kind="error">{error}</Alert>}
 

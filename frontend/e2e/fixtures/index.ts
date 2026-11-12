@@ -1,6 +1,6 @@
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
 
-import { createStore, type Store } from "./data";
+import { MODULES, createStore, type Store } from "./data";
 import { installMockApi } from "./mock-api";
 
 export * from "./data";
@@ -93,4 +93,36 @@ export async function signIn(page: Page, username = "e2e.manager"): Promise<void
 }
 
 /** Wipe the signed-in storage state for a spec that must start anonymous. */
+/**
+ * Open modules on the LEDGER — the table — rather than the casebook index,
+ * the way a user who chose it last time gets it: the app remembers the choice
+ * per module. For specs about the table itself: its columns, sort, paging and
+ * rows.
+ */
+export async function preferLedger(page: Page): Promise<void> {
+  const names = MODULES.map((m) => m.name);
+  await page.addInitScript((list: string[]) => {
+    for (const n of list) localStorage.setItem(`legal.view.${n}`, "ledger");
+  }, names);
+}
+
+/**
+ * Go to a section the way someone would from any floor: "All sections", then
+ * its name. The strip under the floor tabs only lists the open floor's own
+ * sections, so a section on another floor is not a link on screen until then.
+ */
+export async function openSection(page: Page, label: string): Promise<void> {
+  await page.getByRole("button", { name: /^All sections/ }).filter({ visible: true }).first().click();
+  await page
+    .getByRole("dialog", { name: "All sections" })
+    // A section with something waiting on it says so in its name
+    // ("Workflows, 2 waiting on you"), so the match is on what comes first.
+    .getByRole("link", { name: new RegExp(`^${escapeRegExp(label)}(,|$)`) })
+    .click();
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export const signedOut = { storageState: { cookies: [], origins: [] } };

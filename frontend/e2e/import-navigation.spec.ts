@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures";
+import { expect, openSection, test } from "./fixtures";
 
 /**
  * An import must outlive the room that started it.
@@ -45,7 +45,7 @@ test("an import keeps going while you browse other modules", async ({ page }) =>
   console.log("started, batches so far:", batches.length);
 
   // Leave the room mid-import — the bug.
-  await page.getByRole("link", { name: "Matters" }).click();
+  await openSection(page, "Matters");
   await expect(page).toHaveURL(/matters/);
   const duringAway = batches.length;
   console.log("navigated away after", duringAway, "batch(es)");
@@ -57,10 +57,10 @@ test("an import keeps going while you browse other modules", async ({ page }) =>
   console.log("kept going while away — batches now:", batches.length);
 
   // Come back: the room must show the run, not an empty dropzone.
-  await page.getByRole("link", { name: "Import" }).click();
+  await openSection(page, "Import");
   await expect(page).toHaveURL(/import/);
   // The room is code-split; wait for the chunk to render before counting.
-  await expect(page.locator("h2", { hasText: "Import" })).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator(".import-running, .dropzone").first()).toBeVisible({ timeout: 20_000 });
   const dropzones = await page.locator(".dropzone").count();
   const progress = await page.locator(".import-running").count();
   console.log("back on /import — dropzone:", dropzones, "progress:", progress);
@@ -87,7 +87,7 @@ test("a finished import announces itself from another module", async ({ page }) 
     buffer: Buffer.from("Matter ID,Client Name\nMT-1,A\nMT-2,B"),
   });
   await page.locator(".import-actions .btn-primary").click();
-  await page.getByRole("link", { name: "Clients" }).click();
+  await openSection(page, "Clients");
   await expect(page).toHaveURL(/clients/);
 
   // The toast provider sits above the router, so this should still arrive.

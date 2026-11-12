@@ -1,60 +1,82 @@
+import type { Page } from "@playwright/test";
+
 import { expect, signedOut, test } from "./fixtures";
 
 /**
  * Runs only in the `mobile` project (Pixel 7, 412px wide), which is below both
- * the 820px drawer breakpoint and the 960px login reflow.
+ * the 720px phone breakpoint — bottom bar, one screen at a time — and the
+ * 960px login reflow.
  */
 test.describe("Mobile shell", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
 
-  test("keeps the sidebar off-canvas until the menu is pressed", async ({ page }) => {
-    const sidebar = page.locator(".sidebar");
+  const bar = (page: Page) => page.getByRole("navigation", { name: "Main" });
+  const directory = (page: Page) => page.getByRole("dialog", { name: "All sections" });
 
-    // The drawer is translated out of view rather than removed, so position —
-    // not visibility — is what says whether it is open.
-    const closed = await sidebar.boundingBox();
-    expect(closed?.x ?? 0).toBeLessThan(0);
-    await expect(page.locator(".backdrop")).toBeHidden();
+  test("puts the main places on a bottom bar, the rest one tap away", async ({ page }) => {
+    // The floor tabs give way to the bar on a phone.
+    await expect(page.getByRole("navigation", { name: "Floors" })).toBeHidden();
+    for (const name of ["Reception", "Matters", "Docket", "Time"]) {
+      await expect(bar(page).getByRole("link", { name })).toBeVisible();
+    }
+    await expect(bar(page).getByRole("link", { name: "Reception" })).toHaveClass(/active/);
 
-    await page.getByRole("button", { name: "Menu" }).click();
-
-    await expect(sidebar).toHaveClass(/open/);
-    await expect(page.locator(".backdrop")).toBeVisible();
-    await expect.poll(async () => (await sidebar.boundingBox())?.x).toBe(0);
+    await bar(page).getByRole("link", { name: "Docket" }).click();
+    await expect(page).toHaveURL(/\/deadlines_and_sol$/);
+    await expect(bar(page).getByRole("link", { name: "Docket" })).toHaveClass(/active/);
   });
 
-  test("closes the drawer after navigating", async ({ page }) => {
-    await page.getByRole("button", { name: "Menu" }).click();
-    await page.locator("nav.nav").getByRole("link", { name: "Timekeepers", exact: true }).click();
+  test("opens every section from All sections, and closes on arrival", async ({ page }) => {
+    await bar(page).getByRole("button", { name: /^All sections/ }).click();
+    await expect(directory(page)).toBeVisible();
+    // The sheet takes the whole width of the phone.
+    const box = await directory(page).boundingBox();
+    expect(Math.round(box?.width ?? 0)).toBe(page.viewportSize()?.width);
 
+    await directory(page).getByRole("link", { name: "Timekeepers", exact: true }).click();
     await expect(page).toHaveURL(/\/timekeepers$/);
-    await expect(page.locator(".sidebar")).not.toHaveClass(/open/);
-    await expect(page.locator(".backdrop")).toBeHidden();
+    await expect(directory(page)).toHaveCount(0);
+    // A floor with more than one section lists them under its header.
+    await expect(page.locator("nav.nav").getByRole("link", { name: "Matters" })).toBeVisible();
   });
 
-  test("closes the drawer when the scrim is tapped", async ({ page }) => {
-    await page.getByRole("button", { name: "Menu" }).click();
-    await expect(page.locator(".backdrop")).toBeVisible();
-
-    // The scrim spans the viewport but the open drawer sits on top of its
-    // left edge, so tap the far right where the scrim is actually exposed.
-    const box = await page.locator(".backdrop").boundingBox();
-    await page.locator(".backdrop").click({
-      position: { x: (box?.width ?? 400) - 8, y: 120 },
-    });
-    await expect(page.locator(".sidebar")).not.toHaveClass(/open/);
+  test("closes All sections from its close button", async ({ page }) => {
+    await bar(page).getByRole("button", { name: /^All sections/ }).click();
+    await directory(page).getByRole("button", { name: "Close" }).click();
+    await expect(directory(page)).toHaveCount(0);
   });
 
   test("never scrolls the page horizontally", async ({ page }) => {
-    for (const path of ["/", "/matters", "/workflows", "/reports", "/settings"]) {
+    for (const path of [
+      "/",
+      "/matters",
+      "/matters?view=ledger",
+      "/invoices?view=ledger",
+      "/workflows",
+      "/reports",
+      "/settings",
+    ]) {
       await page.goto(path);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth
       );
       expect(overflow, `${path} overflows horizontally by ${overflow}px`).toBeLessThanOrEqual(1);
     }
+  });
+
+  test("shows the index, then the record on its own screen", async ({ page }) => {
+    await page.goto("/matters");
+    const index = page.getByRole("region", { name: "Matters index" });
+    await expect(index).toBeVisible();
+
+    await index.locator(".cb-card", { hasText: "Pineda v. Bright Path" }).click();
+    await expect(index).toBeHidden();
+    await expect(page.locator(".cb-paper .cb-party").first()).toContainText("Pineda");
+
+    await page.locator(".cb-paper").getByRole("button", { name: "Matters" }).click();
+    await expect(index).toBeVisible();
   });
 
   test("keeps the dashboard's starting point reachable", async ({ page }) => {
@@ -80,17 +102,28 @@ test.describe("Mobile shell", () => {
     expect(columns).toBe(1);
   });
 
-  test("scrolls a wide table inside its own container", async ({ page }) => {
-    await page.goto("/matters");
+  test("sets a ledger out as one card per row", async ({ page }) => {
+    await page.goto("/matters?view=ledger");
     const wrap = page.locator(".table-wrap");
     await expect(wrap).toBeVisible();
-    // The table may be wider than the phone; the wrapper absorbs it.
-    const scrollable = await wrap.evaluate((el) => el.scrollWidth > el.clientWidth);
+    // No column heads to scroll after: each value carries its own label.
+    await expect(page.locator("table.data thead")).toBeHidden();
+    const cell = page.locator("table.data tbody tr").first().locator("td[data-label='Caption']");
+    await expect(cell).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
     expect(overflow).toBeLessThanOrEqual(1);
-    expect(typeof scrollable).toBe("boolean");
+  });
+
+  test("searches the whole firm on a screen of its own", async ({ page }) => {
+    await page.getByRole("button", { name: "Search the whole firm" }).click();
+    const search = page.getByRole("dialog", { name: "Search the whole firm" });
+    await expect(search).toBeVisible();
+    await search.getByRole("textbox").fill("Pineda");
+    await search.getByRole("option", { name: /Pineda v\. Bright Path/ }).first().click();
+    await expect(page).toHaveURL(/\/matters/);
+    await expect(page.locator(".cb-paper .cb-party").first()).toContainText("Pineda");
   });
 });
 

@@ -112,7 +112,7 @@ export function WorkflowDetail({
   // drawing it in the chrome as well would show it twice — once renameable and
   // once not. `title` still names the dialog for assistive tech.
   return (
-    <Modal title={detail.data?.name ?? workflow.name} onClose={onClose} hideTitle>
+    <Modal title={detail.data?.name ?? workflow.name} onClose={onClose} hideTitle wide>
       <WorkflowConsole workflow={workflow} onDeleted={onClose} />
     </Modal>
   );

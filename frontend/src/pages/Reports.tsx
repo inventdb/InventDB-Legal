@@ -605,7 +605,6 @@ function PageHead({ count }: { count: number }) {
   return (
     <div className="page-head">
       <div className="titles">
-        <h2>Reports</h2>
         <p>
           Live reports re-query your data every time you open them, and can be
           renamed or rewritten by describing the change. Snapshots keep the numbers

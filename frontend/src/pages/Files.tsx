@@ -168,7 +168,6 @@ export default function Files() {
     <div className="content">
       <div className="page-head">
         <div className="titles">
-          <h2>Files</h2>
           <p>
             Every document in the practice, wherever it is attached — pleadings, retainers,
             invoices, certificates. Pick a record type and drill into its folders, or search by

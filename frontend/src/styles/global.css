@@ -62,13 +62,15 @@
   --focus-on-chrome: #ffc72c;
 
   /* ---- surfaces ---- */
-  --bg: #f3f8fc; /* Powder 50 */
+  --bg: #e9f1f8; /* Powder 75: the desk the papers lie on */
   --surface: #ffffff;
   --surface-2: #f8fbfe;
   --surface-3: #e4eff8; /* Powder 100 */
   --border: #d5e2ee;
   --border-strong: #7891ad; /* control edges — 3:1 on surface */
   --card-border: transparent; /* light cards are borderless — shadow instead */
+  /* The casebook's folder tabs, one step darker than the desk. */
+  --tab: #dbe8f3;
   --scrim: rgba(10, 20, 38, 0.55);
 
   /* ---- ink ---- */
@@ -102,26 +104,45 @@
   --chart-axis: #586a84; /* axis ticks are text — same 4.5:1 bar as captions */
   --chart-grid: #e8eff6;
 
-  /* ---- depth: exactly two resting levels ---- */
-  --shadow-sm: 0 1px 2px rgba(20, 35, 63, 0.06), 0 1px 3px rgba(20, 35, 63, 0.08);
-  --shadow: 0 4px 14px -6px rgba(20, 35, 63, 0.2), 0 1px 3px rgba(20, 35, 63, 0.08);
-  --shadow-lg: 0 16px 48px rgba(20, 35, 63, 0.2);
+  /* ---- depth: paper on a desk ----
+     A sheet lies flat: a hairline at its foot and a long, soft fall below it.
+     Nothing floats except what was summoned (menus, sheets, dialogs). */
+  --paper-shadow: 0 1px 0 #d5e2ee, 0 18px 40px -18px rgba(20, 35, 63, 0.28);
+  --sheet-shadow: -24px 0 60px -20px rgba(20, 35, 63, 0.35);
+  --shadow-sm: var(--paper-shadow);
+  --shadow: var(--paper-shadow);
+  --shadow-lg: 0 30px 70px rgba(2, 6, 14, 0.3);
 
-  /* ---- shape · density · motion (theme-independent) ---- */
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --radius-pill: 999px;
+  /* ---- the casebook's rules ----
+     --gold is sunflower's text-and-line form (deep gold by day, sunflower by
+     night), the same rule the login page follows. --rule-red is the double
+     margin line of pleading paper. --series-2 is the second series in the
+     small inline charts. */
+  --gold: #b07f00;
+  --rule-red: #cf9a9b;
+  --series-2: #7fa9cf;
+
+  /* ---- shape · density · motion (theme-independent) ----
+     Paper has square corners. 2px only takes the edge off a pixel. */
+  --radius-sm: 2px;
+  --radius: 2px;
+  --radius-lg: 2px;
+  /* Pills become tabs and tallies with square shoulders; a thing that must be
+     round (an avatar, a count bubble) says so with its own radius. */
+  --radius-pill: 2px;
 
   --sidebar-w: 256px;
   --topbar-h: 60px;
 
   --font: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  /* The logo package's wordmark face: the lockup, and the login headline that
-     sits beside it. Nothing else in the product is serif. Fallbacks mirror the lockup SVG's own. */
+  /* The logo package's wordmark face. The casebook also sets its titles in it
+     — page titles, record captions, big figures — the way a brief sets its
+     headings; everything that is read or typed stays in Poppins. Fallbacks
+     mirror the lockup SVG's own. */
   --font-wordmark: "Cormorant Garamond", Cormorant, Garamond, Georgia,
     "Times New Roman", serif;
+  --serif: var(--font-wordmark);
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
 
   /* ---- motion ----
@@ -170,6 +191,7 @@
   --focus-on-chrome: #ffc72c;
 
   --bg: #0a1426;
+  --tab: #0f1b33;
   --surface: #111e36;
   --surface-2: #172743;
   --surface-3: #1e3152;
@@ -204,10 +226,15 @@
   --chart-axis: #879ebd;
   --chart-grid: #1e3152;
 
-  /* dark cards carry a low-alpha edge instead of a shadow */
-  --shadow-sm: none;
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+  /* By night a sheet is edged rather than shadowed: the fall is lost on navy. */
+  --paper-shadow: 0 0 0 1px #1e3152, 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+  --sheet-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.6);
+  --shadow-sm: var(--paper-shadow);
+  --shadow: var(--paper-shadow);
+  --shadow-lg: 0 30px 70px rgba(0, 0, 0, 0.55);
+  --gold: #ffc72c;
+  --rule-red: #7d4b57;
+  --series-2: #5a78a6;
 }
 
 * {
@@ -445,179 +472,8 @@ h4 {
   animation-delay: 325ms;
 }
 
-/* The topbar title swaps per route rather than hard-cutting. */
-.topbar h1 {
-  animation: slide-in var(--dur-2) var(--ease-out) both;
-}
-
-/* ---- Buttons ------------------------------------------------------------ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: var(--surface-3);
-  color: var(--text);
-  font-weight: 500;
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: background-color var(--dur-1) var(--ease),
-    color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease),
-    box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
-  white-space: nowrap;
-  font-family: inherit;
-}
-.btn:hover {
-  background: var(--brand-tint);
-  color: var(--brand);
-  transform: translateY(-1px);
-}
-/* Press beats hover: the button must return under the cursor on mousedown,
-   otherwise the lift reads as the click having missed. */
-.btn:active {
-  transform: translateY(1px);
-  transition-duration: 60ms;
-}
-.btn:disabled:hover {
-  transform: none;
-}
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.btn-primary {
-  background: var(--brand-solid);
-  color: var(--on-brand);
-  font-weight: 600;
-}
-.btn-primary:hover {
-  background: var(--brand-solid-hover);
-  color: var(--on-brand);
-}
-/* Sunflower: at most one per screen — the action that starts the screen's main
-   job. Navy ink on yellow (10:1); never white. */
-.btn-accent {
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-}
-.btn-accent:hover {
-  background: var(--accent-hover);
-  color: var(--on-accent);
-}
-.btn-ghost {
-  background: transparent;
-  border-color: var(--border-strong);
-}
-.btn-ghost:hover {
-  background: var(--brand-tint);
-  border-color: var(--brand-line);
-  color: var(--brand);
-}
-.btn-danger {
-  background: var(--danger);
-  color: #ffffff;
-  font-weight: 600;
-}
-/* The dark-mode danger step is a light coral so it reads on navy; a filled
-   button made from it needs dark ink, not white (white would land near 2:1). */
-[data-theme="dark"] .btn-danger {
-  color: #14233f;
-}
-.btn-danger:hover {
-  background: var(--danger);
-  filter: brightness(0.93);
-}
-.btn-icon {
-  padding: 8px;
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-}
-.btn-icon:hover {
-  background: var(--brand-tint);
-  color: var(--brand);
-}
-.btn-sm {
-  padding: 6px 10px;
-  font-size: 12.5px;
-}
-.btn-block {
-  width: 100%;
-  justify-content: center;
-}
-
-/* ---- Cards --------------------------------------------------------------
-   Borderless with one soft shadow in light; a low-alpha edge replaces the
-   shadow in dark. */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--dur-2) var(--ease),
-    box-shadow var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
-}
 .card-pad {
   padding: 18px 20px;
-}
-/* The lift is limited to the stat tiles. Chart cards stay put — a card that
-   shifts under the pointer while you are tracking a data point is a hazard,
-   not a flourish; same for the cards that wrap tables and forms. */
-.card.stat:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
-}
-.card.stat:hover .stat-ico {
-  transform: scale(1.08);
-}
-.stat .stat-ico {
-  transition: transform var(--dur-2) var(--ease-spring),
-    background-color var(--dur-2) var(--ease);
-}
-
-/* ---- Badges ------------------------------------------------------------- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.45;
-  white-space: nowrap;
-}
-.badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.9;
-}
-.badge.success {
-  background: var(--success-soft);
-  color: var(--success);
-}
-.badge.warn {
-  background: var(--warn-soft);
-  color: var(--warn);
-}
-.badge.danger {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-.badge.info {
-  background: var(--info-soft);
-  color: var(--info);
-}
-.badge.neutral {
-  background: var(--neutral-soft);
-  color: var(--neutral);
 }
 
 /* ---- Forms -------------------------------------------------------------- */
@@ -760,31 +616,6 @@ select option:checked {
   padding-right: 38px;
 }
 
-/* ---- Layout ------------------------------------------------------------- */
-.app-shell {
-  display: flex;
-  min-height: 100vh;
-}
-.sidebar {
-  width: var(--sidebar-w);
-  flex-shrink: 0;
-  /* Navy chrome — the bulk of the 60%. Everything inside reads the on-chrome
-     tokens, and focus rings switch to sunflower so they show on navy. */
-  background: var(--chrome);
-  /* In dark mode chrome and page are both deep navy; a faint edge keeps them
-     apart. In light mode it disappears against the powder page. */
-  border-right: 1px solid var(--chrome-line);
-  color: var(--on-chrome-muted);
-  --focus: var(--focus-on-chrome);
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 40;
-  transition: transform 0.22s var(--ease);
-}
 /* ---- Brand lockup -------------------------------------------------------
    Counsel mark + wordmark + expanded product name, per
    inventdb-legal-logo/lockup/lockup-horizontal-{light,dark,reversed}.svg.
@@ -866,216 +697,6 @@ select option:checked {
   padding-top: 5px;
 }
 
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  height: var(--topbar-h);
-  border-bottom: 1px solid var(--chrome-line);
-}
-/* On navy the lockup takes the package's reversed colourway: white wordmark,
-   "Legal" in sunflower, a powder tagline over a faint powder rule. */
-.sidebar-brand .brand-lockup-name {
-  color: var(--on-chrome);
-}
-.sidebar-brand .brand-lockup-suffix {
-  color: var(--accent);
-}
-.sidebar-brand .brand-lockup-tag {
-  color: var(--on-chrome-muted);
-  border-top-color: var(--chrome-line);
-}
-/* The mark sits on a raised navy tile — the "white logo on navy" rule, so it
-   inherits #fff through currentColor and the pans take the reversed second
-   tone. */
-.sidebar-brand .logo {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--chrome-active);
-  color: #ffffff;
-  --mark-tone: rgba(255, 255, 255, 0.55);
-  flex-shrink: 0;
-}
-.nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.nav-section {
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--on-chrome-muted);
-  opacity: 0.85;
-  padding: 14px 12px 6px;
-}
-.nav-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--on-chrome-muted);
-  font-weight: 400;
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: background-color var(--dur-1) var(--ease),
-    color var(--dur-1) var(--ease), transform var(--dur-2) var(--ease-out);
-}
-.nav-item:hover {
-  background: var(--chrome-hover);
-  color: var(--on-chrome);
-  transform: translateX(3px);
-}
-.nav-item.active {
-  background: var(--chrome-active);
-  color: var(--on-chrome);
-  font-weight: 600;
-  transform: none;
-}
-/* An accent rail at the sidebar's edge that grows into place on selection —
-   the only piece of chrome that tells you *which* section you landed in
-   after the page itself has finished arriving. */
-.nav-item::before {
-  content: "";
-  position: absolute;
-  /* The nav scrolls (`overflow-y: auto`), which also clips horizontally, so
-     -10px — the full width of the nav's padding — is as far left as the rail
-     can reach before it is cut off. -6px keeps a 4px gutter so it reads as a
-     deliberate marker rather than something clipped by the window edge. */
-  left: -6px;
-  top: 50%;
-  width: 3px;
-  height: 0;
-  /* Fully rounded: inset from the edge it reads as a floating marker, so a
-     square left edge would look like the bar had been cut off. */
-  border-radius: var(--radius-pill);
-  background: var(--accent); /* the sidebar's one sunflower element */
-  transform: translateY(-50%);
-  transition: height var(--dur-2) var(--ease-spring);
-}
-.nav-item.active::before {
-  height: 20px;
-}
-.nav-item svg {
-  flex-shrink: 0;
-  transition: transform var(--dur-2) var(--ease-spring);
-}
-.nav-item.active svg {
-  transform: scale(1.1);
-}
-.nav-count {
-  margin-left: auto;
-  font-size: 11.5px;
-  color: var(--on-chrome-muted);
-  background: var(--chrome-line);
-  padding: 1px 7px;
-  border-radius: var(--radius-pill);
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
-  margin-left: var(--sidebar-w);
-  display: flex;
-  flex-direction: column;
-}
-.topbar {
-  height: var(--topbar-h);
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  /* Navy chrome, continuous with the sidebar. */
-  background: var(--chrome);
-  border-bottom: 1px solid var(--chrome-line);
-  color: var(--on-chrome);
-  --focus: var(--focus-on-chrome);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 20px;
-}
-.topbar h1 {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--on-chrome);
-}
-.topbar .btn-icon {
-  color: var(--on-chrome-muted);
-}
-.topbar .btn-icon:hover {
-  background: var(--chrome-hover);
-  color: var(--on-chrome);
-}
-.topbar .spacer {
-  flex: 1;
-}
-.content {
-  padding: 22px;
-  flex: 1;
-}
-.page-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-.page-head .titles h2 {
-  font-size: 21px;
-  font-weight: 600;
-}
-.page-head .titles p {
-  margin: 3px 0 0;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 300;
-}
-.page-head .actions {
-  margin-left: auto;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--brand-soft);
-  color: var(--brand);
-  display: grid;
-  place-items: center;
-  font-weight: 600;
-  font-size: 12.5px;
-  letter-spacing: 0.01em;
-}
-
-/* mobile menu button + backdrop */
-.menu-btn {
-  display: none;
-}
-.backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--scrim);
-  z-index: 39;
-}
-/* The theme toggle swaps one glyph for another; keying the icon on the theme
-   remounts it so the new one turns into place instead of popping. */
-.topbar .btn-icon svg {
-  animation: icon-swap var(--dur-3) var(--ease-spring) both;
-}
-
 /* ---- Stat cards --------------------------------------------------------- */
 .stat-grid {
   display: grid;
@@ -1099,15 +720,7 @@ select option:checked {
   font-size: 12.5px;
   font-weight: 500;
 }
-.stat .stat-ico {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  display: grid;
-  place-items: center;
-  background: var(--brand-soft);
-  color: var(--brand);
-}
+
 .stat .stat-value {
   font-size: 27px;
   font-weight: 600;
@@ -1233,9 +846,11 @@ select option:checked {
    inside it. The search box and the record count stay put as a consequence,
    which is where you want them on a screen whose whole job is finding a row. */
 .content-fill {
-  height: calc(100vh - var(--topbar-h));
+  /* --fill-top is where the content starts (measured by Layout); the shell's
+     bottom padding is the margin the page keeps under the last row. */
+  height: calc(100vh - var(--fill-top, 200px) - var(--shell-pad-b, 0px));
   /* Phone browsers count the collapsing address bar in `vh`; `dvh` does not. */
-  height: calc(100dvh - var(--topbar-h));
+  height: calc(100dvh - var(--fill-top, 200px) - var(--shell-pad-b, 0px));
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -1265,55 +880,6 @@ select option:checked {
   box-shadow: inset 0 -1px 0 var(--border);
 }
 
-/* ---- Table -------------------------------------------------------------- */
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-table.data {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-  min-width: 560px;
-}
-/* Sentence-case, muted column heads — the brand type hierarchy carries the
-   distinction, not letterspaced caps. */
-table.data th {
-  text-align: left;
-  padding: 11px 14px;
-  color: var(--text-muted);
-  font-weight: 500;
-  font-size: 12.5px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-}
-table.data th.no-sort {
-  cursor: default;
-}
-table.data th:hover:not(.no-sort) {
-  color: var(--brand);
-}
-table.data td {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-  font-variant-numeric: tabular-nums;
-}
-table.data tr:last-child td {
-  border-bottom: none;
-}
-table.data tbody tr {
-  transition: background-color 0.12s var(--ease);
-}
-table.data tbody tr:hover {
-  background: var(--brand-tint);
-}
 .row-actions {
   display: flex;
   gap: 4px;
@@ -1343,12 +909,10 @@ table.data tbody tr:hover {
   align-items: center;
   justify-content: space-between;
   gap: 10px 16px;
-  margin-top: 12px;
-  padding: 10px 14px;
-  background: var(--surface);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  /* A ruled line under the ledger, not a card of its own. */
+  margin-top: 0;
+  padding: 8px 2px 0;
+  border-top: 1px solid var(--border-strong);
 }
 .pager-status {
   margin: 0;
@@ -1434,94 +998,7 @@ table.data tbody tr:hover {
   min-width: 200px;
   max-width: 420px;
 }
-.count-pill {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  padding: 6px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-}
-/* A count that means "something is held up on you" has to read differently
-   from one that is only tallying rows. */
-.count-pill.is-warn {
-  background: var(--warn-soft);
-  border-color: transparent;
-  color: var(--warn);
-  font-weight: 600;
-}
 
-/* ---- Waiting-on-you count ------------------------------------------------ */
-/* Rides the Workflows nav entry: a parked run is answered on that page, so the
-   count and the thing it refers to are one click apart. */
-.nav-badge {
-  margin-left: auto;
-  min-width: 20px;
-  padding: 0 6px;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 18px;
-  text-align: center;
-}
-.nav-item.active .nav-badge {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-/* ---- Modal -------------------------------------------------------------- */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--scrim);
-  z-index: 320; /* above the drill-down panel (300): a file opened from it */
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 5vh 16px;
-  overflow-y: auto;
-  animation: fade-in var(--dur-2) var(--ease-out) both;
-  backdrop-filter: blur(3px);
-}
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 640px;
-  /* Spring easing: the dialog was summoned, so a touch of overshoot reads as
-     responsive. Entrances the user did not ask for stay on --ease-out. */
-  animation: modal-in var(--dur-3) var(--ease-spring) both;
-}
-.modal.narrow {
-  max-width: 440px;
-}
-.modal-head {
-  display: flex;
-  align-items: center;
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--border);
-}
-.modal-head h3 {
-  font-size: 16.5px;
-  font-weight: 600;
-}
-.modal-head .btn-icon {
-  margin-left: auto;
-}
-.modal-body {
-  padding: 20px 22px;
-}
-.modal-foot {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  padding: 16px 22px;
-  border-top: 1px solid var(--border);
-}
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1655,29 +1132,6 @@ table.data tbody tr:hover {
   border: 0;
 }
 
-/* ---- States ------------------------------------------------------------- */
-.empty {
-  text-align: center;
-  padding: 56px 20px;
-  color: var(--text-muted);
-}
-.empty .empty-ico {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  background: var(--brand-soft);
-  display: grid;
-  place-items: center;
-  margin: 0 auto 14px;
-  color: var(--brand);
-}
-.empty h3 {
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.empty p {
-  font-weight: 300;
-}
 .spinner {
   width: 22px;
   height: 22px;
@@ -1700,12 +1154,6 @@ table.data tbody tr:hover {
   animation: spin 0.8s linear infinite;
 }
 
-.alert {
-  padding: 11px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-}
 .alert.error {
   background: var(--danger-soft);
   color: var(--danger);
@@ -1723,61 +1171,57 @@ table.data tbody tr:hover {
   color: var(--warn);
 }
 
-/* ---- Toasts ------------------------------------------------------------- */
-.toast-wrap {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  z-index: 340; /* above dialogs and the drill-down panel */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.toast {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--brand);
-  box-shadow: var(--shadow-lg);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  min-width: 240px;
-  font-size: 13.5px;
-  font-weight: 500;
-  /* Slides in from the edge it lives on, so the eye is led to the corner. */
-  animation: toast-in var(--dur-3) var(--ease-spring) both;
-}
-.toast.success {
-  border-left-color: var(--success);
-}
-.toast.error {
-  border-left-color: var(--danger);
-}
-
 /* ---- Login ---------------------------------------------------------------
-   One full-screen sheet: the firm drawn in section (components/FirmScene.tsx)
-   on an ink drafting ground, the headline over the sky, the title block in
-   the cut ground, and the sign-in sheet hanging from the leader that runs out
-   of the lobby. The ground is ink in both themes, so text on it uses fixed
-   light values; the sign-in sheet is paper in both themes for the same
-   reason.
+   One full-screen scene: the firm, cut open so every floor shows
+   (components/FirmScene.tsx), the headline over the sky, a quiet footer on
+   the street, and the sign-in sheet hanging from the line that runs out of
+   the lobby. By night in dark mode, by day in light mode.
+
+   The page speaks in four colours, set once per mode below and used
+   everywhere on it:
+     --lp-text    the lockup's name and the page's plain text
+     --lp-muted   supporting copy
+     --lp-gold    the yellow: "Legal", the headline, small gold details.
+                  Sunflower by night; by day a deeper gold of the same hue,
+                  because Sunflower itself is a fill, not text, on pale
+                  paper (1.6:1). The drawing uses the same rule.
+     --lp-rule    hairlines and control edges
+   Fills stay true Sunflower in both modes: the button, the sheet's top edge.
 
    `--u` is the size of one drawing unit on screen. The drawing is 1800 × 1000
    and slices to fill, bottom-aligned, so a point `n` units above its bottom
-   edge sits `n × --u` above the bottom of the screen. The lobby's leader is at
+   edge sits `n × --u` above the bottom of the screen. The lobby's line is at
    y 825, 175 units up — that is where the sign-in sheet's bottom edge goes. */
 .login-page {
   --u: max(calc(100vw / 1800), calc(100vh / 1000));
+  --lp-text: #ffffff;
+  --lp-muted: rgba(228, 239, 248, 0.78);
+  --lp-gold: #ffc72c;
+  --lp-rule: rgba(185, 214, 238, 0.3);
+  --lp-chip: rgba(5, 11, 23, 0.4);
+  --mark-tone: rgba(255, 255, 255, 0.55);
   position: relative;
   min-height: 100vh;
   overflow: hidden;
   isolation: isolate;
-  color: #ffffff;
-  --mark-tone: rgba(255, 255, 255, 0.55);
+  color: var(--lp-text);
   /* Night sky: deep at the zenith, lifting toward the horizon, with the
      corners vignetted so the eye settles on the firm. */
   background-color: #050b17;
   background-image: radial-gradient(130% 90% at 50% 40%, transparent 55%, rgba(2, 5, 12, 0.6) 100%),
     linear-gradient(180deg, #050b17 0%, #0a1630 50%, #15284d 88%, #1a2f57 100%);
+}
+[data-theme="light"] .login-page {
+  --lp-text: #14233f;
+  --lp-muted: #43546f;
+  --lp-gold: #b07f00;
+  --lp-rule: rgba(20, 35, 63, 0.2);
+  --lp-chip: rgba(255, 255, 255, 0.6);
+  --mark-tone: #7fa9cf;
+  /* Day sky: powder at the top, paper at the street. */
+  background-color: #f3f8fc;
+  background-image: radial-gradient(130% 90% at 50% 40%, transparent 60%, rgba(185, 214, 238, 0.35) 100%),
+    linear-gradient(180deg, #d4e6f6 0%, #e8f1fa 45%, #f6f9fc 88%, #f3f8fc 100%);
 }
 .login-scene {
   position: fixed;
@@ -1794,7 +1238,7 @@ table.data tbody tr:hover {
   position: absolute;
   top: 44px;
   left: 56px;
-  max-width: 420px;
+  max-width: 440px;
   z-index: 1;
 }
 .login-hero .hero-badge {
@@ -1803,47 +1247,40 @@ table.data tbody tr:hover {
   gap: 12px;
   animation: fade-in var(--dur-3) var(--ease-out) both;
 }
-/* On the ink sheet the lockup takes the package's reversed cut
-   (lockup-horizontal-reversed.svg): white, with "Legal" in sunflower. */
 .login-hero .brand-lockup-name {
-  color: #ffffff;
+  color: var(--lp-text);
 }
 .login-hero .brand-lockup-suffix {
-  color: #ffc72c;
+  color: var(--lp-gold);
 }
 .login-hero .brand-lockup-tag {
-  color: rgba(255, 255, 255, 0.72);
-  border-top-color: rgba(255, 255, 255, 0.28);
+  color: var(--lp-muted);
+  border-top-color: var(--lp-rule);
 }
-.login-annot {
-  margin-top: 34px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #ffc72c;
-  animation: fade-in var(--dur-3) var(--ease-out) 150ms both;
-}
-/* The headline borrows the wordmark's Cormorant Garamond: the one place
-   outside the lockup that the product speaks in a legal serif. */
+/* The headline borrows the wordmark's Cormorant Garamond — the one place
+   outside the lockup that the product speaks in a legal serif — and the
+   wordmark's gold. Two set lines, close-leaded, sitting a measured step
+   below the lockup and above the copy. */
 .login-hero h1 {
+  margin-top: 30px;
   font-family: var(--font-wordmark);
-  font-size: clamp(46px, 5.2vw, 76px);
+  font-size: clamp(44px, 4.4vw, 64px);
   font-weight: 500;
-  line-height: 0.96;
-  letter-spacing: -0.015em;
-  margin-top: 12px;
-  max-width: 9ch;
-  color: #ffffff;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--lp-gold);
   animation: rise var(--dur-3) var(--ease-out) 200ms both;
 }
+.login-hero h1 span {
+  display: block;
+}
 .login-hero p {
-  margin-top: 18px;
+  margin-top: 16px;
   max-width: 34ch;
   font-size: 14px;
   font-weight: 300;
   line-height: 1.6;
-  color: rgba(228, 239, 248, 0.82);
+  color: var(--lp-muted);
   animation: rise var(--dur-3) var(--ease-out) 260ms both;
 }
 
@@ -2028,33 +1465,74 @@ table.data tbody tr:hover {
   text-decoration: underline;
 }
 
-/* ---- the title block, in the cut ground ---- */
+/* ---- the footer, on the street ---- */
 .hero-foot {
   position: absolute;
   left: 56px;
-  bottom: 22px;
+  bottom: 26px;
   z-index: 1;
-  display: grid;
-  grid-template-columns: auto auto auto;
-  border: 1px solid rgba(185, 214, 238, 0.32);
-  background: rgba(11, 21, 39, 0.86);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   font-size: 12px;
-  color: rgba(228, 239, 248, 0.88);
+  color: var(--lp-muted);
   animation: fade-in var(--dur-3) var(--ease-out) 600ms both;
 }
-.tb-cell {
-  padding: 7px 14px 8px;
+.hero-foot span + span::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 12px 2px;
+  border-radius: 50%;
+  background: var(--lp-gold);
 }
-.tb-cell + .tb-cell {
-  border-left: 1px solid rgba(185, 214, 238, 0.32);
+.hero-foot span:first-child {
+  color: var(--lp-text);
+  font-weight: 500;
 }
-.tb-cell span {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(185, 214, 238, 0.62);
+
+/* ---- the light / dark switch ---- */
+.login-theme {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--lp-rule);
+  border-radius: 50%;
+  background: var(--lp-chip);
+  color: var(--lp-text);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  animation: fade-in var(--dur-3) var(--ease-out) 300ms both;
+}
+.login-theme:hover {
+  border-color: var(--lp-gold);
+  color: var(--lp-gold);
+}
+.login-theme:focus-visible {
+  outline: 2px solid var(--lp-gold);
+  outline-offset: 2px;
+}
+.login-theme svg {
+  animation: icon-swap var(--dur-2) var(--ease-spring);
+}
+
+/* By day the sign-in sheet is white paper on a paler stack. */
+[data-theme="light"] .login-sheet {
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(20, 35, 63, 0.16);
+}
+[data-theme="light"] .login-form-wrap::before {
+  background: #c3d5e7;
+  box-shadow: 0 30px 70px rgba(20, 35, 63, 0.2);
+}
+[data-theme="light"] .login-form-wrap::after {
+  background: #e1ebf4;
 }
 
 /* Between the phone layout and a full desktop the drawing is narrower than
@@ -2157,8 +1635,12 @@ table.data tbody tr:hover {
   flex-wrap: wrap;
 }
 .report-stage-head h3 {
-  font-size: 17px;
-  font-weight: 600;
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.1;
+  font-variant-numeric: lining-nums;
 }
 .report-stage-actions {
   margin-left: auto;
@@ -2347,7 +1829,7 @@ table.data tbody tr:hover {
 /* ---- Responsive --------------------------------------------------------- */
 /* ---- Login on narrow screens -------------------------------------------
    The page stacks: lockup and headline, then the whole firm in its own band,
-   then the sign-in sheet hanging just below the street, then the title block.
+   then the sign-in sheet hanging just below the street, then the footer.
    The band is short and wide, so the drawing slices to the firm and the
    courthouse beside it. The sheet stays above the fold. */
 @media (max-width: 960px) {
@@ -2379,16 +1861,22 @@ table.data tbody tr:hover {
     display: flex;
     justify-content: center;
   }
-  .login-annot,
   .login-hero p {
     display: none;
   }
   .login-hero h1 {
-    margin: 14px auto 0;
-    max-width: none;
+    margin: 12px auto 0;
     font-size: 32px;
     text-align: center;
-    text-shadow: 0 2px 18px rgba(11, 21, 39, 0.9);
+  }
+  .login-hero h1 span {
+    display: inline;
+  }
+  .login-theme {
+    top: 18px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
   }
   .login-form-wrap {
     position: relative;
@@ -2405,17 +1893,13 @@ table.data tbody tr:hover {
   }
   .hero-foot {
     position: static;
-    margin: 14px auto 0;
-    max-width: 400px;
-    width: 100%;
-    grid-template-columns: 1fr;
+    margin: 16px auto 0;
+    justify-content: center;
   }
-  .tb-cell:first-child,
-  .tb-cell:last-child {
+  .hero-foot span:first-child,
+  .hero-foot span:last-child,
+  .hero-foot span:nth-child(2)::before {
     display: none;
-  }
-  .tb-cell + .tb-cell {
-    border-left: 0;
   }
 }
 
@@ -2447,12 +1931,7 @@ table.data tbody tr:hover {
     font-size: 11.5px;
     line-height: 1.3;
   }
-  .stat .stat-ico {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    flex-shrink: 0;
-  }
+
   .stat .stat-value {
     font-size: 20px;
   }
@@ -2463,38 +1942,7 @@ table.data tbody tr:hover {
 }
 
 @media (max-width: 820px) {
-  .sidebar {
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .main {
-    margin-left: 0;
-  }
-  .menu-btn {
-    display: inline-flex;
-  }
-  /* Kept in the box and toggled with opacity/visibility rather than display,
-     so the scrim can actually cross-fade with the drawer sliding in — a
-     display swap gives the transition nothing to interpolate. Visibility is
-     stepped at the end of the fade-out so the layer stops taking clicks. */
-  .backdrop {
-    display: block;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--dur-2) var(--ease),
-      visibility 0s linear var(--dur-2);
-  }
-  .backdrop.show {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity var(--dur-2) var(--ease), visibility 0s;
-  }
-  .content {
-    padding: 16px;
-  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }

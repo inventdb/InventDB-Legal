@@ -1,4 +1,7 @@
-import { expect, rows, test } from "./fixtures";
+import { expect, rows, test, preferLedger } from "./fixtures";
+
+// These read rows from the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 test.describe("API failure handling", () => {
   test("shows the server's message when a list call fails", async ({ page }) => {

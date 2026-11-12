@@ -1,19 +1,23 @@
 /**
- * FirmScene — the firm drawn as an architect's section, on the login page and
- * the dashboard banner.
+ * FirmScene — the law firm, cut open so every floor shows, on the login page
+ * and the dashboard banner.
  *
- * The whole practice lives inside one building, cut open so every floor shows.
- * The floors are named the way a firm would name its rooms rather than its
- * software — the Enquiry Room, the Parlour, Chambers, Clockwork, the
- * Strongroom, the Watch, the Archive and the Observatory — each with a line of
- * script that hints at what happens there, and a small hand-drawn scene in its
- * first bay. A lift travels the core, rooms light and dim, the clock keeps
- * time, the vault wheel turns, the revolving door turns, the telescope sweeps.
- * The courthouse stands a little way off.
+ * The floors are named for what a firm's partners look for in running the
+ * practice, not for the software's modules — New Business, Client Care, Case
+ * Management, Profitability, Compliance, Risk & Deadlines, Documents and
+ * Practice Insight — each with a line of script on what it gives the firm, and
+ * a hand-drawn scene of that work in its first bay: the engagement letter
+ * signed, briefs tied in ribbon, client money held in balance against the
+ * ledger, the limitation date circled. The other rooms are the firm at work —
+ * counsel in gown and bands, banker's lamps, law reports, sealed deeds.
  *
- * On login the sheet is drafted in front of you — lines draw on, the lobby and
- * then each floor light up, and a leader runs out of the lobby to the sign-in
- * sheet, which arrives last (its timing is in global.css). The layers carry a
+ * It is alive in small ways: a lift travels the core, the
+ * clock keeps time, the scales settle, the hourglass turns, the safe's dial
+ * turns. Nothing pulses or flickers. The courthouse stands a little way off.
+ *
+ * On login the building draws itself, the lobby and then each floor light up,
+ * and a line runs out of the lobby to the sign-in sheet, which arrives last
+ * (its timing is in global.css). The layers carry a
  * depth (`--z`) that the login page turns into parallax as the pointer moves.
  * On the dashboard every floor, and the courthouse, is a link to its module.
  *
@@ -31,6 +35,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { ENTITY_BY_NAME } from "../config/entities";
+import { FLOORS as BUILDING } from "../config/floors";
 
 export type Sky = "morning" | "afternoon" | "evening";
 
@@ -55,7 +60,7 @@ export function timeOfDay(now: Date = new Date()): Sky {
 const FX0 = 660;
 const FX1 = 1140;
 const W = FX1 - FX0;
-const CORE = 160;
+const CORE = 172;
 const SHAFT = FX0 + CORE - 22;
 const BAY0 = FX0 + CORE;
 const BAYS = 4;
@@ -66,9 +71,6 @@ const FLOOR_H = 54;
 const ROOF = LOBBY_TOP - 8 * FLOOR_H; // 348
 export const LEADER_Y = 825;
 
-/** Storey heights, for the level markers: a 4.2 m lobby, then 3.6 m floors. */
-const level = (k: number) => 4.2 + k * 3.6;
-const fmtLevel = (m: number) => `+${m.toFixed(2).padStart(5, "0")}`;
 
 /** Stable pseudo-random 0..1008, so nothing reshuffles between renders. */
 const hash = (n: number) => (Math.imul(n * 7919 + 13, 0x9e3779b1) >>> 0) % 1009;
@@ -82,7 +84,7 @@ const pivot = (x: number, y: number) => css({ transformOrigin: `${x}px ${y}px` }
 
 type Box = { x: number; y: number; w: number; h: number };
 
-/** A standing or seated figure: head and shoulders, feet at `yb`. */
+/** A figure in everyday clothes: head and shoulders, feet at `yb`. */
 function Figure({ x, yb, tall = 1 }: { x: number; yb: number; tall?: number }) {
   const body = 14 * tall;
   return (
@@ -93,63 +95,159 @@ function Figure({ x, yb, tall = 1 }: { x: number; yb: number; tall?: number }) {
   );
 }
 
-function Enquiry({ x, y, w, h }: Box) {
+/** An advocate in gown and bands — the firm's own people. */
+function Advocate({ x, yb, tall = 1 }: { x: number; yb: number; tall?: number }) {
+  const t = tall;
+  return (
+    <>
+      <circle cx={x} cy={yb - 25 * t} r={3.6} />
+      <path d={`M${x - 7.5},${yb} L${x - 4.5},${yb - 17 * t} a4.5,4.5 0 0 1 9,0 L${x + 7.5},${yb} Z`} />
+      <rect x={x - 1.5} y={yb - 21 * t} width={1.2} height={4.5} className="bands" />
+      <rect x={x + 0.3} y={yb - 21 * t} width={1.2} height={4.5} className="bands" />
+    </>
+  );
+}
+
+/** Someone seated: the figure, shortened, sitting at `yb`. */
+const Seated = ({ x, yb }: { x: number; yb: number }) => <Figure x={x} yb={yb} tall={0.75} />;
+
+/** The green-shaded banker's lamp of every law office, standing at `yb`. */
+function BankersLamp({ x, yb }: { x: number; yb: number }) {
+  return (
+    <>
+      <rect x={x - 3.5} y={yb - 2} width={7} height={2} />
+      <line x1={x} x2={x} y1={yb - 2} y2={yb - 8} className="ink-line" />
+      <path d={`M${x - 7.5},${yb - 8} h15 l-2.5,-5 h-10 Z`} />
+    </>
+  );
+}
+
+/** A sheet of paper: deed, letter or certificate. */
+function Paper({ x, y, w, h, lines = 3 }: Box & { lines?: number }) {
+  return (
+    <>
+      <rect x={x} y={y} width={w} height={h} className="paper" />
+      {Array.from({ length: lines }, (_, i) => (
+        <line key={i} x1={x + 2.5} x2={x + w - 2.5} y1={y + 4 + i * 3.5} y2={y + 4 + i * 3.5} className="paper-line" />
+      ))}
+    </>
+  );
+}
+
+/** A wax seal with its ribbon tails. */
+function Seal({ x, y }: { x: number; y: number }) {
+  return (
+    <>
+      <path d={`M${x - 2},${y + 2} l-2,6 l2.5,-1.5 l1,2 Z M${x + 2},${y + 2} l2,6 l-2.5,-1.5 l-1,2 Z`} />
+      <circle cx={x} cy={y} r={3.2} />
+    </>
+  );
+}
+
+/** Rows of bound law reports: uniform spines, each with a gilt band. */
+function LawBooks({ x, y, w, h, rows }: Box & { rows: number }) {
+  const rh = h / rows;
+  return (
+    <>
+      <rect x={x} y={y} width={w} height={h} className="ink-line" />
+      {Array.from({ length: rows }, (_, r) => {
+        const base = y + (r + 1) * rh;
+        const n = Math.floor((w - 3) / 4);
+        return (
+          <g key={r}>
+            {Array.from({ length: n }, (_, i) => (
+              <rect key={i} x={x + 2 + i * 4} y={base - rh + 2.5} width={3} height={rh - 2.5} />
+            ))}
+            <line x1={x + 2} x2={x + 2 + n * 4} y1={base - rh + 5} y2={base - rh + 5} className="bands-line" />
+            <line x1={x} x2={x + w} y1={base} y2={base} className="ink-line" />
+          </g>
+        );
+      })}
+    </>
+  );
+}
+
+/** New Business — the first consultation, and the engagement letter signed. */
+function NewBusiness({ x, y, w, h }: Box) {
   const yb = y + h;
   const cx = x + w / 2;
   return (
     <>
-      <Figure x={x + 15} yb={yb - 2} />
-      <Figure x={x + w - 15} yb={yb - 2} />
-      <rect x={cx - 12} y={yb - 14} width={24} height={2.4} />
-      <rect x={cx - 1} y={yb - 12} width={2} height={12} />
-      <path
-        className="ink-line talk"
-        d={`M${cx - 9},${y + 7} h18 a3,3 0 0 1 3,3 v5 a3,3 0 0 1 -3,3 h-9 l-4,4 v-4 h-5 a3,3 0 0 1 -3,-3 v-5 a3,3 0 0 1 3,-3 Z`}
-      />
-    </>
-  );
-}
-
-function Parlour({ x, y, w, h }: Box) {
-  const yb = y + h;
-  return (
-    <>
-      <rect x={x + 30} y={y + 6} width={14} height={10} className="ink-line" />
-      <path
-        d={`M${x + 8},${yb} v-13 a3,3 0 0 1 3,-3 h3 v-7 a3,3 0 0 1 3,-3 h14 a3,3 0 0 1 3,3 v7 h3 a3,3 0 0 1 3,3 v13 h-3 v-4 h-26 v4 Z`}
-      />
-      <circle cx={x + 24} cy={yb - 27} r={3.6} className="lamp-face" />
-      <line x1={x + w - 13} x2={x + w - 13} y1={yb} y2={y + 15} className="ink-line" />
-      <path d={`M${x + w - 20},${y + 15} h14 l-3,-8 h-8 Z`} />
-      <rect x={x + w - 17} y={yb - 2} width={8} height={2} />
-    </>
-  );
-}
-
-function Chambers({ x, y, w, h }: Box) {
-  const yb = y + h;
-  return (
-    <>
-      <line x1={x + w / 2 - 12} x2={x + w / 2 - 12} y1={y} y2={y + 7} className="ink-line" />
-      <path d={`M${x + w / 2 - 18},${y + 12} h12 l-3,-5 h-6 Z`} />
-      <rect x={x + 6} y={yb - 13} width={40} height={2.4} />
+      <rect x={x + 6} y={yb - 13} width={w - 12} height={2.4} />
       <rect x={x + 8} y={yb - 11} width={2} height={11} />
-      <rect x={x + 42} y={yb - 11} width={2} height={11} />
-      <rect x={x + 10} y={yb - 19} width={15} height={6} />
-      <rect x={x + 12} y={yb - 25} width={13} height={6} className="ink-line" />
-      <rect x={x + 28} y={yb - 18} width={12} height={5} className="ink-line" />
-      <Figure x={x + w - 14} yb={yb} tall={1.2} />
-      <rect x={x + w - 25} y={yb - 25} width={6} height={8} className="ink-line" />
+      <rect x={x + w - 10} y={yb - 11} width={2} height={11} />
+      <Advocate x={x + 13} yb={yb - 11} tall={0.62} />
+      <Seated x={x + w - 13} yb={yb - 11} />
+      <line x1={cx} x2={cx} y1={yb - 13} y2={y + 27} className="ink-line" />
+      <Paper x={cx - 8} y={y + 4} w={16} h={23} lines={3} />
+      <path d={`M${cx - 5},${y + 22} q2,-3 3.5,0 t3.5,0 t3,-1`} className="sign" />
+      <line x1={cx + 5} y1={y + 23} x2={cx + 12} y2={y + 15} className="ink-line heavy" />
     </>
   );
 }
 
-function Clockwork({ x, y, w, h }: Box) {
+/** Client Care — a client and their lawyer at ease, the firm's credentials on the wall. */
+function ClientCare({ x, y, w, h }: Box) {
   const yb = y + h;
-  const cx = x + 22;
-  const cy = y + 20;
+  const cx = x + w / 2;
   return (
     <>
+      <Paper x={cx - 10} y={y + 4} w={20} h={13} lines={2} />
+      <Seal x={cx + 6} y={y + 14} />
+      {/* armchairs, facing */}
+      <rect x={x + 4} y={yb - 22} width={3} height={22} />
+      <rect x={x + 4} y={yb - 9} width={15} height={3} />
+      <rect x={x + 16} y={yb - 6} width={2} height={6} />
+      <Seated x={x + 12} yb={yb - 9} />
+      <rect x={x + w - 7} y={yb - 22} width={3} height={22} />
+      <rect x={x + w - 19} y={yb - 9} width={15} height={3} />
+      <rect x={x + w - 18} y={yb - 6} width={2} height={6} />
+      <Seated x={x + w - 12} yb={yb - 9} />
+      {/* the client's file, on the table between them */}
+      <rect x={cx - 6} y={yb - 12} width={12} height={2} />
+      <rect x={cx - 1} y={yb - 10} width={2} height={10} />
+      <rect x={cx - 5} y={yb - 16} width={10} height={4} className="paper" />
+    </>
+  );
+}
+
+/** Case Management — briefs tied in ribbon, and counsel taking one up. */
+function CaseManagement({ x, y, w, h }: Box) {
+  const yb = y + h;
+  return (
+    <>
+      <rect x={x + 4} y={yb - 13} width={42} height={2.4} />
+      <rect x={x + 6} y={yb - 11} width={2} height={11} />
+      <rect x={x + 42} y={yb - 11} width={2} height={11} />
+      {[
+        [x + 7, yb - 19, 17],
+        [x + 9, yb - 25, 14],
+        [x + 11, yb - 31, 12],
+      ].map(([bx, by, bw]) => (
+        <g key={by}>
+          <rect x={bx} y={by} width={bw} height={6} className="paper" />
+          <line x1={bx + bw / 2} x2={bx + bw / 2} y1={by} y2={by + 6} className="ribbon" />
+        </g>
+      ))}
+      <path d={`M${x + 17},${y + 12} l-3,-3 m3,3 l3,-3`} className="ribbon" />
+      <BankersLamp x={x + 35} yb={yb - 13} />
+      <Advocate x={x + w - 11} yb={yb} tall={1.05} />
+      <rect x={x + w - 23} y={yb - 21} width={7} height={9} className="paper" />
+      <line x1={x + w - 19.5} x2={x + w - 19.5} y1={yb - 21} y2={yb - 12} className="ribbon" />
+    </>
+  );
+}
+
+/** Profitability — the clock that time is recorded against, in six-minute
+ *  units, and the ledger it ends up in. */
+function Profitability({ x, y, w, h }: Box) {
+  const yb = y + h;
+  const cx = x + 20;
+  const cy = y + 19;
+  const wedge = (36 * Math.PI) / 180;
+  return (
+    <>
+      <path d={`M${cx},${cy} L${cx},${cy - 13} A13,13 0 0 1 ${cx + Math.sin(wedge) * 13},${cy - Math.cos(wedge) * 13} Z`} className="unit" />
       <circle cx={cx} cy={cy} r={14} className="ink-line heavy" />
       {Array.from({ length: 12 }, (_, i) => {
         const a = (i / 12) * Math.PI * 2;
@@ -168,131 +266,132 @@ function Clockwork({ x, y, w, h }: Box) {
       <line x1={cx} y1={cy} x2={cx} y2={cy - 10} className="ink-line heavy hand-m" style={pivot(cx, cy)} />
       <line x1={cx} y1={cy} x2={cx + 6.5} y2={cy} className="ink-line heavy hand-h" style={pivot(cx, cy)} />
       <circle cx={cx} cy={cy} r={1.8} />
-      <rect x={x + 10} y={yb - 3} width={24} height={3} />
-      <path d={`M${x + w - 24},${y + 10} h12 l-6,9 l6,9 h-12 l6,-9 Z`} className="ink-line" />
-      <path d={`M${x + w - 21},${y + 25} h6 l-3,-4 Z`} />
-      <rect x={x + w - 26} y={y + 7} width={16} height={2.5} />
-      <rect x={x + w - 26} y={y + 28} width={16} height={2.5} />
-      <rect x={x + w - 30} y={yb - 9} width={24} height={2.4} />
-      <circle cx={x + w - 18} cy={yb - 16} r={3.4} />
-    </>
-  );
-}
-
-function Strongroom({ x, y, w, h }: Box) {
-  const cx = x + 26;
-  const cy = y + h / 2 + 1;
-  return (
-    <>
-      <circle cx={cx} cy={cy} r={18} className="ink-line heavy" />
-      <circle cx={cx} cy={cy} r={13} className="ink-line" />
-      <rect x={cx - 21} y={cy - 9} width={3} height={6} />
-      <rect x={cx - 21} y={cy + 3} width={3} height={6} />
-      <g className="wheel" style={pivot(cx, cy)}>
-        {[0, 60, 120].map((a) => (
-          <line
-            key={a}
-            x1={cx - Math.cos((a * Math.PI) / 180) * 9}
-            y1={cy - Math.sin((a * Math.PI) / 180) * 9}
-            x2={cx + Math.cos((a * Math.PI) / 180) * 9}
-            y2={cy + Math.sin((a * Math.PI) / 180) * 9}
-            className="ink-line heavy"
-          />
-        ))}
-        <circle cx={cx} cy={cy} r={2.6} />
-      </g>
-      {Array.from({ length: 9 }, (_, i) => (
-        <rect
-          key={i}
-          x={x + w - 25 + (i % 3) * 7}
-          y={y + 9 + Math.floor(i / 3) * 10}
-          width={5.5}
-          height={8}
-          className={i === 4 ? undefined : "ink-line"}
-        />
+      {/* the ledger, open on a desk, with the day's fees beside it */}
+      <rect x={x + 38} y={yb - 11} width={w - 42} height={2.4} />
+      <rect x={x + 40} y={yb - 9} width={2} height={9} />
+      <rect x={x + w - 6} y={yb - 9} width={2} height={9} />
+      <rect x={x + 39} y={yb - 27} width={22} height={15} className="paper" />
+      <line x1={x + 50} x2={x + 50} y1={yb - 27} y2={yb - 12} className="paper-line" />
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <line x1={x + 41} x2={x + 48} y1={yb - 23 + i * 4} y2={yb - 23 + i * 4} className="paper-line" />
+          <line x1={x + 52} x2={x + 59} y1={yb - 23 + i * 4} y2={yb - 23 + i * 4} className="paper-line" />
+        </g>
+      ))}
+      {[0, 1, 2, 3].map((i) => (
+        <rect key={i} x={x + w - 10} y={yb - 13.5 - i * 2.4} width={7} height={1.8} rx={0.9} />
       ))}
     </>
   );
 }
 
-function Watch({ x, y, w, h }: Box) {
+/** Compliance — client money and the ledger, held in balance; the safe beside. */
+function Compliance({ x, y, w, h }: Box) {
   const yb = y + h;
-  const gx = x + 7;
-  const gy = y + 7;
+  const sx = x + 22;
+  const by = y + 11;
   return (
     <>
-      <rect x={gx} y={gy} width={36} height={30} className="ink-line" />
+      <rect x={sx - 7} y={yb - 3} width={14} height={3} />
+      <line x1={sx} x2={sx} y1={yb - 3} y2={by} className="ink-line heavy" />
+      <circle cx={sx} cy={by - 2} r={1.8} />
+      <g className="tip" style={pivot(sx, by)}>
+        <line x1={sx - 16} x2={sx + 16} y1={by} y2={by} className="ink-line heavy" />
+        {[-16, 16].map((d) => (
+          <g key={d}>
+            <line x1={sx + d} x2={sx + d - 5} y1={by} y2={by + 13} className="ink-line" />
+            <line x1={sx + d} x2={sx + d + 5} y1={by} y2={by + 13} className="ink-line" />
+            <path d={`M${sx + d - 7},${by + 13} q7,6 14,0 Z`} />
+          </g>
+        ))}
+        {/* coins on one pan, the trust ledger on the other */}
+        {[0, 1, 2].map((i) => (
+          <rect key={i} x={sx - 20} y={by + 10 - i * 2.4} width={8} height={1.9} rx={0.9} />
+        ))}
+        <rect x={sx + 12} y={by + 5} width={8} height={7} className="paper" />
+      </g>
+      <rect x={x + w - 22} y={yb - 25} width={19} height={25} className="ink-line heavy" />
+      <circle cx={x + w - 12.5} cy={yb - 14} r={5} className="ink-line" />
+      <g className="dial" style={pivot(x + w - 12.5, yb - 14)}>
+        <line x1={x + w - 12.5} x2={x + w - 12.5} y1={yb - 14} y2={yb - 18} className="ink-line heavy" />
+      </g>
+      <rect x={x + w - 8} y={yb - 5} width={3} height={2} />
+    </>
+  );
+}
+
+/** Risk & Deadlines — the date that cannot be missed, and the sand running. */
+function RiskDeadlines({ x, y, w, h }: Box) {
+  const yb = y + h;
+  const gx = x + 5;
+  const gy = y + 6;
+  const hx = x + w - 14;
+  const hy = y + 22;
+  return (
+    <>
+      <rect x={gx} y={gy} width={36} height={30} className="paper" />
       <rect x={gx} y={gy} width={36} height={6} />
       {[1, 2, 3].map((c) => (
-        <line key={c} x1={gx + c * 9} x2={gx + c * 9} y1={gy + 6} y2={gy + 30} className="ink-line" />
+        <line key={c} x1={gx + c * 9} x2={gx + c * 9} y1={gy + 6} y2={gy + 30} className="paper-line" />
       ))}
       {[1, 2].map((r) => (
-        <line key={r} x1={gx} x2={gx + 36} y1={gy + 6 + r * 8} y2={gy + 6 + r * 8} className="ink-line" />
+        <line key={r} x1={gx} x2={gx + 36} y1={gy + 6 + r * 8} y2={gy + 6 + r * 8} className="paper-line" />
       ))}
-      <rect x={gx + 19.5} y={gy + 15.5} width={6} height={5} className="mark" />
-      <Figure x={x + w - 14} yb={yb} tall={1.15} />
-      <line x1={x + w - 18} y1={yb - 19} x2={gx + 30} y2={gy + 20} className="ink-line heavy" />
-    </>
-  );
-}
-
-function Archive({ x, y, w, h }: Box) {
-  const yb = y + h;
-  const shelves = [x + 6, x + 32];
-  return (
-    <>
-      {shelves.map((sx, s) => (
-        <g key={sx}>
-          <rect x={sx} y={y + 4} width={22} height={h - 4} className="ink-line" />
-          {[0, 1, 2, 3].map((r) => {
-            const ry = y + 4 + (r + 1) * 10.5;
-            let bx = sx + 1.5;
-            const boxes: ReactNode[] = [];
-            for (let i = 0; i < 4 && bx < sx + 19; i++) {
-              const bw = 2.5 + (hash(s * 31 + r * 7 + i) % 3);
-              boxes.push(<rect key={i} x={bx} y={ry - 8} width={bw} height={8} />);
-              bx += bw + 1.2;
-            }
-            return (
-              <g key={r}>
-                {boxes}
-                <line x1={sx} x2={sx + 22} y1={ry} y2={ry} className="ink-line" />
-              </g>
-            );
-          })}
-        </g>
-      ))}
-      <line x1={x + w - 13} y1={yb} x2={x + w - 8} y2={y + 4} className="ink-line heavy" />
-      <line x1={x + w - 5} y1={yb} x2={x + w - 1} y2={y + 4} className="ink-line heavy" />
-      {[0, 1, 2, 3].map((r) => (
-        <line key={r} x1={x + w - 12 + r * 1.1} x2={x + w - 4 + r * 0.9} y1={yb - 8 - r * 9} y2={yb - 8 - r * 9} className="ink-line" />
-      ))}
-    </>
-  );
-}
-
-function Observatory({ x, y, w, h }: Box) {
-  const yb = y + h;
-  const px = x + w - 26;
-  const py = yb - 18;
-  return (
-    <>
-      <polyline
-        points={`${x + 6},${y + 18} ${x + 12},${y + 13} ${x + 17},${y + 15} ${x + 23},${y + 8} ${x + 28},${y + 10}`}
-        className="ink-line heavy"
-      />
-      <line x1={x + 6} x2={x + 30} y1={y + 21} y2={y + 21} className="ink-line" />
-      <Figure x={x + 14} yb={yb} />
-      <line x1={px} y1={py} x2={px - 9} y2={yb} className="ink-line heavy" />
-      <line x1={px} y1={py} x2={px + 9} y2={yb} className="ink-line heavy" />
-      <line x1={px} y1={py} x2={px} y2={yb} className="ink-line" />
-      <g className="scope" style={pivot(px, py)}>
-        <g transform={`rotate(-34 ${px} ${py})`}>
-          <rect x={px - 10} y={py - 3.5} width={30} height={7} rx={1.5} />
-          <rect x={px + 20} y={py - 5} width={4} height={10} />
-          <rect x={px - 14} y={py - 2} width={4} height={4} />
-        </g>
+      <ellipse cx={gx + 22.5} cy={gy + 18} rx={6} ry={5} className="ink-line heavy" />
+      <rect x={hx - 9} y={yb - 3} width={18} height={3} />
+      <g className="flip" style={pivot(hx, hy)}>
+        <rect x={hx - 8} y={hy - 16} width={16} height={2.5} />
+        <rect x={hx - 8} y={hy + 13.5} width={16} height={2.5} />
+        <path d={`M${hx - 6},${hy - 13.5} h12 l-6,13.5 l6,13.5 h-12 l6,-13.5 Z`} className="ink-line" />
+        <path d={`M${hx - 4.5},${hy + 13.5} h9 l-4.5,-6 Z`} />
+        <path d={`M${hx - 3},${hy - 10} h6 l-3,4 Z`} />
       </g>
+      <line x1={hx} x2={hx} y1={hy + 16} y2={yb - 3} className="ink-line" />
+    </>
+  );
+}
+
+/** Documents — the firm's library of law reports, and a sealed deed on the lectern. */
+function Documents({ x, y, w, h }: Box) {
+  const yb = y + h;
+  const lx = x + w - 15;
+  return (
+    <>
+      <LawBooks x={x + 4} y={y + 4} w={37} h={h - 4} rows={4} />
+      <line x1={lx} x2={lx} y1={yb} y2={y + 30} className="ink-line heavy" />
+      <rect x={lx - 6} y={yb - 2} width={12} height={2} />
+      <path d={`M${lx - 9},${y + 30} l18,-4 v2 l-18,4 Z`} />
+      <rect x={lx - 8} y={y + 6} width={16} height={21} className="paper" />
+      {[0, 1, 2].map((i) => (
+        <line key={i} x1={lx - 5.5} x2={lx + 5.5} y1={y + 10 + i * 3.5} y2={y + 10 + i * 3.5} className="paper-line" />
+      ))}
+      <Seal x={lx + 3} y={y + 22} />
+    </>
+  );
+}
+
+/** Practice Insight — the partners' meeting, the firm's year on the board. */
+function PracticeInsight({ x, y, w, h }: Box) {
+  const yb = y + h;
+  const ex = x + 17;
+  return (
+    <>
+      <line x1={ex} y1={y + 26} x2={ex - 9} y2={yb} className="ink-line heavy" />
+      <line x1={ex} y1={y + 26} x2={ex + 9} y2={yb} className="ink-line heavy" />
+      <rect x={ex - 13} y={y + 4} width={26} height={22} className="paper" />
+      {[
+        [4, 6],
+        [10, 10],
+        [16, 15],
+      ].map(([dx, bh]) => (
+        <rect key={dx} x={ex - 13 + dx} y={y + 23 - bh} width={4.5} height={bh} />
+      ))}
+      <line x1={ex - 10} x2={ex + 10} y1={y + 23} y2={y + 23} className="paper-line" />
+      <Advocate x={x + 39} yb={yb} tall={1.05} />
+      <line x1={x + 35} y1={yb - 19} x2={ex + 11} y2={y + 14} className="ink-line heavy" />
+      <rect x={x + 48} y={yb - 12} width={w - 50} height={2.4} />
+      <rect x={x + w - 5} y={yb - 10} width={2} height={10} />
+      <Seated x={x + w - 11} yb={yb - 12} />
     </>
   );
 }
@@ -316,19 +415,27 @@ const entity = (name: string) => ({
 });
 
 /** Bottom to top. */
+// Names and scripts come from the building the signed-in app files its
+// sections under (config/floors), so the firm drawn on the way in and the
+// floors you then work on can never disagree.
+const story = (num: string) => {
+  const f = BUILDING.find((b) => b.num === num);
+  return { name: f?.name ?? "", script: f?.script ?? "" };
+};
+
 const FLOORS: Floor[] = [
-  { id: "intake", name: "Enquiry Room", script: "first words, first heard", ...entity("intake_and_leads"), Scene: Enquiry },
-  { id: "clients", name: "The Parlour", script: "where clients are known", ...entity("clients"), Scene: Parlour },
-  { id: "matters", name: "Chambers", script: "where cases take shape", ...entity("matters"), Scene: Chambers },
-  { id: "billing", name: "Clockwork", script: "every hour, honoured", module: "Time & Billing", to: "/time_entries", Scene: Clockwork },
-  { id: "trust", name: "Strongroom", script: "held in trust, untouched", ...entity("trust_ledger_cta"), Scene: Strongroom },
-  { id: "docket", name: "The Watch", script: "no date slips past", ...entity("deadlines_and_sol"), Scene: Watch },
-  { id: "records", name: "Archive", script: "every page, kept", module: "Files", to: "/files", Scene: Archive },
-  { id: "reports", name: "Observatory", script: "the practice, seen whole", module: "Reports", to: "/reports", Scene: Observatory },
+  { id: "intake", ...story("01"), ...entity("intake_and_leads"), Scene: NewBusiness },
+  { id: "clients", ...story("02"), ...entity("clients"), Scene: ClientCare },
+  { id: "matters", ...story("03"), ...entity("matters"), Scene: CaseManagement },
+  { id: "billing", ...story("04"), module: "Time & Billing", to: "/time_entries", Scene: Profitability },
+  { id: "trust", ...story("05"), ...entity("trust_ledger_cta"), Scene: Compliance },
+  { id: "docket", ...story("06"), ...entity("deadlines_and_sol"), Scene: RiskDeadlines },
+  { id: "records", ...story("07"), module: "Files", to: "/files", Scene: Documents },
+  { id: "reports", ...story("08"), module: "Reports", to: "/reports", Scene: PracticeInsight },
 ];
 
-const LOBBY = { name: "Threshold", script: "every visit begins here" };
-const COURT = { id: "court", name: "The Court", script: "where the calendar leads", ...entity("court_calendar") };
+const LOBBY = story("G");
+const COURT = { id: "court", name: "The Court", script: "hearings, on the calendar", ...entity("court_calendar") };
 
 /** The building, floor by floor, for a screen-reader list on login. */
 export const FIRM_FEATURES = [
@@ -341,60 +448,71 @@ export const FIRM_FEATURES = [
 const LOBBY_AT = 900;
 const floorAt = (k: number) => 1050 + k * 130;
 
-/* ── Furniture for the other bays ───────────────────────────────────────── */
+/* ── The firm's other rooms ─────────────────────────────────────────────── */
 
 /**
- * `v` picks the furniture. It steps across the floors rather than being
- * random, so no two neighbouring bays repeat and each floor has about one
- * room dark.
+ * The bays beside each floor's scene are the firm at work: a lawyer at a desk
+ * under a banker's lamp, counsel at the law reports, a conference across the
+ * table, the files, a framed admission on the wall. `v` picks which, stepping
+ * across the floors rather than at random, so no two neighbouring bays repeat
+ * and each floor has about one room dark.
  */
-function Bay({ x, y, w, h, seed, v }: Box & { seed: number; v: number }) {
+function Bay({ x, y, w, h, v }: Box & { v: number }) {
   const yb = y + h;
   if (v === 5) return <rect x={x} y={y} width={w} height={h} className="room off ln-thin" pathLength={1} />;
-  // About one lit room in four comes and goes, on its own slow clock.
-  const flux = hash(seed + 5) % 4 === 0;
-  const style = flux
-    ? css({ "--fx": `${14 + (hash(seed + 9) % 16)}s`, "--fd": `${3 + (hash(seed + 11) % 9)}s` })
-    : undefined;
   return (
-    <g className={flux ? "bay flux" : "bay"} style={style}>
+    <g className="bay">
       <rect x={x} y={y} width={w} height={h} className="room lit" />
       <g className="ink lit">
         {v === 0 && (
           <>
-            <rect x={x + 8} y={yb - 13} width={w - 16} height={2.4} />
-            <rect x={x + w * 0.58} y={yb - 22} width={13} height={9} />
-            <Figure x={x + w * 0.34} yb={yb - 11} tall={0.75} />
+            <rect x={x + 6} y={yb - 13} width={w - 12} height={2.4} />
+            <rect x={x + 8} y={yb - 11} width={2} height={11} />
+            <rect x={x + w - 10} y={yb - 11} width={2} height={11} />
+            <Seated x={x + w * 0.3} yb={yb - 11} />
+            <rect x={x + w * 0.42} y={yb - 15} width={9} height={2} className="paper" />
+            <BankersLamp x={x + w * 0.72} yb={yb - 13} />
           </>
         )}
         {v === 1 && (
           <>
-            <rect x={x + 7} y={y + 8} width={w * 0.36} height={h - 8} className="ink-line" />
-            <line x1={x + 7} x2={x + 7 + w * 0.36} y1={y + 19} y2={y + 19} className="ink-line" />
-            <line x1={x + 7} x2={x + 7 + w * 0.36} y1={y + 30} y2={y + 30} className="ink-line" />
-            <Figure x={x + w * 0.72} yb={yb} tall={1.2} />
+            <LawBooks x={x + 5} y={y + 6} w={29} h={h - 6} rows={3} />
+            <Advocate x={x + w * 0.72} yb={yb} tall={1.05} />
+            <rect x={x + w * 0.72 - 12} y={yb - 22} width={6} height={8} className="paper" />
           </>
         )}
         {v === 2 && (
           <>
-            <rect x={x + w * 0.22} y={yb - 12} width={w * 0.56} height={2.4} />
-            <Figure x={x + w * 0.2} yb={yb - 10} tall={0.7} />
-            <Figure x={x + w * 0.8} yb={yb - 10} tall={0.7} />
+            <rect x={x + w * 0.2} y={yb - 12} width={w * 0.6} height={2.4} />
+            <rect x={x + w * 0.5 - 1} y={yb - 10} width={2} height={10} />
+            <Seated x={x + w * 0.18} yb={yb - 10} />
+            <Seated x={x + w * 0.82} yb={yb - 10} />
+            <rect x={x + w * 0.36} y={yb - 15} width={8} height={3} className="paper" />
+            <rect x={x + w * 0.52} y={yb - 15} width={8} height={3} className="paper" />
           </>
         )}
         {v === 3 && (
           <>
-            <circle cx={x + w - 18} cy={yb - 18} r={7} className="ink-line" />
-            <line x1={x + w - 18} x2={x + w - 18} y1={yb - 11} y2={yb} className="ink-line" />
-            <rect x={x + 8} y={yb - 13} width={30} height={2.4} />
-            <Figure x={x + 22} yb={yb - 11} tall={0.75} />
+            <rect x={x + 7} y={yb - 30} width={17} height={30} className="ink-line heavy" />
+            {[0, 1, 2].map((i) => (
+              <g key={i}>
+                <line x1={x + 7} x2={x + 24} y1={yb - 20 + i * 10} y2={yb - 20 + i * 10} className="ink-line" />
+                <rect x={x + 13} y={yb - 26 + i * 10} width={5} height={1.8} />
+              </g>
+            ))}
+            <Figure x={x + w * 0.66} yb={yb} tall={1.15} />
+            <rect x={x + w * 0.66 - 11} y={yb - 21} width={7} height={9} className="paper" />
           </>
         )}
         {v === 4 && (
           <>
-            <rect x={x + 10} y={y + 9} width={22} height={14} className="ink-line" />
-            <line x1={x + 13} x2={x + 29} y1={y + 19} y2={y + 13} className="ink-line" />
-            <Figure x={x + w - 22} yb={yb} tall={1.15} />
+            <Paper x={x + w / 2 - 9} y={y + 5} w={18} h={12} lines={2} />
+            <Seal x={x + w / 2 + 5} y={y + 15} />
+            <rect x={x + 8} y={yb - 13} width={w - 16} height={2.4} />
+            <rect x={x + 10} y={yb - 11} width={2} height={11} />
+            <rect x={x + w - 12} y={yb - 11} width={2} height={11} />
+            <Advocate x={x + w * 0.36} yb={yb - 11} tall={0.62} />
+            <rect x={x + w * 0.55} y={yb - 21} width={12} height={8} className="paper" />
           </>
         )}
       </g>
@@ -433,9 +551,9 @@ function Passerby({ x, tall = 1 }: { x: number; tall?: number }) {
 }
 
 /** The scales of justice, drawn rather than borrowed from an icon set. */
-function Scales({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+function Scales({ x, y, s = 1, ink = false }: { x: number; y: number; s?: number; ink?: boolean }) {
   return (
-    <g className="emblem" transform={`translate(${x} ${y}) scale(${s})`}>
+    <g className={ink ? "emblem ink-emblem" : "emblem"} transform={`translate(${x} ${y}) scale(${s})`}>
       <line x1={0} y1={-7} x2={0} y2={7} />
       <line x1={-4} y1={7} x2={4} y2={7} />
       <line x1={-10} y1={-4.5} x2={10} y2={-4.5} />
@@ -495,7 +613,6 @@ function Courthouse() {
       <rect x={112} y={864} width={266} height={8} className="c-fill ln-thin" pathLength={1} />
       <rect x={100} y={872} width={290} height={8} className="c-fill ln-thin" pathLength={1} />
       {/* named beside the dome, in open sky clear of the page's copy */}
-      <line x1={292} x2={310} y1={668} y2={656} className="ln-thin" pathLength={1} />
       <text x={314} y={652} className="court-name">
         {COURT.name.toUpperCase()}
       </text>
@@ -554,7 +671,7 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
         {...target(t)}
       >
         <text x={FX0 + 14} y={gy + 12} className="core-num lit">
-          {`L${String(k + 1).padStart(2, "0")}`}
+          {String(k + 1).padStart(2, "0")}
         </text>
         <text x={FX0 + 14} y={gy + 27} className="core-name lit">
           {f.name}
@@ -574,19 +691,10 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
               y={gy}
               w={BAY_W - 6}
               h={gh}
-              seed={k * 11 + b}
               v={(k * 5 + b * 2) % 6}
             />
           );
         })}
-        {/* level marker */}
-        <g className="level">
-          <line x1={FX0 - 46} x2={FX0} y1={bottom} y2={bottom} className="ln-thin" pathLength={1} />
-          <path d={`M${FX0 - 40},${bottom - 9} h12 l-6,9 Z`} className="level-mark" />
-          <text x={FX0 - 52} y={bottom - 3} textAnchor="end">
-            {fmtLevel(level(k))}
-          </text>
-        </g>
         <rect x={FX0} y={top} width={W} height={FLOOR_H} className="floor-hit" />
       </g>
     );
@@ -606,9 +714,6 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
           : { "aria-hidden": true, focusable: false })}
       >
         <defs>
-          <pattern id={`${uid}-hatch`} width={9} height={9} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <line x1={0} y1={0} x2={0} y2={9} className="hatch" />
-          </pattern>
           <radialGradient id={`${uid}-halo`}>
             <stop offset="0" className="halo-0" />
             <stop offset="1" className="halo-1" />
@@ -694,12 +799,17 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
               <text x={(BAY0 + FX1) / 2 - 20} y={LOBBY_TOP + 22} textAnchor="middle" className="firm-sign">
                 INVENTDB · LEGAL
               </text>
+              {/* the firm's scales on the wall behind the reception desk */}
+              <Scales x={BAY0 + 32} y={LOBBY_TOP + 46} s={1.1} ink />
               <rect x={BAY0 + 18} y={GROUND - 22} width={70} height={22} />
-              <Figure x={BAY0 + 52} yb={GROUND - 22} tall={0.7} />
+              <Figure x={BAY0 + 60} yb={GROUND - 22} tall={0.7} />
+              {/* a client waiting, briefcase at their side */}
               <rect x={BAY0 + 120} y={GROUND - 12} width={56} height={4} />
               <rect x={BAY0 + 122} y={GROUND - 8} width={3} height={8} />
               <rect x={BAY0 + 171} y={GROUND - 8} width={3} height={8} />
               <Figure x={BAY0 + 138} yb={GROUND - 12} tall={0.85} />
+              <rect x={BAY0 + 150} y={GROUND - 19} width={12} height={7} rx={1} />
+              <path d={`M${BAY0 + 153},${GROUND - 19} v-2.5 h6 v2.5`} className="ink-line" />
               <Figure x={BAY0 + 200} yb={GROUND} tall={1.6} />
               <circle cx={BAY0 + 228} cy={GROUND - 20} r={9} className="ink-line" />
               <rect x={BAY0 + 224} y={GROUND - 11} width={8} height={11} />
@@ -712,13 +822,6 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
                 <line x1={1070} x2={1070} y1={LOBBY_TOP + 40} y2={GROUND - 4} className="ink-line heavy" />
                 <line x1={1110} x2={1110} y1={LOBBY_TOP + 40} y2={GROUND - 4} className="ink-line heavy" />
               </g>
-            </g>
-            <g className="level">
-              <line x1={FX0 - 46} x2={FX0} y1={GROUND} y2={GROUND} className="ln-thin" pathLength={1} />
-              <path d={`M${FX0 - 40},${GROUND - 9} h12 l-6,9 Z`} className="level-mark" />
-              <text x={FX0 - 52} y={GROUND - 3} textAnchor="end">
-                {fmtLevel(0)}
-              </text>
             </g>
           </g>
 
@@ -754,15 +857,6 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
             />
           ))}
 
-          {/* overall height */}
-          <g className="dim">
-            <line x1={FX0 - 120} x2={FX0 - 120} y1={GROUND} y2={ROOF} className="ln-thin" pathLength={1} />
-            <line x1={FX0 - 128} x2={FX0 - 112} y1={GROUND + 8} y2={GROUND - 8} className="ln-thin" pathLength={1} />
-            <line x1={FX0 - 128} x2={FX0 - 112} y1={ROOF + 8} y2={ROOF - 8} className="ln-thin" pathLength={1} />
-            <text x={FX0 - 130} y={(GROUND + ROOF) / 2} transform={`rotate(-90 ${FX0 - 130} ${(GROUND + ROOF) / 2})`} textAnchor="middle">
-              {`${level(8).toFixed(2)} m · 9 storeys`}
-            </text>
-          </g>
         </g>
 
         {/* the leader from the lobby to the sign-in sheet */}
@@ -773,8 +867,8 @@ function FirmSceneImpl({ variant, sky }: { variant: "hero" | "banner"; sky: Sky 
           </g>
         )}
 
-        {/* the street, cut, with the lobby's light spilling onto it */}
-        <rect x={-100} y={GROUND} width={2000} height={140} style={{ fill: `url(#${uid}-hatch)` }} className="soil" />
+        {/* the street, with the lobby's light spilling onto it */}
+        <rect x={-100} y={GROUND} width={2000} height={140} className="street" />
         <ellipse cx={980} cy={GROUND + 4} rx={320} ry={34} style={{ fill: `url(#${uid}-spill)` }} className="spill" />
         <line x1={-100} x2={1900} y1={GROUND} y2={GROUND} className="ground ln" pathLength={1} />
         <g className="px" style={layer(8)}>

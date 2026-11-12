@@ -1,4 +1,7 @@
-import { MODULES, designedLayout, expect, rows, test } from "./fixtures";
+import { MODULES, designedLayout, expect, rows, test, preferLedger, openSection } from "./fixtures";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * Saved views — the named browse states at the head of every module.
@@ -396,7 +399,7 @@ test.describe("New view — the designer", () => {
     await page.keyboard.press("Escape");
     await expect(panel).toHaveCount(0);
     // And the page is still alive.
-    await page.locator("nav.nav").getByRole("link", { name: "Clients", exact: true }).click();
+    await openSection(page, "Clients");
     await expect(page).toHaveURL(/\/clients/);
   });
 

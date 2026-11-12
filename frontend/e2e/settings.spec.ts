@@ -76,9 +76,11 @@ test.describe("Topbar controls", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 
-  test("signs out from the topbar", async ({ page }) => {
+  test("signs out from the account menu", async ({ page }) => {
     await page.goto("/");
-    await page.locator("header.topbar").getByRole("button", { name: "Sign out" }).click();
+    const masthead = page.locator("header.topbar");
+    await masthead.getByRole("button", { name: "Your account" }).click();
+    await masthead.getByRole("menuitem", { name: "Sign out" }).click();
 
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();

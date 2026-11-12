@@ -1,6 +1,9 @@
 import type { Page, Request } from "@playwright/test";
 
-import { expect, field, row, sseBody, test } from "./fixtures";
+import { expect, field, row, sseBody, test, preferLedger, openSection } from "./fixtures";
+
+// These are about the ledger (the table), so modules open on it.
+test.beforeEach(async ({ page }) => preferLedger(page));
 
 /**
  * The drill-down panel — the right-hand view a click on any record, result row,
@@ -277,7 +280,7 @@ test.describe("links into a record", () => {
 
   test("leaving the page puts the panel away", async ({ page }) => {
     await page.goto("/matters");
-    await page.locator("nav.nav").getByRole("link", { name: "Invoices" }).click();
+    await openSection(page, "Invoices");
     await row(page, "INV-2026-1553").getByText("INV-2026-1553").click();
     await expect(panel(page)).toBeVisible();
     // The backdrop covers the sidebar, so Back is the way off the page.

@@ -6,7 +6,7 @@
   z-index: 300;
   display: flex;
   justify-content: flex-end;
-  background: rgba(10, 20, 38, 0.32);
+  background: var(--scrim);
   animation: drill-fade 0.16s var(--ease-out);
 }
 
@@ -17,8 +17,11 @@
   grid-template-rows: auto minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
   background: var(--surface);
-  border-left: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
+  /* A sheet laid over the casebook: edged in sunflower like every summoned
+     sheet, falling away to the left. */
+  border-top: 4px solid var(--accent);
+  box-shadow: var(--sheet-shadow);
+  padding-top: env(safe-area-inset-top, 0px);
   animation: drill-slide 0.22s var(--ease-out);
 }
 
@@ -102,15 +105,18 @@
 }
 .drill-title h2 {
   margin: 2px 0 0;
-  font-size: 19px;
-  line-height: 1.3;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums;
   word-break: break-word;
 }
 .drill-kicker {
   margin: 0;
-  font-size: 11.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 11px;
   color: var(--text-faint);
 }
 .drill-key { font-family: var(--font-mono); text-transform: none; letter-spacing: 0; }
@@ -135,17 +141,21 @@
   align-items: baseline;
   gap: 8px;
 }
+.drill-section-head {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-strong);
+}
 .drill-section-head h3 {
   margin: 0;
-  font-size: 13px;
+  font-family: var(--serif);
+  font-size: 20px;
   font-weight: 600;
+  letter-spacing: 0;
 }
 .drill-count {
+  font-family: var(--font-mono);
   font-size: 11.5px;
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  background: var(--neutral-soft);
-  color: var(--text-muted);
+  color: var(--text-faint);
 }
 
 .drill-fields {
@@ -162,7 +172,7 @@
   border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
-.drill-field dt { color: var(--text-faint); }
+.drill-field dt { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); padding-top: 2px; }
 .drill-field dd { margin: 0; min-width: 0; word-break: break-word; }
 
 .drill-link {
@@ -183,8 +193,7 @@
 
 .drill-grid-wrap {
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-top: 1px solid var(--border);
   transition: opacity 0.15s;
 }
 .drill-grid-wrap.is-paging { opacity: 0.6; }
@@ -196,12 +205,14 @@
 }
 .drill-grid th {
   text-align: left;
-  font-weight: 600;
-  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
   white-space: nowrap;
   padding: 7px 10px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  border-bottom: 1px solid var(--border-strong);
+  background: var(--surface-2);
 }
 .drill-grid th.is-sortable { cursor: pointer; }
 .drill-grid td {
@@ -216,7 +227,8 @@
 .drill-grid tr.is-clickable { cursor: pointer; }
 .drill-grid tr.is-clickable:hover td,
 .drill-grid tr.is-clickable:focus-visible td { background: var(--brand-tint); }
-.drill-grid td.drill-key { color: var(--text-muted); font-size: 12px; }
+.drill-grid tr.is-clickable:hover td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.drill-grid td.drill-key { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
 
 .drill-pager {
   display: flex;
@@ -321,22 +333,24 @@ table.data tbody tr.is-drillable:focus-visible td { background: var(--brand-tint
 .drill-jump {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px 20px;
   margin-top: -4px;
+  border-bottom: 1px solid var(--border);
 }
 .drill-jump-link {
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
+  margin-bottom: -1px;
+  padding: 4px 0 7px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
   color: var(--text-muted);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 .drill-jump-link:hover,
 .drill-jump-link:focus-visible {
-  border-color: var(--brand);
-  color: var(--brand);
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
 .drill-section { scroll-margin-top: 12px; }

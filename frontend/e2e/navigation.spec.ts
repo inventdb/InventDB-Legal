@@ -1,8 +1,8 @@
-import { expect, test } from "./fixtures";
+import { expect, openSection, test } from "./fixtures";
 
 /**
- * Every sidebar destination, with the title Layout's `pageTitle()` should put
- * in the topbar. Several are the interesting ones — `trust_ledger_cta`,
+ * Every destination in the building, with the title Layout's `pageTitle()`
+ * should put in the page's h1. Several are the interesting ones — `trust_ledger_cta`,
  * `deadlines_and_sol` and `costs_and_disbursements` all have a route segment
  * and a label that deliberately disagree.
  */
@@ -45,58 +45,92 @@ const DESTINATIONS = [
   { link: "Settings", path: "/settings", title: "Settings" },
 ] as const;
 
-test.describe("Sidebar navigation", () => {
+/** The floors, in the order the folder tabs run, with what each opens on. */
+const FLOORS = [
+  { tab: "Reception", opens: "/" },
+  { tab: "New Business", opens: "/intake_and_leads" },
+  { tab: "Client Care", opens: "/clients" },
+  { tab: "Case Management", opens: "/matters" },
+  { tab: "Profitability", opens: "/time_entries" },
+  { tab: "Compliance", opens: "/trust_ledger_cta" },
+  { tab: "Risk & Deadlines", opens: "/court_calendar" },
+  { tab: "Documents", opens: "/files" },
+  { tab: "Practice Insight", opens: "/reports" },
+  { tab: "Lookups & Settings", opens: "/lookups" },
+] as const;
+
+test.describe("The building", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
 
-  test("renders every section and destination", async ({ page }) => {
-    const nav = page.locator("nav.nav");
-    for (const section of [
-      "Practice",
-      "Time & Billing",
-      "Money",
-      "Calendar & Docket",
-      "Intake",
-      "Automation & Insights",
-    ]) {
-      await expect(nav.locator(".nav-section", { hasText: section })).toBeVisible();
+  test("files every destination under a floor", async ({ page }) => {
+    const floors = page.getByRole("navigation", { name: "Floors" });
+    await expect(floors.getByRole("link")).toHaveCount(FLOORS.length);
+    for (const { tab } of FLOORS) {
+      await expect(floors.getByRole("link", { name: new RegExp(tab) })).toBeVisible();
     }
-    await expect(nav.getByRole("link")).toHaveCount(DESTINATIONS.length);
+
+    // "All sections" is the whole building on one sheet: every destination.
+    await page.getByRole("button", { name: "All sections" }).click();
+    const directory = page.getByRole("dialog", { name: "All sections" });
+    await expect(directory.getByRole("link")).toHaveCount(DESTINATIONS.length);
+    for (const { link, path } of DESTINATIONS) {
+      await expect(directory.locator(`a[href="${path}"]`)).toContainText(link);
+    }
+    // A parked run is announced on its section here too.
+    await expect(directory.getByRole("link", { name: "Workflows, 2 waiting on you" })).toBeVisible();
   });
+
+  for (const { tab, opens } of FLOORS) {
+    test(`the ${tab} tab opens its first section`, async ({ page }) => {
+      await page
+        .getByRole("navigation", { name: "Floors" })
+        .getByRole("link", { name: new RegExp(tab) })
+        .click();
+      await expect(page).toHaveURL(opens);
+    });
+  }
 
   for (const { link, path, title } of DESTINATIONS) {
     test(`navigates to ${link}`, async ({ page }) => {
-      // Located by href rather than accessible name. An entry that carries a
-      // count badge — Workflows, when a run is parked — has that count in its
-      // name by design ("Workflows, 2 waiting on you"), which is right for a
-      // screen reader and fatal to an exact-name match.
-      const entry = page.locator("nav.nav").locator(`a[href="${path}"]`);
-      await expect(entry).toContainText(link);
-      await entry.click();
+      await openSection(page, link);
 
       await expect(page).toHaveURL(path);
-      // The topbar h1 is the only heading guaranteed on every page; entity
-      // pages repeat the same text in an h2, so the level matters.
+      // The frame's h1 is the one heading guaranteed on every page.
       await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
+      // Arrived, the section is the one marked on its floor's strip. Located
+      // by href rather than accessible name: an entry carrying a count badge —
+      // Workflows, when a run is parked — has the count in its name by design.
+      const entry = page.locator("nav.nav").locator(`a[href="${path}"]`);
+      await expect(entry).toContainText(link);
+      await expect(entry).toHaveClass(/active/);
     });
   }
 
   test("marks the current destination active", async ({ page }) => {
     const nav = page.locator("nav.nav");
     await expect(nav.locator(".nav-item.active")).toHaveText("Dashboard");
+    await expect(
+      page.getByRole("navigation", { name: "Floors" }).getByRole("link", { name: /Reception/ })
+    ).toHaveAttribute("aria-current", "page");
 
-    await nav
-      .getByRole("link", { name: "Costs & Disbursements", exact: true })
+    await page
+      .getByRole("navigation", { name: "Floors" })
+      .getByRole("link", { name: /Profitability/ })
       .click();
+    await nav.getByRole("link", { name: "Costs & Disbursements", exact: true }).click();
     await expect(nav.locator(".nav-item.active")).toHaveText("Costs & Disbursements");
+    await expect(
+      page.getByRole("navigation", { name: "Floors" }).getByRole("link", { name: /Profitability/ })
+    ).toHaveAttribute("aria-current", "page");
 
-    // Dashboard's link is `end`, so a child route must not light it up too.
+    // One section lit at a time.
     await expect(nav.locator(".nav-item.active")).toHaveCount(1);
   });
 
   test("survives a full reload on a deep route", async ({ page }) => {
-    await page.goto("/time_entries");
+    await page.goto("/time_entries?view=ledger");
     await page.reload();
     await expect(
       page.getByRole("heading", { name: "Time Entries", level: 1 })
@@ -105,10 +139,7 @@ test.describe("Sidebar navigation", () => {
   });
 
   test("supports browser back and forward", async ({ page }) => {
-    await page
-      .locator("nav.nav")
-      .getByRole("link", { name: "Timekeepers", exact: true })
-      .click();
+    await openSection(page, "Timekeepers");
     await expect(page).toHaveURL(/\/timekeepers$/);
 
     await page.goBack();
@@ -117,6 +148,16 @@ test.describe("Sidebar navigation", () => {
 
     await page.goForward();
     await expect(page).toHaveURL(/\/timekeepers$/);
+  });
+
+  test("finds a section by name in the directory", async ({ page }) => {
+    await page.getByRole("button", { name: "All sections" }).click();
+    const directory = page.getByRole("dialog", { name: "All sections" });
+    await directory.getByPlaceholder("Find a section").fill("trust");
+    await expect(directory.getByRole("link")).toHaveCount(1);
+    await directory.getByRole("link", { name: "Trust Ledger (CTA)" }).click();
+    await expect(page).toHaveURL("/trust_ledger_cta");
+    await expect(directory).toHaveCount(0);
   });
 });
 

@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures";
 
 /**
@@ -275,11 +277,23 @@ test.describe("Notifications", () => {
 });
 
 test.describe("The waiting badge", () => {
+  // Away from Practice Insight, the Workflows link is not on the strip; the
+  // count rides the bell in the masthead and the floor's own tab instead.
+  const bell = (page: Page) => page.getByRole("link", { name: /^Notifications/ });
+  const floorTab = (page: Page) =>
+    page.getByRole("navigation", { name: "Floors" }).getByRole("link", { name: /Practice Insight/ });
+
   test("shows the count from anywhere in the app", async ({ page }) => {
     // A run parks while you are on another page entirely. The shell polls, so
     // the count finds you without your having to go and look for it.
     await page.goto("/matters");
 
+    await expect(bell(page)).toHaveAccessibleName("Notifications, 2 waiting on you");
+    await expect(bell(page).locator(".cb-dot")).toHaveText("2");
+    await expect(floorTab(page).locator(".cb-badge")).toHaveText("2");
+
+    // On its own floor the count sits on the Workflows link itself.
+    await floorTab(page).click();
     const badge = page.locator("nav.nav .nav-item", { hasText: "Workflows" }).locator(".nav-badge");
     await expect(badge).toHaveText("2");
     await expect(badge).toHaveAttribute("aria-label", "2 waiting on you");
@@ -293,10 +307,12 @@ test.describe("The waiting badge", () => {
         body: JSON.stringify({ notifications: [] }),
       })
     );
-    await page.goto("/matters");
+    await page.goto("/workflows");
     await expect(page.locator("nav.nav .nav-item", { hasText: "Workflows" })).toBeVisible();
 
     await expect(page.locator(".nav-badge")).toHaveCount(0);
+    await expect(bell(page)).toHaveAccessibleName("Notifications");
+    await expect(page.locator(".cb-dot, .cb-badge")).toHaveCount(0);
   });
 
   test("counts only outstanding decisions, not answered or informational ones", async ({
@@ -304,7 +320,7 @@ test.describe("The waiting badge", () => {
   }) => {
     // Four notifications are seeded and only two hold a run open.
     await page.goto("/matters");
-    await expect(page.locator(".nav-badge")).toHaveText("2");
+    await expect(bell(page).locator(".cb-dot")).toHaveText("2");
   });
 });
 

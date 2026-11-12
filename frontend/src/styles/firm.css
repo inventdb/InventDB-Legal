@@ -1,10 +1,10 @@
 /* ==========================================================================
-   The firm, in section — components/FirmScene.tsx, on the login sheet and the
+   The firm, cut open — components/FirmScene.tsx, on the login page and the
    dashboard banner.
 
-   An architect's drawing rather than an illustration. Hairline outlines, solid
-   poché where the building is cut, flat fills for lit rooms, monospaced
-   annotation and a line of italic script on every floor. Depth comes from
+   Hairline outlines, solid slabs and walls, flat fills for lit rooms, ink
+   scenes of the firm at work, and a line of italic script on every floor.
+   Depth comes from
    layers: a hazed far city, a nearer one, the courthouse, the firm with its
    cast shade, and the street in front. By day it is navy ink on powder paper;
    at night (and in dark mode at any hour) it is powder line on ink, and the
@@ -34,7 +34,7 @@
   --f-room-hi: #ffc72c;
   --f-ink: #1f4a85;
   --f-core: #14233f;
-  --f-core-num: #7a5a00;
+  --f-core-num: var(--f-gold);
   --f-script: #43546f;
   --f-annot: rgba(20, 35, 63, 0.6);
   --f-far1: #dbe8f3;
@@ -44,8 +44,13 @@
   --f-court: #ffffff;
   --f-recess: rgba(31, 74, 133, 0.08);
   --f-dome: rgba(255, 199, 44, 0.55);
+  /* One rule for yellow, shared with the login page: Sunflower for fills
+     (the lift, flags, lamps), and for lines and text a deeper gold by day,
+     where Sunflower on pale paper would not read. */
   --f-accent: #ffc72c;
-  --f-hatch: rgba(31, 74, 133, 0.2);
+  --f-gold: #b07f00;
+  --f-street: rgba(31, 74, 133, 0.07);
+  --f-paper: #ffffff;
   --f-tree: #d5e6dc;
   --f-star-op: 0;
   --f-moon: #ffffff;
@@ -65,7 +70,7 @@
   --f-room-hi: #fff0b8;
   --f-ink: #14233f;
   --f-core: #e4eff8;
-  --f-core-num: #ffc72c;
+  --f-core-num: var(--f-gold);
   --f-script: rgba(228, 239, 248, 0.68);
   --f-annot: rgba(185, 214, 238, 0.66);
   --f-far1: #14244a;
@@ -75,7 +80,9 @@
   --f-court: #0e1a30;
   --f-recess: rgba(185, 214, 238, 0.06);
   --f-dome: #ffc72c;
-  --f-hatch: rgba(185, 214, 238, 0.13);
+  --f-gold: #ffc72c;
+  --f-street: #08111f;
+  --f-paper: #fff7e2;
   --f-tree: #0d1a31;
   --f-star-op: 1;
   --f-moon: #fdf3d0;
@@ -117,7 +124,7 @@
 }
 .firm .star {
   fill: #ffffff;
-  animation: f-twinkle 5.2s ease-in-out infinite;
+  opacity: 0.75;
 }
 .firm .moon {
   fill: var(--f-moon);
@@ -137,7 +144,6 @@
 }
 .firm .far-win {
   fill: var(--f-far-win);
-  animation: f-twinkle 9s ease-in-out infinite;
 }
 .haze-0 {
   stop-color: var(--f-haze);
@@ -190,12 +196,9 @@
   fill: var(--f-poche);
   animation: f-fade 700ms var(--ease-out) 500ms both;
 }
-.firm .soil {
+.firm .street {
+  fill: var(--f-street);
   animation: f-fade 900ms var(--ease-out) 300ms both;
-}
-.firm .hatch {
-  stroke: var(--f-hatch);
-  stroke-width: 1;
 }
 
 /* ---- Rooms, lit from the lobby up -------------------------------------- */
@@ -207,10 +210,6 @@
 }
 .firm .lit {
   animation: f-light 500ms var(--ease-out) var(--d, 0ms) both;
-}
-/* Some rooms keep their own hours: they dim and come back on a slow clock. */
-.firm .bay.flux {
-  animation: f-flux var(--fx, 18s) ease-in-out calc(var(--d, 0ms) + var(--fd, 4s)) infinite;
 }
 .firm .ink {
   fill: var(--f-ink);
@@ -224,8 +223,30 @@
   stroke-width: 2;
   stroke-linecap: round;
 }
-.firm .ink .lamp-face {
-  fill: var(--f-ink);
+.firm .ink .paper {
+  fill: var(--f-paper);
+  stroke: var(--f-ink);
+  stroke-width: 1;
+}
+.firm .ink .paper-line {
+  stroke: var(--f-ink);
+  stroke-width: 0.7;
+  opacity: 0.55;
+}
+/* Gilt bands on the law reports, the bands at counsel's collar, and the
+   ribbon round a brief all take the room's own light, so they read as cut
+   out of the ink. */
+.firm .ink .bands {
+  fill: var(--f-room);
+}
+.firm .ink .bands-line,
+.firm .ink .ribbon {
+  fill: none;
+  stroke: var(--f-room);
+  stroke-width: 1.1;
+}
+.firm .ink .unit {
+  opacity: 0.35;
 }
 
 /* The floors' small motions. Each loop ends where it started, so reduced
@@ -236,28 +257,28 @@
 .firm .hand-h {
   animation: f-spin 480s linear infinite;
 }
-.firm .wheel {
-  animation: f-turn 16s ease-in-out infinite;
+.firm .tip {
+  animation: f-tip 9s ease-in-out infinite;
 }
-.firm .revolve {
-  animation: f-revolve 7s ease-in-out infinite;
+.firm .dial {
+  animation: f-dial 12s ease-in-out infinite;
 }
-.firm .scope {
-  animation: f-scan 11s ease-in-out infinite;
+.firm .flip {
+  animation: f-flip 14s ease-in-out infinite;
 }
-.firm .talk {
-  animation: f-talk 6s ease-in-out infinite;
-}
-.firm .mark {
-  animation: f-mark 3.2s ease-in-out infinite;
+.firm .sign {
+  fill: none;
+  stroke: var(--f-ink);
+  stroke-width: 1.1;
+  stroke-linecap: round;
 }
 
 /* ---- Core: the floor's name, number and script -------------------------- */
 .firm text.core-name {
   font-family: var(--font);
-  font-size: 11.5px;
+  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   fill: var(--f-core);
 }
@@ -282,15 +303,6 @@
   letter-spacing: 0.32em;
   fill: var(--f-ink);
 }
-.firm .level text {
-  font-size: 10.5px;
-}
-.firm .level-mark {
-  fill: var(--f-annot);
-  animation: f-fade 400ms var(--ease-out) var(--d, 0ms) both;
-}
-.firm .level text,
-.firm .dim text,
 .firm .court-drawing text {
   animation: f-fade 500ms var(--ease-out) var(--d, 0ms) both;
 }
@@ -313,14 +325,21 @@
 /* ---- Emblem and flags --------------------------------------------------- */
 .firm .emblem {
   fill: none;
-  stroke: var(--f-accent);
+  stroke: var(--f-gold);
   stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
   animation: f-fade 600ms var(--ease-out) 900ms both;
 }
 .firm .emblem circle {
-  fill: var(--f-accent);
+  fill: var(--f-gold);
+}
+/* The scales on the lobby wall are drawn in ink, like the rest of the room. */
+.firm .ink-emblem {
+  stroke: var(--f-ink);
+}
+.firm .ink-emblem circle {
+  fill: var(--f-ink);
 }
 .firm .flag {
   fill: var(--f-accent);
@@ -371,7 +390,7 @@
 
 /* ---- The leader to the sign-in sheet ------------------------------------ */
 .firm .leader line {
-  stroke: var(--f-accent);
+  stroke: var(--f-gold);
   stroke-width: 1.4;
   stroke-dasharray: 1;
   animation: f-draw 600ms var(--ease-out) 2200ms both;
@@ -393,7 +412,7 @@
 }
 .firm .floor.is-active text.core-name,
 .firm .court.is-active text.court-name {
-  fill: var(--f-accent);
+  fill: var(--f-gold);
 }
 .firm--banner .floor,
 .firm--banner .court {
@@ -413,9 +432,7 @@
 /* ---- Dashboard: the banner the greeting sits in ------------------------
    At banner size the annotation would be too small to read, so it goes; the
    caption names whatever the pointer is on. */
-.firm--banner text,
-.firm--banner .level,
-.firm--banner .dim {
+.firm--banner text {
   display: none;
 }
 .room-banner {
@@ -521,37 +538,11 @@
   }
 }
 @keyframes f-light {
-  0% {
+  from {
     opacity: 0;
   }
-  40% {
+  to {
     opacity: 1;
-  }
-  55% {
-    opacity: 0.45;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes f-flux {
-  0%,
-  42%,
-  100% {
-    opacity: 1;
-  }
-  50%,
-  86% {
-    opacity: 0.22;
-  }
-}
-@keyframes f-twinkle {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.3;
   }
 }
 @keyframes f-spin {
@@ -562,65 +553,48 @@
     transform: rotate(360deg);
   }
 }
-@keyframes f-turn {
+@keyframes f-tip {
   0%,
   100% {
     transform: rotate(0deg);
   }
-  40%,
-  55% {
-    transform: rotate(120deg);
+  30% {
+    transform: rotate(-5deg);
   }
-}
-@keyframes f-revolve {
-  0%,
-  100% {
-    transform: scaleX(1);
-  }
-  25% {
-    transform: scaleX(0.15);
-  }
-  50% {
-    transform: scaleX(-1);
-  }
-  75% {
-    transform: scaleX(0.15);
-  }
-}
-@keyframes f-scan {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  45% {
-    transform: rotate(-6deg);
-  }
-  70% {
+  60% {
     transform: rotate(3deg);
   }
-}
-@keyframes f-talk {
-  0%,
-  55%,
-  100% {
-    opacity: 1;
-  }
-  65%,
-  90% {
-    opacity: 0;
+  80% {
+    transform: rotate(-1deg);
   }
 }
-@keyframes f-mark {
+@keyframes f-dial {
   0%,
   100% {
-    opacity: 1;
+    transform: rotate(0deg);
   }
-  50% {
-    opacity: 0.25;
+  35% {
+    transform: rotate(140deg);
+  }
+  65% {
+    transform: rotate(-60deg);
   }
 }
-/* The lift calls at Chambers, the Observatory, the Strongroom and the
-   Enquiry Room, and comes home to the lobby. */
+@keyframes f-flip {
+  0%,
+  42% {
+    transform: rotate(0deg);
+  }
+  50%,
+  92% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* The lift calls at Case Management, Practice Insight, Compliance and New
+   Business, and comes home to Reception. */
 @keyframes f-lift {
   0%,
   8% {
