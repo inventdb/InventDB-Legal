@@ -19,6 +19,7 @@ import { useAuth } from "../auth/AuthContext";
 import { agentText as _agentText, isCancel, type AgentStep } from "../analyze/agent";
 import { AgentTimeline } from "../analyze/Timeline";
 import { ActionProgress } from "../analyze/ui";
+import { FirmScene, timeOfDay, type Sky } from "../components/FirmScene";
 import { ConfirmDialog } from "../components/Modal";
 import { Skeleton } from "../analyze/ui";
 import { loadDashboard, saveDashboard } from "../dashboard/dashboardStore";
@@ -32,19 +33,22 @@ import type { Widget } from "../dashboard/types";
 // builds that only reach it through suggestWidgets.
 void _agentText;
 
+const GREETING: Record<Sky, string> = {
+  morning: "Good morning",
+  afternoon: "Good afternoon",
+  evening: "Good evening",
+};
+
 /**
  * Time-of-day greeting, in the reader's own timezone.
  *
- * Evening starts at 4pm. Later than that and the greeting reads as a clock that
- * is wrong — "good afternoon" at half past five was reported as a bug. The date
- * is a parameter so the boundaries can be tested without waiting for one to
- * arrive.
+ * The boundaries live in `timeOfDay`, which also picks the banner's sky, so
+ * the greeting and the picture can never disagree. Evening starts at 4pm. The
+ * date is a parameter so the boundaries can be tested without waiting for one
+ * to arrive.
  */
 export function greeting(now: Date = new Date()): string {
-  const h = now.getHours();
-  if (h < 12) return "Good morning";
-  if (h < 16) return "Good afternoon";
-  return "Good evening";
+  return GREETING[timeOfDay(now)];
 }
 
 export default function Dashboard() {
@@ -547,34 +551,42 @@ function useGridFlip(
   );
 }
 
-/** Room header — the greeting, the dashboard picker, and what the room is. */
+/**
+ * Room header — the greeting, the dashboard picker, and what the room is, set
+ * in a banner beside the firm drawn in section. Each floor of it opens its
+ * module, and its sky follows the same time of day as the greeting.
+ */
 function Head() {
+  const sky = timeOfDay();
   return (
-    <div className="room-head">
-      <div className="room-kicker">Today · Legal</div>
-      <div className="room-title">
-        <h2>{greeting()}</h2>
-        <label className="ns-pick">
-          <span>Dashboard for</span>
-          <span className="ns-pick-control">
-            {/* One namespace, so the picker has one option — the same control
-                SOAR shows on a single-namespace instance. */}
-            <select
-              className="input"
-              value={NS}
-              onChange={() => {}}
-              aria-label="Dashboard namespace"
-            >
-              <option value={NS}>{NS}</option>
-            </select>
-            <ChevronDown size={13} aria-hidden />
-          </span>
-        </label>
+    <div className="room-head room-banner" data-sky={sky}>
+      <div className="room-banner-copy">
+        <div className="room-kicker">Today · Legal</div>
+        <div className="room-title">
+          <h2>{greeting()}</h2>
+          <label className="ns-pick">
+            <span>Dashboard for</span>
+            <span className="ns-pick-control">
+              {/* One namespace, so the picker has one option — the same control
+                  SOAR shows on a single-namespace instance. */}
+              <select
+                className="input"
+                value={NS}
+                onChange={() => {}}
+                aria-label="Dashboard namespace"
+              >
+                <option value={NS}>{NS}</option>
+              </select>
+              <ChevronDown size={13} aria-hidden />
+            </span>
+          </label>
+        </div>
+        <p className="room-sub">
+          A live view of your <b>{NS}</b> data. Every figure shows the query behind it, so you
+          can check where it came from.
+        </p>
       </div>
-      <p className="room-sub">
-        A live view of your <b>{NS}</b> data. Every figure shows the query behind it, so you
-        can check where it came from.
-      </p>
+      <FirmScene variant="banner" sky={sky} />
     </div>
   );
 }

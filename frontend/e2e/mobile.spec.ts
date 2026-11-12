@@ -68,9 +68,14 @@ test.describe("Mobile shell", () => {
   test("gives a widget the full width rather than a squeezed column", async ({ page }) => {
     // Every span collapses to one column below the breakpoint: a 3-of-12 figure
     // on a phone is a figure nobody can read.
+    // An empty dashboard has no grid once it has loaded, which the catch
+    // already treats as one column; the short timeout stops the lookup from
+    // waiting out the whole test for a grid that will not appear.
     const columns = await page
       .locator(".bento")
-      .evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length)
+      .evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length, undefined, {
+        timeout: 3000,
+      })
       .catch(() => 1);
     expect(columns).toBe(1);
   });

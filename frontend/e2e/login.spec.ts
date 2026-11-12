@@ -12,9 +12,8 @@ test.describe("Login page", () => {
       page.getByRole("heading", { name: "Legal practice, modernised." })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
-    await expect(
-      page.getByText("Matters, clients and the whole file in one place")
-    ).toBeVisible();
+    // The practice is drawn as the firm's floors.
+    await expect(page.locator('[data-floor="matters"]')).toBeVisible();
     await expect(page.getByText("Powered by InventDB SOAR — secure & real-time")).toBeVisible();
   });
 

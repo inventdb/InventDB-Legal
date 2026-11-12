@@ -118,8 +118,8 @@
 
   --font: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  /* The logo package's wordmark face, and its only job: the lockup. Nothing
-     else in the product is serif. Fallbacks mirror the lockup SVG's own. */
+  /* The logo package's wordmark face: the lockup, and the login headline that
+     sits beside it. Nothing else in the product is serif. Fallbacks mirror the lockup SVG's own. */
   --font-wordmark: "Cormorant Garamond", Cormorant, Garamond, Georgia,
     "Times New Roman", serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
@@ -1753,185 +1753,331 @@ table.data tbody tr:hover {
   border-left-color: var(--danger);
 }
 
-/* ---- Login --------------------------------------------------------------
-   The navy gradient's one in-app home: a high-impact hero surface, white
-   logo, light text. */
+/* ---- Login ---------------------------------------------------------------
+   One full-screen sheet: the firm drawn in section (components/FirmScene.tsx)
+   on an ink drafting ground, the headline over the sky, the title block in
+   the cut ground, and the sign-in sheet hanging from the leader that runs out
+   of the lobby. The ground is ink in both themes, so text on it uses fixed
+   light values; the sign-in sheet is paper in both themes for the same
+   reason.
+
+   `--u` is the size of one drawing unit on screen. The drawing is 1800 × 1000
+   and slices to fill, bottom-aligned, so a point `n` units above its bottom
+   edge sits `n × --u` above the bottom of the screen. The lobby's leader is at
+   y 825, 175 units up — that is where the sign-in sheet's bottom edge goes. */
 .login-page {
+  --u: max(calc(100vw / 1800), calc(100vh / 1000));
+  position: relative;
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-}
-.login-hero {
-  background: var(--brand-grad);
-  /* The mark reads these two: #fff through currentColor, and the package's
-     reversed second tone for the pan outlines. */
+  overflow: hidden;
+  isolation: isolate;
   color: #ffffff;
   --mark-tone: rgba(255, 255, 255, 0.55);
-  padding: 56px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
+  /* Night sky: deep at the zenith, lifting toward the horizon, with the
+     corners vignetted so the eye settles on the firm. */
+  background-color: #050b17;
+  background-image: radial-gradient(130% 90% at 50% 40%, transparent 55%, rgba(2, 5, 12, 0.6) 100%),
+    linear-gradient(180deg, #050b17 0%, #0a1630 50%, #15284d 88%, #1a2f57 100%);
 }
-/* a single soft powder bloom, so the flat navy gets some depth */
-.login-hero::after {
-  content: "";
+.login-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+.login-scene .firm {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- the copy, over the sky ---- */
+.login-hero {
   position: absolute;
-  width: 460px;
-  height: 460px;
-  right: -170px;
-  bottom: -190px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(185, 214, 238, 0.2) 0%,
-    rgba(185, 214, 238, 0) 70%
-  );
-  pointer-events: none;
-}
-.login-hero > * {
-  position: relative;
+  top: 44px;
+  left: 56px;
+  max-width: 420px;
   z-index: 1;
 }
 .login-hero .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  animation: fade-in var(--dur-3) var(--ease-out) both;
 }
-/* On the navy hero the lockup takes the package's reversed cut
-   (lockup-horizontal-reversed.svg): white, with "Legal" in sunflower.
-   --brand-grad is identical in both themes, so these are fixed values. */
+/* On the ink sheet the lockup takes the package's reversed cut
+   (lockup-horizontal-reversed.svg): white, with "Legal" in sunflower. */
 .login-hero .brand-lockup-name {
   color: #ffffff;
 }
 .login-hero .brand-lockup-suffix {
-  color: #ffc72c; /* Sunflower — the accent that survives on navy */
+  color: #ffc72c;
 }
 .login-hero .brand-lockup-tag {
-  color: rgba(255, 255, 255, 0.78);
-  border-top-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.72);
+  border-top-color: rgba(255, 255, 255, 0.28);
 }
+.login-annot {
+  margin-top: 34px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffc72c;
+  animation: fade-in var(--dur-3) var(--ease-out) 150ms both;
+}
+/* The headline borrows the wordmark's Cormorant Garamond: the one place
+   outside the lockup that the product speaks in a legal serif. */
 .login-hero h1 {
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  margin-top: 22px;
-  max-width: 15ch;
+  font-family: var(--font-wordmark);
+  font-size: clamp(46px, 5.2vw, 76px);
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.015em;
+  margin-top: 12px;
+  max-width: 9ch;
   color: #ffffff;
+  animation: rise var(--dur-3) var(--ease-out) 200ms both;
 }
 .login-hero p {
-  font-size: 15px;
+  margin-top: 18px;
+  max-width: 34ch;
+  font-size: 14px;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.88);
-  max-width: 44ch;
-  margin-top: 16px;
+  line-height: 1.6;
+  color: rgba(228, 239, 248, 0.82);
+  animation: rise var(--dur-3) var(--ease-out) 260ms both;
 }
-.login-hero .hero-feats {
-  display: grid;
-  gap: 12px;
-  margin-top: 28px;
+
+/* ---- the sign-in sheet, hung from the lobby's leader ---- */
+.login-form-wrap {
+  position: absolute;
+  right: clamp(24px, 6vw, 112px);
+  bottom: calc(var(--u) * 175);
+  z-index: 1;
+  width: min(380px, calc(100vw - 48px));
 }
-.login-hero .hero-feat {
+/* Two sheets beneath the top one, offset, so it reads as a stack of paper on
+   the desk rather than a card floating on the screen. */
+.login-form-wrap::before,
+.login-form-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #c9d8e7;
+  animation: sheet-in 650ms var(--ease-out) 2500ms both;
+}
+.login-form-wrap::before {
+  transform: translate(14px, 14px);
+  background: #8ea6c2;
+  box-shadow: 0 40px 90px rgba(2, 6, 14, 0.7);
+}
+.login-form-wrap::after {
+  transform: translate(7px, 7px);
+}
+.login-sheet {
+  position: relative;
+  z-index: 1;
+  padding: 26px 28px 22px;
+  background: #f6f9fc;
+  color: #14233f;
+  border-top: 4px solid #ffc72c;
+  box-shadow: 0 18px 40px rgba(2, 6, 14, 0.45);
+  animation: sheet-in 650ms var(--ease-out) 2500ms both;
+}
+.ls-annot {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #586a84;
 }
-.login-hero .hero-feat svg {
-  color: #b9d6ee; /* Powder Blue */
-  flex-shrink: 0;
-}
-.login-hero .hero-foot {
-  font-size: 12.5px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.72);
-}
-.login-hero .hero-foot a {
-  color: #ffffff;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.login-form-wrap {
-  display: grid;
+.ls-annot span {
+  display: inline-grid;
   place-items: center;
-  padding: 32px;
-  background: var(--bg);
+  width: 20px;
+  height: 20px;
+  background: #14233f;
+  color: #ffc72c;
+  letter-spacing: 0;
 }
-.login-card {
-  width: 100%;
-  max-width: 380px;
-  animation: rise var(--dur-3) var(--ease-out) 80ms both;
+.login-sheet .lc-head {
+  margin: 16px 0 22px;
 }
-/* The hero's copy assembles behind the sign-in card rather than with it. */
-.login-hero .hero-badge {
-  animation: rise-sm var(--dur-3) var(--ease-out) both;
+.login-sheet .lc-head h2 {
+  font-family: var(--font-wordmark);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #14233f;
 }
-.login-hero h1 {
-  animation: rise var(--dur-3) var(--ease-out) 70ms both;
-}
-.login-hero > div > p {
-  animation: rise var(--dur-3) var(--ease-out) 130ms both;
-}
-.login-hero .hero-feat {
-  animation: slide-in var(--dur-3) var(--ease-out) both;
-}
-.login-hero .hero-feat:nth-child(1) {
-  animation-delay: 190ms;
-}
-.login-hero .hero-feat:nth-child(2) {
-  animation-delay: 240ms;
-}
-.login-hero .hero-feat:nth-child(3) {
-  animation-delay: 290ms;
-}
-.login-hero .hero-feat:nth-child(4) {
-  animation-delay: 340ms;
-}
-.login-hero .hero-foot {
-  animation: fade-in var(--dur-3) var(--ease-out) 400ms both;
-}
-.login-card .lc-head {
-  margin-bottom: 22px;
-}
-.login-card .lc-head h2 {
-  font-size: 23px;
-  font-weight: 600;
-}
-.login-card .lc-head p {
-  color: var(--text-muted);
+.login-sheet .lc-head p {
+  margin-top: 8px;
+  font-size: 13px;
   font-weight: 300;
-  margin-top: 6px;
-  font-size: 13.5px;
+  color: #43546f;
 }
-.login-card form {
+.login-sheet form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
+}
+.ls-field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #43546f;
+}
+.ls-field input {
+  width: 100%;
+  padding: 8px 0 9px;
+  border: 0;
+  border-bottom: 1.5px solid #7891ad;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  color: #14233f;
+  outline: none;
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.ls-field input::placeholder {
+  color: #9aabbf;
+}
+.ls-field input:focus {
+  border-bottom-color: #14233f;
+  box-shadow: 0 2px 0 #ffc72c;
+}
+.ls-pass {
+  position: relative;
+}
+.ls-pass input {
+  padding-right: 32px;
+}
+.ls-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 24px;
+  border: 0;
+  background: none;
+  color: #586a84;
+  cursor: pointer;
+}
+.ls-toggle:hover {
+  color: #14233f;
+}
+.ls-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 0;
+  background: #ffc72c;
+  color: #14233f;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease);
+}
+.ls-submit svg {
+  transition: transform var(--dur-1) var(--ease);
+}
+.ls-submit:hover:not(:disabled) {
+  background: #f2b705;
+}
+.ls-submit:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+.ls-submit:focus-visible {
+  outline: 2px solid #14233f;
+  outline-offset: 2px;
+}
+.ls-submit:disabled {
+  justify-content: center;
+  opacity: 0.75;
+  cursor: progress;
 }
 .login-meta {
   margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #d5e2ee;
   font-size: 12.5px;
-  color: var(--text-muted);
-  text-align: center;
+  color: #43546f;
 }
 .login-meta a {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--brand);
+  color: #1f4a85;
   font-weight: 500;
 }
 .login-meta a:hover {
   text-decoration: underline;
 }
-.login-meta .login-meta-sub {
-  margin-top: 8px;
-  font-weight: 300;
-  color: var(--text-faint);
+
+/* ---- the title block, in the cut ground ---- */
+.hero-foot {
+  position: absolute;
+  left: 56px;
+  bottom: 22px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  border: 1px solid rgba(185, 214, 238, 0.32);
+  background: rgba(11, 21, 39, 0.86);
+  font-size: 12px;
+  color: rgba(228, 239, 248, 0.88);
+  animation: fade-in var(--dur-3) var(--ease-out) 600ms both;
+}
+.tb-cell {
+  padding: 7px 14px 8px;
+}
+.tb-cell + .tb-cell {
+  border-left: 1px solid rgba(185, 214, 238, 0.32);
+}
+.tb-cell span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(185, 214, 238, 0.62);
+}
+
+/* Between the phone layout and a full desktop the drawing is narrower than
+   the sheet's usual inset allows; tucking the sheet to the edge keeps it off
+   the firm's floors. */
+@media (min-width: 961px) and (max-width: 1240px) {
+  .login-form-wrap {
+    right: 24px;
+    width: 320px;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 /* ---- Reports ------------------------------------------------------------
@@ -2199,86 +2345,77 @@ table.data tbody tr:hover {
   margin-top: 2px;
 }
 /* ---- Responsive --------------------------------------------------------- */
-/* ---- Login on narrow screens: form first, story below ---------------------
-   The hero can't sit beside the form here, and the previous fix — hiding it —
-   left the page with no logo, no product name and no route to registration.
-   Instead `display: contents` dissolves the panel so its parts become direct
-   children of the page, and `order` reflows them to: brand band → sign-in card
-   → story. The form stays above the fold, so signing in never requires a
-   scroll, and the copy is still there for anyone who wants it. */
+/* ---- Login on narrow screens -------------------------------------------
+   The page stacks: lockup and headline, then the whole firm in its own band,
+   then the sign-in sheet hanging just below the street, then the title block.
+   The band is short and wide, so the drawing slices to the firm and the
+   courthouse beside it. The sheet stays above the fold. */
 @media (max-width: 960px) {
   .login-page {
     display: flex;
     flex-direction: column;
+    min-height: 100svh;
+    padding: 22px 16px 20px;
   }
-  .login-hero,
-  .login-hero > .hero-copy {
-    display: contents;
-  }
-  /* `display: contents` removes the panel's box, so its decorative bloom loses
-     the `overflow: hidden` that used to clip it and its `right: -170px` starts
-     measuring from the viewport — widening the page by 170px. It has no job
-     once the panel is dissolved. */
-  .login-hero::after {
-    display: none;
-  }
-
-  /* A slim gradient band keeps the brand colour that the full panel carried.
-     The lockup stays white here, so the .login-hero colour overrides still
-     apply — `display: contents` removes the box, not the ancestor. */
-  .login-hero .hero-badge {
-    order: 1;
-    justify-content: center;
-    background: var(--brand-grad);
-    padding: 22px 18px;
+  .login-scene {
+    position: relative;
+    inset: auto;
+    z-index: 0;
+    order: 2;
+    height: clamp(210px, 36vh, 340px);
+    margin: 4px -16px 0;
   }
   .login-form-wrap {
-    order: 2;
-    padding: 26px 18px 10px;
-    align-content: start;
-  }
-  /* Below the card this copy sits on the page background rather than the
-     gradient, so the white-on-gradient colours revert to the text tokens. */
-  .login-story {
     order: 3;
-    padding: 18px 18px 0;
-    max-width: 480px;
-    width: 100%;
-    margin: 0 auto;
+  }
+  .hero-foot {
+    order: 4;
+  }
+  .login-hero {
+    position: static;
+    max-width: none;
+  }
+  .login-hero .hero-badge {
+    display: flex;
+    justify-content: center;
+  }
+  .login-annot,
+  .login-hero p {
+    display: none;
   }
   .login-hero h1 {
-    font-size: 23px;
-    letter-spacing: -0.02em;
-    margin-top: 0;
+    margin: 14px auto 0;
     max-width: none;
-    color: var(--text);
+    font-size: 32px;
+    text-align: center;
+    text-shadow: 0 2px 18px rgba(11, 21, 39, 0.9);
   }
-  .login-hero p {
-    font-size: 14px;
-    color: var(--text-muted);
-    max-width: none;
-  }
-  .login-hero .hero-feats {
-    margin-top: 18px;
-    gap: 10px;
-  }
-  .login-hero .hero-feat {
-    font-size: 13.5px;
-    color: var(--text-muted);
-  }
-  .login-hero .hero-feat svg {
-    color: var(--brand);
-  }
-  .login-hero .hero-foot {
-    order: 4;
-    padding: 20px 18px 32px;
-    max-width: 480px;
-    width: 100%;
+  .login-form-wrap {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: calc(100% - 14px);
+    max-width: 400px;
     margin: 0 auto;
-    color: var(--text-faint);
   }
-  .login-hero .hero-foot a {
-    color: var(--brand);
+  .login-sheet,
+  .login-form-wrap::before,
+  .login-form-wrap::after {
+    animation-delay: 1400ms;
+  }
+  .hero-foot {
+    position: static;
+    margin: 14px auto 0;
+    max-width: 400px;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+  .tb-cell:first-child,
+  .tb-cell:last-child {
+    display: none;
+  }
+  .tb-cell + .tb-cell {
+    border-left: 0;
   }
 }
 
