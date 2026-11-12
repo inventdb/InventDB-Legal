@@ -14,11 +14,10 @@
  *                     survives a 16px favicon or a dense table row.
  *
  * Colour: the primary shapes take `currentColor`, so the mark inherits its
- * surroundings exactly as the previous keystone did — white on the brand
- * gradient in the sidebar tile and the login hero, Orbital Indigo / Wisteria
- * Bloom on a plain surface. The second tone reads `--mark-tone`, which
- * global.css sets per theme and per context (#a184c4 light, #7d63a0 dark,
- * rgba(255,255,255,.55) on the gradient); it falls back to `currentColor` for
+ * surroundings — white on the navy sidebar tile and the login hero, navy
+ * (#1f4a85) or Powder Blue (#b9d6ee, dark) on a plain surface. The second
+ * tone reads `--mark-tone`, which global.css sets per theme and per context
+ * (#7fa9cf, or rgba(255,255,255,.55) on navy); it falls back to `currentColor` for
  * a one-colour rendering wherever that token is not in scope. Passing `tone`
  * overrides both.
  */

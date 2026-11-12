@@ -6,7 +6,7 @@
   z-index: 300;
   display: flex;
   justify-content: flex-end;
-  background: rgba(20, 16, 26, 0.32);
+  background: rgba(10, 20, 38, 0.32);
   animation: drill-fade 0.16s var(--ease-out);
 }
 

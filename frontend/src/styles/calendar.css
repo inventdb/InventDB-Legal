@@ -133,8 +133,8 @@
 button.cal-date { cursor: pointer; }
 button.cal-date:hover { background: var(--neutral-soft); }
 .cal-day.is-today .cal-date {
-  background: var(--brand-solid);
-  color: #fff;
+  background: var(--accent); /* today is one of sunflower's few jobs */
+  color: var(--on-accent);
   font-weight: 600;
 }
 

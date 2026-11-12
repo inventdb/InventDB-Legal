@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { useTheme, type Theme } from "./ThemeContext";
 
 /**
- * Chart colours for the InventDB brand theme.
+ * Chart colours for the InventDB Legal theme (Midnight Navy · Powder Blue ·
+ * Sunflower Yellow).
  *
  * Recharts writes colours into SVG attributes and into its own legend/tooltip
  * markup, so charts need concrete values rather than `var(--chart-1)`. These
@@ -13,8 +14,10 @@ import { useTheme, type Theme } from "./ThemeContext";
  * The palette is CATEGORICAL: it encodes which series a mark belongs to, never
  * how large it is. Slots are handed out in fixed order and never cycled, so a
  * category keeps its colour when the series count changes. Slot 1 is the brand
- * purple, stepped into each mode's lightness band (Cosmic Indigo #6a229d sits
- * a hair under the light floor; Wisteria Bloom #c696e8 sits over the dark cap).
+ * blue: navy itself is too dark to hold the light-mode lightness band, so the
+ * series uses the palette's validated blue, and the purple moved to slot 7.
+ * The swap keeps every adjacent pair and the first-three all-pairs gate at the
+ * figures recorded at the foot of global.css.
  *
  * Validated in both modes for lightness band, chroma floor, colour-vision
  * separation (Machado 2009 protan/deutan at full severity), a normal-vision
@@ -28,38 +31,37 @@ import { useTheme, type Theme } from "./ThemeContext";
  */
 const SERIES: Record<Theme, readonly string[]> = {
   light: [
-    "#6d25a2", // brand purple
+    "#2a78d6", // brand blue
     "#eb6834", // orange
     "#1baf7a", // aqua
     "#eda100", // yellow
     "#e87ba4", // magenta
     "#008300", // green
-    "#2a78d6", // blue
+    "#6d25a2", // purple
     "#e34948", // red
   ],
   dark: [
-    "#a67ce0",
+    "#3987e5",
     "#d95926",
     "#199e70",
     "#c98500",
     "#d55181",
     "#008300",
-    "#3987e5",
+    "#a67ce0",
     "#e66767",
   ],
 };
 
 /** Everything past the last slot folds into one neutral "Other". */
-const OTHER: Record<Theme, string> = { light: "#6b6672", dark: "#9f9ba4" };
+const OTHER: Record<Theme, string> = { light: "#586a84", dark: "#9fb6d3" };
 
 /**
  * Axis ink, gridlines and the hover cursor wash, per mode. Axis ticks are
- * text, so they carry the same 4.5:1 bar as captions — Steel Mist (#9f9ba4)
- * only clears it on the dark surface.
+ * text, so they carry the same 4.5:1 bar as captions (--text-faint).
  */
 const CHROME: Record<Theme, { axis: string; grid: string; cursor: string }> = {
-  light: { axis: "#736e7b", grid: "#ece9ef", cursor: "rgba(72,23,106,0.06)" },
-  dark: { axis: "#9f9ba4", grid: "#302c33", cursor: "rgba(198,150,232,0.10)" },
+  light: { axis: "#586a84", grid: "#e8eff6", cursor: "rgba(31,74,133,0.06)" },
+  dark: { axis: "#879ebd", grid: "#1e3152", cursor: "rgba(185,214,238,0.10)" },
 };
 
 /** Reserved state colours — never reused as a series colour. */
@@ -69,17 +71,17 @@ const STATUS: Record<
 > = {
   light: {
     success: "#1d7a4b",
-    warn: "#8a6200",
-    danger: "#b23a42",
-    neutral: "#6b6672",
-    brand: "#48176a",
+    warn: "#7a5a00",
+    danger: "#b3261e",
+    neutral: "#586a84",
+    brand: "#1f4a85",
   },
   dark: {
-    success: "#56bd87",
-    warn: "#e3b75e",
-    danger: "#e08589",
-    neutral: "#9f9ba4",
-    brand: "#c696e8",
+    success: "#5cc492",
+    warn: "#ffd66b",
+    danger: "#f08a84",
+    neutral: "#9fb6d3",
+    brand: "#b9d6ee",
   },
 };
 

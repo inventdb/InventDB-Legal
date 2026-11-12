@@ -7,10 +7,15 @@ Everything is drawn on one `0 0 128 128` grid.
 
 | Primary | Second tone | Use |
 |---|---|---|
-| `#48176a` Orbital Indigo | `#a184c4` | light surfaces (default) |
-| `#c696e8` Wisteria Bloom | `#7d63a0` | dark theme |
-| `#ffffff` | `rgba(255,255,255,.55)` | brand gradient, login hero |
-| `#2a1035` | same | one-colour / print / fax |
+| `#14233f` Midnight Navy | `#7fa9cf` | light surfaces (default) |
+| `#b9d6ee` Powder Blue | `#7fa9cf` | dark theme |
+| `#ffffff` | `rgba(255,255,255,.55)` | navy chrome, sidebar tile, login hero |
+| `#14233f` | same | one-colour / print / fax |
+
+The reversed lockup sets "Legal" in Sunflower Yellow `#ffc72c`. These follow
+the InventDB Legal design system (Midnight Navy 60% · Powder Blue 30% ·
+Sunflower Yellow 10%); the geometry is unchanged from the original plum
+package.
 
 ## Two cuts
 
@@ -21,8 +26,9 @@ Everything is drawn on one `0 0 128 128` grid.
 
 ```
 mark/       full + solid cuts in every colourway, incl. currentColor
-lockup/     horizontal lockup, light / dark / reversed on plum
-favicon/    favicon.svg (plum tile), favicon-transparent.svg, apple-touch-icon.svg
+lockup/     horizontal lockup, light / dark / reversed on navy
+favicon/    favicon.svg (navy tile), favicon-transparent.svg, apple-touch-icon.svg
+png/        raster exports of the above (mark-navy-*, mark-solid-*, icon-tile-*, favicons)
 react/      BrandMark.tsx, BrandLockup.tsx — drop-in replacements
 ```
 

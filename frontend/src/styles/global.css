@@ -1,27 +1,23 @@
 /* ============================================================================
    InventDB Legal — global styles & design tokens
    ----------------------------------------------------------------------------
-   Themed to the InventDB brand book
-   (docs/brand/InventDB_Brand Delivery Package/01 - BRAND BOOK).
+   Themed to the InventDB Legal design system: Midnight Navy, Powder Blue and
+   Sunflower Yellow in a 60 · 30 · 10 split.
 
-   Primary          Orbital Indigo      #48176a
-   Secondary        Cosmic Indigo       #6a229d
-                    Wisteria Bloom      #c696e8
-                    Lavender Mist       #edd7ff
-                    Nebula Lavender     #f3e9fa
-   Tertiary         Midnight Graphite   #201e21
-                    Graphite            #403d43
-                    Steel Mist          #9f9ba4
-                    Silver Fog          #e4e2e5
-                    Misty White         #ffffff
-   Gradient         #48176a → #6a229d   (hero / high-impact surfaces only)
-   Typeface         Poppins — Bold/SemiBold headings · Medium subheads ·
-                    Regular body · Light captions
+   60%  Midnight Navy     #14233f   chrome (sidebar, top bar), ink, primary
+                                    actions
+   30%  Powder Blue       #b9d6ee   page ground tints, selection, the
+                                    interactive colour in dark mode
+   10%  Sunflower Yellow  #ffc72c   attention only: the active-nav rail, today,
+                                    due-soon flags, one hero action per screen
 
-   Steps the brand ramp doesn't name (canvas tints, dark-mode surfaces, hover
-   states) are interpolated from the brand hexes and marked "derived".
-   Components reference tokens only — never a raw brand hex.
-   Theme-aware (light/dark via [data-theme]) and fully responsive.
+   Sunflower is a FILL, never text — it is 1.6:1 on white. Text on it is
+   --on-accent (navy, 10:1); yellow-family text uses --accent-ink.
+   Typeface         Poppins — SemiBold headings · Medium labels · Regular body
+                    · Light subtitles
+
+   Components reference tokens only — never a raw hex. Theme-aware (light/dark
+   via [data-theme]) and fully responsive.
    ============================================================================ */
 
 :root {
@@ -33,68 +29,83 @@
   accent-color: var(--brand);
 
   /* ---- brand ---- */
-  --brand: #48176a; /* Orbital Indigo — links, active nav, icons */
-  --brand-strong: #6a229d; /* Cosmic Indigo — hover / gradient end */
-  --brand-solid: #48176a; /* the one filled action */
-  --brand-soft: #edd7ff; /* Lavender Mist — active nav pill, icon tiles */
-  --brand-tint: #f3e9fa; /* Nebula Lavender — row hover, soft fills */
-  --brand-line: rgba(72, 23, 106, 0.26);
+  --brand: #1f4a85; /* Navy 500 — links, active tab, acting icons (8.8:1 on white) */
+  --brand-strong: #14233f; /* Midnight Navy — link hover */
+  --brand-solid: #14233f; /* the one filled action */
+  --brand-solid-hover: #1e3357;
+  --brand-soft: #e4eff8; /* Powder 100 — selected row, icon tiles, focus halo */
+  --brand-tint: #eef5fb; /* row hover, soft fills */
+  --brand-line: rgba(31, 74, 133, 0.28);
   --on-brand: #ffffff;
-  /* The Counsel mark's second tone — the pan outlines. Straight from the logo
-     package's colourway table; contexts that reverse the mark (the sidebar
-     tile, the login hero) override it locally. */
-  --mark-tone: #a184c4;
-  --brand-grad: linear-gradient(145deg, #48176a 0%, #6a229d 100%);
+  /* The Counsel mark's second tone — the pan outlines. Contexts that reverse
+     the mark (the sidebar tile, the login hero) override it locally. */
+  --mark-tone: #7fa9cf;
+  --brand-grad: linear-gradient(145deg, #14233f 0%, #1e3357 100%);
+
+  /* ---- accent: Sunflower, the 10% ---- */
+  --accent: #ffc72c;
+  --accent-hover: #f2b705;
+  --on-accent: #14233f;
+  --accent-soft: #fff3cc;
+  --accent-ink: #7a5a00; /* yellow-family text, 6.4:1 on white */
+
+  /* ---- chrome: the navy sidebar and top bar ---- */
+  --chrome: #14233f;
+  --chrome-hover: #1e3357;
+  --chrome-active: #2b4673;
+  --chrome-line: rgba(185, 214, 238, 0.14);
+  --on-chrome: #ffffff;
+  --on-chrome-muted: #b9d6ee; /* Powder Blue on navy, 10.4:1 */
+
+  /* ---- focus ---- */
+  --focus: #1f4a85;
+  --focus-on-chrome: #ffc72c;
 
   /* ---- surfaces ---- */
-  --bg: #f7f4fa; /* derived: Nebula Lavender lifted toward white */
-  --surface: #ffffff; /* Misty White */
-  --surface-2: #faf7fc; /* derived */
-  --surface-3: #f3e9fa; /* Nebula Lavender */
-  --border: #e4e2e5; /* Silver Fog */
-  --border-strong: #d3cfd8; /* derived */
+  --bg: #f3f8fc; /* Powder 50 */
+  --surface: #ffffff;
+  --surface-2: #f8fbfe;
+  --surface-3: #e4eff8; /* Powder 100 */
+  --border: #d5e2ee;
+  --border-strong: #7891ad; /* control edges — 3:1 on surface */
   --card-border: transparent; /* light cards are borderless — shadow instead */
+  --scrim: rgba(10, 20, 38, 0.55);
 
   /* ---- ink ---- */
-  --text: #201e21; /* Midnight Graphite */
-  --text-muted: #403d43; /* Graphite */
-  /* derived: Steel Mist stepped down until captions clear 4.5:1 on every light
-     surface (#9f9ba4 itself measures 2.73:1 on white — unreadable at 12px).
-     Steel Mist keeps its role unchanged on dark, where it measures 6.07:1. */
-  --text-faint: #736e7b;
+  --text: #14233f; /* Midnight Navy, 15.6:1 on white */
+  --text-muted: #43546f; /* 7.7:1 on white */
+  --text-faint: #586a84; /* 4.7:1 or better on every light surface */
 
   /* ---- functional state colours ----
-     The brand book defines no status hues; these are the InventDB product's
-     own functional set, chosen to sit quietly beside indigo. "Info" is the
-     brand itself, so no fifth hue enters the system. */
+     "Warn" shares the sunflower family on purpose (due soon = needs
+     attention); "info" is the brand navy, so no extra hue enters. */
   --success: #1d7a4b;
-  --success-soft: #e6f3eb;
-  --warn: #8a6200;
-  --warn-soft: #f8f1dd;
-  --danger: #b23a42;
-  --danger-soft: #f9edee;
-  --info: #48176a;
-  --info-soft: #f3e9fa;
-  --neutral: #6b6672; /* derived: Graphite → Steel Mist */
-  --neutral-soft: #eceaee;
+  --success-soft: #e3f3ea;
+  --warn: #7a5a00;
+  --warn-soft: #fff3cc;
+  --danger: #b3261e;
+  --danger-soft: #fbeceb;
+  --info: #1f4a85;
+  --info-soft: #e4eff8;
+  --neutral: #586a84;
+  --neutral-soft: #e9eef4;
 
-  /* ---- chart series (validated: OKLab CVD ΔE, lightness band, chroma,
-     contrast — see the palette note at the foot of this file) ---- */
-  --chart-1: #6d25a2; /* brand purple, snapped into the light band */
+  /* ---- chart series (see the palette note at the foot of this file) ---- */
+  --chart-1: #2a78d6; /* brand blue */
   --chart-2: #eb6834;
   --chart-3: #1baf7a;
   --chart-4: #eda100;
   --chart-5: #e87ba4;
   --chart-6: #008300;
-  --chart-7: #2a78d6;
+  --chart-7: #6d25a2;
   --chart-8: #e34948;
-  --chart-axis: #736e7b; /* axis ticks are text — same 4.5:1 bar as captions */
-  --chart-grid: #ece9ef;
+  --chart-axis: #586a84; /* axis ticks are text — same 4.5:1 bar as captions */
+  --chart-grid: #e8eff6;
 
   /* ---- depth: exactly two resting levels ---- */
-  --shadow-sm: 0 1px 2px rgba(32, 30, 33, 0.05), 0 1px 3px rgba(32, 30, 33, 0.06);
-  --shadow: 0 4px 14px -6px rgba(32, 30, 33, 0.18), 0 1px 3px rgba(32, 30, 33, 0.06);
-  --shadow-lg: 0 16px 48px rgba(32, 30, 33, 0.18);
+  --shadow-sm: 0 1px 2px rgba(20, 35, 63, 0.06), 0 1px 3px rgba(20, 35, 63, 0.08);
+  --shadow: 0 4px 14px -6px rgba(20, 35, 63, 0.2), 0 1px 3px rgba(20, 35, 63, 0.08);
+  --shadow-lg: 0 16px 48px rgba(20, 35, 63, 0.2);
 
   /* ---- shape · density · motion (theme-independent) ---- */
   --radius-sm: 8px;
@@ -131,49 +142,67 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --brand: #c696e8; /* Wisteria Bloom — the brand's light-on-dark purple */
-  --brand-strong: #edd7ff; /* Lavender Mist */
-  --brand-solid: #6a229d; /* Cosmic Indigo carries filled actions on dark */
-  --brand-soft: rgba(198, 150, 232, 0.16);
-  --brand-tint: rgba(198, 150, 232, 0.09);
-  --brand-line: rgba(198, 150, 232, 0.34);
-  --on-brand: #ffffff;
-  --mark-tone: #7d63a0; /* the package's dark-theme second tone */
-  --brand-grad: linear-gradient(145deg, #48176a 0%, #6a229d 100%);
+  --brand: #b9d6ee; /* Powder Blue becomes the interactive colour on navy */
+  --brand-strong: #e4eff8;
+  --brand-solid: #b9d6ee; /* filled actions are powder with navy text */
+  --brand-solid-hover: #d4e6f5;
+  --brand-soft: rgba(185, 214, 238, 0.16);
+  --brand-tint: rgba(185, 214, 238, 0.08);
+  --brand-line: rgba(185, 214, 238, 0.34);
+  --on-brand: #14233f;
+  --mark-tone: #7fa9cf;
+  --brand-grad: linear-gradient(145deg, #14233f 0%, #1e3357 100%);
 
-  --bg: #17151a; /* derived: below Midnight Graphite */
-  --surface: #201e21; /* Midnight Graphite */
-  --surface-2: #272429; /* derived */
-  --surface-3: #302c33; /* derived */
-  --border: #35313a; /* derived */
-  --border-strong: #4a4551; /* derived, toward Graphite */
-  --card-border: #302c33;
+  --accent: #ffc72c;
+  --accent-hover: #ffd65c;
+  --on-accent: #14233f;
+  --accent-soft: rgba(255, 199, 44, 0.14);
+  --accent-ink: #ffd66b;
 
-  --text: #f3e9fa; /* Nebula Lavender reads as warm white on graphite */
-  --text-muted: #b5b0bd; /* derived */
-  --text-faint: #9f9ba4; /* Steel Mist */
+  --chrome: #0d182e;
+  --chrome-hover: #16264a;
+  --chrome-active: #1e3152;
+  --chrome-line: rgba(185, 214, 238, 0.1);
+  --on-chrome: #e9f1f9;
+  --on-chrome-muted: #9fb6d3;
 
-  --success: #56bd87;
-  --success-soft: rgba(86, 189, 135, 0.14);
-  --warn: #e3b75e;
-  --warn-soft: rgba(227, 183, 94, 0.14);
-  --danger: #e08589;
-  --danger-soft: rgba(224, 133, 137, 0.14);
-  --info: #c696e8;
-  --info-soft: rgba(198, 150, 232, 0.14);
-  --neutral: #9f9ba4;
-  --neutral-soft: rgba(159, 155, 164, 0.16);
+  --focus: #ffc72c;
+  --focus-on-chrome: #ffc72c;
 
-  --chart-1: #a67ce0; /* brand purple, stepped for the dark surface */
+  --bg: #0a1426;
+  --surface: #111e36;
+  --surface-2: #172743;
+  --surface-3: #1e3152;
+  --border: #24375a;
+  --border-strong: #5a78a6;
+  --card-border: #1e3152;
+  --scrim: rgba(4, 9, 18, 0.7);
+
+  --text: #e9f1f9;
+  --text-muted: #a9bdd6;
+  --text-faint: #879ebd;
+
+  --success: #5cc492;
+  --success-soft: rgba(92, 196, 146, 0.14);
+  --warn: #ffd66b;
+  --warn-soft: rgba(255, 199, 44, 0.14);
+  --danger: #f08a84;
+  --danger-soft: rgba(240, 138, 132, 0.14);
+  --info: #b9d6ee;
+  --info-soft: rgba(185, 214, 238, 0.14);
+  --neutral: #9fb6d3;
+  --neutral-soft: rgba(159, 182, 211, 0.14);
+
+  --chart-1: #3987e5;
   --chart-2: #d95926;
   --chart-3: #199e70;
   --chart-4: #c98500;
   --chart-5: #d55181;
   --chart-6: #008300;
-  --chart-7: #3987e5;
+  --chart-7: #a67ce0;
   --chart-8: #e66767;
-  --chart-axis: #9f9ba4;
-  --chart-grid: #302c33;
+  --chart-axis: #879ebd;
+  --chart-grid: #1e3152;
 
   /* dark cards carry a low-alpha edge instead of a shadow */
   --shadow-sm: none;
@@ -224,14 +253,14 @@ h4 {
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
   border-radius: 3px;
 }
 
 ::selection {
   background: var(--brand-soft);
-  color: var(--brand);
+  color: var(--text);
 }
 
 ::-webkit-scrollbar {
@@ -464,12 +493,19 @@ h4 {
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: var(--brand-strong);
+  background: var(--brand-solid-hover);
   color: var(--on-brand);
 }
-[data-theme="dark"] .btn-primary:hover {
-  background: var(--brand);
-  color: #201e21;
+/* Sunflower: at most one per screen — the action that starts the screen's main
+   job. Navy ink on yellow (10:1); never white. */
+.btn-accent {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.btn-accent:hover {
+  background: var(--accent-hover);
+  color: var(--on-accent);
 }
 .btn-ghost {
   background: transparent;
@@ -485,10 +521,10 @@ h4 {
   color: #ffffff;
   font-weight: 600;
 }
-/* The dark-mode danger step is a light pink so it reads on graphite; a filled
+/* The dark-mode danger step is a light coral so it reads on navy; a filled
    button made from it needs dark ink, not white (white would land near 2:1). */
 [data-theme="dark"] .btn-danger {
-  color: #201e21;
+  color: #14233f;
 }
 .btn-danger:hover {
   background: var(--danger);
@@ -682,8 +718,8 @@ select optgroup {
 /* The chosen row. Opaque on purpose — the popup paints the platform's own
    field colour behind it, so a translucent brand tint would composite over
    whatever that happens to be rather than over the menu. `--surface-3` is
-   already the token for one step raised, and reads as lavender in light and a
-   lifted graphite in dark. Where the engine honours this it replaces the
+   already the token for one step raised, and reads as powder in light and a
+   lifted navy in dark. Where the engine honours this it replaces the
    platform's accent blue; where it doesn't, nothing is lost. */
 select option:checked {
   background-color: var(--surface-3);
@@ -732,8 +768,14 @@ select option:checked {
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  /* Navy chrome — the bulk of the 60%. Everything inside reads the on-chrome
+     tokens, and focus rings switch to sunflower so they show on navy. */
+  background: var(--chrome);
+  /* In dark mode chrome and page are both deep navy; a faint edge keeps them
+     apart. In light mode it disappears against the powder page. */
+  border-right: 1px solid var(--chrome-line);
+  color: var(--on-chrome-muted);
+  --focus: var(--focus-on-chrome);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -830,18 +872,30 @@ select option:checked {
   gap: 10px;
   padding: 10px 18px;
   height: var(--topbar-h);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--chrome-line);
 }
-/* The mark sits on the brand gradient — per the brand book's "white logo on
-   gradients" rule, so it inherits #fff through currentColor and the pans take
-   the package's reversed second tone. */
+/* On navy the lockup takes the package's reversed colourway: white wordmark,
+   "Legal" in sunflower, a powder tagline over a faint powder rule. */
+.sidebar-brand .brand-lockup-name {
+  color: var(--on-chrome);
+}
+.sidebar-brand .brand-lockup-suffix {
+  color: var(--accent);
+}
+.sidebar-brand .brand-lockup-tag {
+  color: var(--on-chrome-muted);
+  border-top-color: var(--chrome-line);
+}
+/* The mark sits on a raised navy tile — the "white logo on navy" rule, so it
+   inherits #fff through currentColor and the pans take the reversed second
+   tone. */
 .sidebar-brand .logo {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: var(--brand-grad);
+  background: var(--chrome-active);
   color: #ffffff;
   --mark-tone: rgba(255, 255, 255, 0.55);
   flex-shrink: 0;
@@ -858,7 +912,8 @@ select option:checked {
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: var(--text-faint);
+  color: var(--on-chrome-muted);
+  opacity: 0.85;
   padding: 14px 12px 6px;
 }
 .nav-item {
@@ -868,7 +923,7 @@ select option:checked {
   gap: 11px;
   padding: 9px 12px;
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  color: var(--on-chrome-muted);
   font-weight: 400;
   font-size: 13.5px;
   cursor: pointer;
@@ -876,13 +931,13 @@ select option:checked {
     color var(--dur-1) var(--ease), transform var(--dur-2) var(--ease-out);
 }
 .nav-item:hover {
-  background: var(--brand-tint);
-  color: var(--text);
+  background: var(--chrome-hover);
+  color: var(--on-chrome);
   transform: translateX(3px);
 }
 .nav-item.active {
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: var(--chrome-active);
+  color: var(--on-chrome);
   font-weight: 600;
   transform: none;
 }
@@ -903,7 +958,7 @@ select option:checked {
   /* Fully rounded: inset from the edge it reads as a floating marker, so a
      square left edge would look like the bar had been cut off. */
   border-radius: var(--radius-pill);
-  background: var(--brand);
+  background: var(--accent); /* the sidebar's one sunflower element */
   transform: translateY(-50%);
   transition: height var(--dur-2) var(--ease-spring);
 }
@@ -920,8 +975,8 @@ select option:checked {
 .nav-count {
   margin-left: auto;
   font-size: 11.5px;
-  color: var(--text-faint);
-  background: var(--surface-3);
+  color: var(--on-chrome-muted);
+  background: var(--chrome-line);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
 }
@@ -938,9 +993,11 @@ select option:checked {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
+  /* Navy chrome, continuous with the sidebar. */
+  background: var(--chrome);
+  border-bottom: 1px solid var(--chrome-line);
+  color: var(--on-chrome);
+  --focus: var(--focus-on-chrome);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -949,6 +1006,14 @@ select option:checked {
 .topbar h1 {
   font-size: 17px;
   font-weight: 600;
+  color: var(--on-chrome);
+}
+.topbar .btn-icon {
+  color: var(--on-chrome-muted);
+}
+.topbar .btn-icon:hover {
+  background: var(--chrome-hover);
+  color: var(--on-chrome);
 }
 .topbar .spacer {
   flex: 1;
@@ -985,8 +1050,8 @@ select option:checked {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--brand-grad);
-  color: #ffffff;
+  background: var(--brand-soft);
+  color: var(--brand);
   display: grid;
   place-items: center;
   font-weight: 600;
@@ -1002,7 +1067,7 @@ select option:checked {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(32, 30, 33, 0.5);
+  background: var(--scrim);
   z-index: 39;
 }
 /* The theme toggle swaps one glyph for another; keying the icon on the theme
@@ -1394,23 +1459,23 @@ table.data tbody tr:hover {
   min-width: 20px;
   padding: 0 6px;
   border-radius: var(--radius-pill);
-  background: var(--warn-soft);
-  color: var(--warn);
+  background: var(--accent);
+  color: var(--on-accent);
   font-size: 11px;
   font-weight: 700;
   line-height: 18px;
   text-align: center;
 }
 .nav-item.active .nav-badge {
-  background: var(--warn);
-  color: var(--surface);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 /* ---- Modal -------------------------------------------------------------- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(32, 30, 33, 0.55);
+  background: var(--scrim);
   z-index: 320; /* above the drill-down panel (300): a file opened from it */
   display: flex;
   align-items: flex-start;
@@ -1689,8 +1754,8 @@ table.data tbody tr:hover {
 }
 
 /* ---- Login --------------------------------------------------------------
-   The gradient's one sanctioned in-app home: a high-impact hero surface,
-   white logo, light text — exactly as the brand book prescribes. */
+   The navy gradient's one in-app home: a high-impact hero surface, white
+   logo, light text. */
 .login-page {
   min-height: 100vh;
   display: grid;
@@ -1709,7 +1774,7 @@ table.data tbody tr:hover {
   position: relative;
   overflow: hidden;
 }
-/* a single soft lavender bloom, so the flat gradient gets some depth */
+/* a single soft powder bloom, so the flat navy gets some depth */
 .login-hero::after {
   content: "";
   position: absolute;
@@ -1720,8 +1785,8 @@ table.data tbody tr:hover {
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(237, 215, 255, 0.22) 0%,
-    rgba(237, 215, 255, 0) 70%
+    rgba(185, 214, 238, 0.2) 0%,
+    rgba(185, 214, 238, 0) 70%
   );
   pointer-events: none;
 }
@@ -1734,15 +1799,14 @@ table.data tbody tr:hover {
   align-items: center;
   gap: 12px;
 }
-/* On the brand gradient the token accents would disappear, so the lockup goes
-   monochrome-light here — the brand book's "white logo on gradients" rule,
-   and the package's own lockup-horizontal-reversed.svg.
+/* On the navy hero the lockup takes the package's reversed cut
+   (lockup-horizontal-reversed.svg): white, with "Legal" in sunflower.
    --brand-grad is identical in both themes, so these are fixed values. */
 .login-hero .brand-lockup-name {
   color: #ffffff;
 }
 .login-hero .brand-lockup-suffix {
-  color: #edd7ff; /* Lavender Mist — the accent that survives on the gradient */
+  color: #ffc72c; /* Sunflower — the accent that survives on navy */
 }
 .login-hero .brand-lockup-tag {
   color: rgba(255, 255, 255, 0.78);
@@ -1777,7 +1841,7 @@ table.data tbody tr:hover {
   color: rgba(255, 255, 255, 0.92);
 }
 .login-hero .hero-feat svg {
-  color: #c696e8;
+  color: #b9d6ee; /* Powder Blue */
   flex-shrink: 0;
 }
 .login-hero .hero-foot {
@@ -2318,16 +2382,17 @@ table.data tbody tr:hover {
    Chart palette note
    ----------------------------------------------------------------------------
    --chart-1..8 are a categorical (identity) palette, assigned in fixed slot
-   order and never cycled. Slot 1 is the brand purple snapped into each mode's
-   OKLCH lightness band (#6a229d sits at L 0.429, one thousandth under the
-   0.43 light floor; #c696e8 at L 0.748, over the 0.67 dark cap).
+   order and never cycled. Slot 1 is the brand blue; Midnight Navy itself is
+   too dark for the light-mode lightness band, so the series takes the
+   palette's validated blue, and the purple moved to slot 7. The swap leaves
+   every figure below unchanged (re-measured).
 
    Validated with the data-viz six checks in both modes — lightness band,
    chroma floor, CVD separation (Machado 2009, protan/deutan at severity 1.0),
    normal-vision floor and surface contrast:
 
      light on #ffffff  worst adjacent CVD ΔE 9.1 · normal-vision ΔE 19.6
-     dark  on #201e21  worst adjacent CVD ΔE 8.4 · normal-vision ΔE 19.3
+     dark  on #111e36  worst adjacent CVD ΔE 8.4 · normal-vision ΔE 19.3
 
    In light mode slots 3, 4 and 5 sit below 3:1 against white (2.82 / 2.17 /
    2.69). That is legal only with a relief channel, so every chart using them

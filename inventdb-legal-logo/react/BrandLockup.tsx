@@ -4,7 +4,7 @@ import { BrandMark } from "./BrandMark";
  * Mark + wordmark + expanded product name. The wordmark is Cormorant Garamond
  * (500, with "Legal" in italic 300); the tagline is the app's sans, all caps,
  * tracked 0.28em. Colours come from theme tokens, so the lockup follows
- * light/dark — except on the brand gradient, where it goes monochrome light.
+ * light/dark — except on navy chrome, where it takes the reversed cut.
  */
 export function BrandLockup({
   size = "sm",

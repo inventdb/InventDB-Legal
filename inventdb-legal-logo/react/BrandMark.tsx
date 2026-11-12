@@ -11,7 +11,7 @@
  *
  * `tone` defaults to a translucent currentColor so the mark works in one
  * colour anywhere; pass an explicit tone for the two-tone treatment
- * (#a184c4 on light, #7d63a0 on dark, rgba(255,255,255,0.55) on the gradient).
+ * (#7fa9cf on light and dark, rgba(255,255,255,0.55) on navy chrome).
  */
 export function BrandMark({
   size = 20,

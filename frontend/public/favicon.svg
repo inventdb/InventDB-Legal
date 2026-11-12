@@ -3,9 +3,9 @@
     InventDB Legal — the Counsel mark, solid cut, on no background.
 
     Derived from inventdb-legal-logo/favicon/favicon-transparent.svg. The one
-    addition is the colour-scheme switch: with no plum tile behind it, a single
+    addition is the colour-scheme switch: with no navy tile behind it, a single
     fixed colourway would go invisible on half the browsers in the world —
-    Orbital Indigo vanishes into a dark tab strip, Wisteria Bloom washes out on
+    Midnight Navy vanishes into a dark tab strip, Powder Blue washes out on
     a light one. So the mark carries both of the package's colourways and takes
     whichever the tab strip calls for. The hexes are the package's own; nothing
     is invented here.
@@ -14,11 +14,11 @@
     outlines close up into a smudge. See the package README's two-cuts rule.
   -->
   <style>
-    .ink { fill: #48176a; } /* Orbital Indigo */
-    .pan { fill: #a184c4; } /* the light colourway's second tone */
+    .ink { fill: #14233f; } /* Midnight Navy */
+    .pan { fill: #7fa9cf; } /* the light colourway's second tone */
     @media (prefers-color-scheme: dark) {
-      .ink { fill: #c696e8; } /* Wisteria Bloom */
-      .pan { fill: #7d63a0; } /* the dark colourway's second tone */
+      .ink { fill: #b9d6ee; } /* Powder Blue */
+      .pan { fill: #7fa9cf; } /* the dark colourway's second tone */
     }
   </style>
   <!-- The glyph's ink spans y 12–120, so it sits 2 units high in the box. -->
