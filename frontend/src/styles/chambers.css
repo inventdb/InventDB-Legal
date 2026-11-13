@@ -390,11 +390,37 @@
   display: none;
 }
 
-/* A docket and a dossier read best at a measured width; tables and the
-   dashboard take whatever the window has. */
-.ch-docket-view,
-.ch-dossier {
-  max-width: 1300px;
+/* A page's own head does not repeat the title above it: it carries the line
+   that says what the page is for, and the page's actions on the right. */
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0 0 18px;
+}
+.page-head .titles {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+.page-head .titles h2 {
+  display: none;
+}
+.page-head .titles p {
+  margin: 0;
+  max-width: 90ch;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+.page-head > .stat-ico {
+  display: none;
+}
+.page-head .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 
 /* Reading a record, the list's own tools step aside; the back link returns. */
