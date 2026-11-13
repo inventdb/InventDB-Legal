@@ -151,7 +151,7 @@ test.describe("The guide on the desk", () => {
     await expect(guide(page).getByRole("heading", { name: "No deadline missed" })).toBeVisible();
   });
 
-  test("a first visit opens with the walk-in, and Skip goes straight to sign in", async ({ browser }) => {
+  test("a first visit opens with the firm's mark, and Skip goes straight to sign in", async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: "no-preference",
       storageState: { cookies: [], origins: [] },
@@ -174,7 +174,7 @@ test.describe("The guide on the desk", () => {
     await context.close();
   });
 
-  test("after the walk-in, the booklet opens on its own, and can be skipped to sign in", async ({ browser }) => {
+  test("after the opening, the booklet opens on its own, and can be skipped to sign in", async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: "no-preference",
       storageState: { cookies: [], origins: [] },

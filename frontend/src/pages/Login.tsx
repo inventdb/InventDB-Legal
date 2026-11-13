@@ -14,7 +14,7 @@ import { useTheme } from "../theme/ThemeContext";
 const INVENTDB_URL = "https://www.inventdb.com";
 
 const WALKIN_KEY = "legal.desk.walkin";
-/** The walk-in plays once per device, for someone new, and never with reduced motion. */
+/** The opening plays once per device, for someone new, and never with reduced motion. */
 function firstVisit(): boolean {
   if (typeof window === "undefined") return false;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
@@ -49,8 +49,8 @@ function useNarrow(): boolean {
 /**
  * The sign-in page: the firm's guide, a leather booklet, open in the middle of
  * the page. It turns its own pages and ends with signing in on the left page
- * and signing up on the right. A first visit opens with the walk-in through
- * the firm (DeskIntro). See DeskBook for how the pages turn, and
+ * and signing up on the right. A first visit opens with the firm's mark
+ * (DeskIntro). See DeskBook for how the pages turn, and
  * styles/desk.css for the look.
  */
 export default function Login() {
@@ -61,7 +61,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
   const narrow = useNarrow();
-  // A first visit opens with the walk-in; never with reduced motion, and
+  // A first visit opens with the mark; never with reduced motion, and
   // never for someone who has already read the booklet.
   const [intro, setIntro] = useState(firstVisit);
   const [skipped, setSkipped] = useState(false);
