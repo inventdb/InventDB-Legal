@@ -4,7 +4,7 @@ import { ArrowRight, ExternalLink, Eye, EyeOff, Loader2, Moon, Sun } from "lucid
 
 import { useAuth } from "../auth/AuthContext";
 import { BrandLockup } from "../components/BrandLockup";
-import { DeskPen } from "../components/DeskArt";
+import { DeskIntro } from "../components/DeskIntro";
 import { DeskBook } from "../components/DeskBook";
 import { Alert } from "../components/ui";
 import { useTheme } from "../theme/ThemeContext";
@@ -12,6 +12,25 @@ import { useTheme } from "../theme/ThemeContext";
 // InventDB is the identity provider, so new users register their workspace
 // there rather than in this app.
 const INVENTDB_URL = "https://www.inventdb.com";
+
+const WALKIN_KEY = "legal.desk.walkin";
+/** The walk-in plays once per device, for someone new, and never with reduced motion. */
+function firstVisit(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
+  try {
+    return localStorage.getItem(WALKIN_KEY) !== "1" && localStorage.getItem("legal.desk.seen") !== "1";
+  } catch {
+    return false;
+  }
+}
+function markWalkIn() {
+  try {
+    localStorage.setItem(WALKIN_KEY, "1");
+  } catch {
+    /* a private window: it plays again next time */
+  }
+}
 
 /** True on a phone, where the booklet turns one page at a time. */
 function useNarrow(): boolean {
@@ -28,10 +47,11 @@ function useNarrow(): boolean {
 }
 
 /**
- * The sign-in page: a lawyer's desk, seen from above, with a booklet on it —
- * a short guide to the firm that opens and turns its own pages, and ends with
- * signing in on the left page and signing up on the right. See DeskBook for
- * how the pages turn, and styles/desk.css for the desk.
+ * The sign-in page: the firm's guide, a leather booklet, open in the middle of
+ * the page. It turns its own pages and ends with signing in on the left page
+ * and signing up on the right. A first visit opens with the walk-in through
+ * the firm (DeskIntro). See DeskBook for how the pages turn, and
+ * styles/desk.css for the look.
  */
 export default function Login() {
   const { user, token, login, loading } = useAuth();
@@ -41,6 +61,10 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
   const narrow = useNarrow();
+  // A first visit opens with the walk-in; never with reduced motion, and
+  // never for someone who has already read the booklet.
+  const [intro, setIntro] = useState(firstVisit);
+  const [skipped, setSkipped] = useState(false);
 
   if (user && token) return <Navigate to="/" replace />;
 
@@ -132,15 +156,6 @@ export default function Login() {
 
   return (
     <div className={`dk-room${narrow ? " is-narrow" : ""}`}>
-      {/* The desk's own furniture, set about the booklet. */}
-      <div className="dk-decor dk-lamp" aria-hidden />
-      <div className="dk-decor dk-watch" aria-hidden />
-      <div className="dk-decor dk-files" aria-hidden />
-      <div className="dk-decor dk-pen" aria-hidden>
-        <DeskPen />
-      </div>
-      <div className="dk-decor dk-tea" aria-hidden />
-
       <header className="dk-top">
         <BrandLockup />
         <button
@@ -157,7 +172,17 @@ export default function Login() {
       {/* The headline is set on the booklet's title page; this is the page's own heading. */}
       <h1 className="sr-only">Legal practice, modernised.</h1>
 
-      <DeskBook narrow={narrow} signIn={signIn} signUp={signUp} />
+      <DeskBook narrow={narrow} signIn={signIn} signUp={signUp} hold={intro} skipToSignIn={skipped} />
+      {intro && (
+        <DeskIntro
+          narrow={narrow}
+          onDone={(skip) => {
+            markWalkIn();
+            setIntro(false);
+            if (skip) setSkipped(true);
+          }}
+        />
+      )}
 
       <footer className="dk-foot">
         <span>InventDB Legal</span>

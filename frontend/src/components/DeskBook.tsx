@@ -219,10 +219,16 @@ export function DeskBook({
   narrow,
   signIn,
   signUp,
+  hold = false,
+  skipToSignIn = false,
 }: {
   narrow: boolean;
   signIn: ReactNode;
   signUp: ReactNode;
+  /** While the first-visit walk-in plays, the booklet waits, closed and out of reach. */
+  hold?: boolean;
+  /** The walk-in was skipped: go straight to sign in. */
+  skipToSignIn?: boolean;
 }) {
   const reduce = useRef(
     typeof window !== "undefined" &&
@@ -261,6 +267,12 @@ export function DeskBook({
   }, []);
   useEffect(() => () => window.clearTimeout(stepTimer.current), []);
 
+  useEffect(() => {
+    if (!skipToSignIn) return;
+    setAuto(false);
+    goTo(LAST, 90);
+  }, [skipToSignIn, goTo]);
+
   // Someone who has read it before is taken straight to sign in.
   useEffect(() => {
     if (reduce || !returning) return;
@@ -275,11 +287,11 @@ export function DeskBook({
       setAuto(false);
       return;
     }
-    if (!auto || held) return;
+    if (!auto || held || hold) return;
     const wait = flipped === 0 ? 1100 : flipped === 1 ? 4200 : 6500;
     const t = window.setTimeout(() => goTo(flipped + 1), wait);
     return () => window.clearTimeout(t);
-  }, [auto, held, flipped, goTo]);
+  }, [auto, held, hold, flipped, goTo]);
 
   const next = useCallback(() => {
     setAuto(false);
@@ -293,6 +305,20 @@ export function DeskBook({
     setAuto(false);
     goTo(target, 120);
   };
+  /** From sign in, back to the contents, and the tour plays again. */
+  const retour = () => {
+    goTo(1, 120);
+    setAuto(true);
+  };
+
+  // While held, nothing in the booklet can be reached.
+  const root = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    if (hold) el.setAttribute("inert", "");
+    else el.removeAttribute("inert");
+  }, [hold]);
 
   // The arrow keys turn the pages, except while typing.
   useEffect(() => {
@@ -498,7 +524,10 @@ export function DeskBook({
           ))}
         </ul>
         <div className="dk-where">
-          In the app: <b>{c.sections}</b>
+          <span>In the app</span>
+          {c.sections.split(" · ").map((name) => (
+            <b key={name}>{name}</b>
+          ))}
         </div>
         {folio(2 + i * 2)}
       </div>
@@ -550,7 +579,7 @@ export function DeskBook({
           : `${CHAPTERS[flipped - 2].group}`;
 
   return (
-    <>
+    <div className="dk-shell" ref={root}>
       <div className="dk-stage">
         <div
           ref={book}
@@ -658,8 +687,13 @@ export function DeskBook({
               Skip to sign in
             </button>
           )}
+          {flipped >= LAST && !reduce && (
+            <button type="button" className="dk-tour" onClick={retour}>
+              Take the tour
+            </button>
+          )}
         </div>
       </nav>
-    </>
+    </div>
   );
 }

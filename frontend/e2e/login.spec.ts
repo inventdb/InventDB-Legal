@@ -151,12 +151,36 @@ test.describe("The guide on the desk", () => {
     await expect(guide(page).getByRole("heading", { name: "No deadline missed" })).toBeVisible();
   });
 
-  test("on a first visit the booklet opens on its own, and can be skipped to sign in", async ({ browser }) => {
+  test("a first visit opens with the walk-in, and Skip goes straight to sign in", async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: "no-preference",
       storageState: { cookies: [], origins: [] },
     });
     const page = await context.newPage();
+    await page.goto("/login");
+    const walkIn = page.locator(".dk-intro");
+    await expect(walkIn).toBeVisible();
+    // The booklet waits behind it, out of reach.
+    await expect(page.locator(".dk-shell")).toHaveAttribute("inert", "");
+    await walkIn.getByRole("button", { name: "Skip to sign in" }).click();
+    await expect(walkIn).toHaveCount(0);
+    await expect(where(page)).toHaveText("Sign in");
+    await expect(page.getByLabel("Username", { exact: true })).toBeVisible();
+    expect(await page.evaluate(() => localStorage.getItem("legal.desk.walkin"))).toBe("1");
+    // Once seen, it does not play again.
+    await page.reload();
+    await expect(where(page)).toHaveText(/./);
+    await expect(walkIn).toHaveCount(0);
+    await context.close();
+  });
+
+  test("after the walk-in, the booklet opens on its own, and can be skipped to sign in", async ({ browser }) => {
+    const context = await browser.newContext({
+      reducedMotion: "no-preference",
+      storageState: { cookies: [], origins: [] },
+    });
+    const page = await context.newPage();
+    await page.addInitScript(() => localStorage.setItem("legal.desk.walkin", "1"));
     await page.goto("/login");
     await expect(where(page)).toHaveText("The cover");
     await expect(where(page)).toHaveText("Foreword", { timeout: 6000 });
