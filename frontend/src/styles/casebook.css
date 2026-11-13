@@ -297,16 +297,18 @@ td.cb-key {
 
 /* ---- Toolbar search: a ruled line, not a box ---------------------------- */
 .toolbar .search .input {
+  height: 38px;
   border: 0;
-  border-bottom: 1.5px solid var(--border-strong);
-  background: transparent;
-  padding-left: 30px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--paper-shadow);
+  padding-left: 36px;
 }
 .toolbar .search .input:focus {
-  border-bottom-color: var(--text);
+  box-shadow: 0 0 0 2px var(--focus);
 }
 .toolbar .search > svg {
-  left: 4px;
+  left: 12px;
 }
 
 /* ---- Sheets and dialogs ------------------------------------------------- */

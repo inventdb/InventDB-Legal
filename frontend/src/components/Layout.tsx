@@ -34,6 +34,7 @@ import { floorsFor, sectionPath, type Floor, type Section } from "../config/floo
 import { useAuth } from "../auth/AuthContext";
 import { usePendingApprovalCount } from "../api/hooks";
 import { useTheme } from "../theme/ThemeContext";
+import { iconFor } from "../config/sectionIcons";
 import { BrandLockup } from "./BrandLockup";
 import { GlobalSearch, SearchHits, hitPath, useFirmSearch } from "./GlobalSearch";
 
@@ -140,6 +141,10 @@ export function Layout() {
       end={s.end}
       className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
     >
+      {(() => {
+        const Icon = iconFor(s.to);
+        return <Icon className="nav-ico" size={17} aria-hidden />;
+      })()}
       <span className="nav-label">{s.label}</span>
       {badgeFor(s) > 0 && (
         <span className="nav-badge" aria-label={`${badgeFor(s)} waiting on you`}>
@@ -262,7 +267,7 @@ export function Layout() {
 
           {/* The route key drives the page transition: a new pathname remounts
               the subtree, so the entrance animations in global.css replay. */}
-          <main className="page" key={location.pathname}>
+          <main className={`page${here === "/" ? " is-home" : ""}`} key={location.pathname}>
             <div className="ch-stage" ref={stage}>
               <h1>{title}</h1>
             </div>
@@ -451,7 +456,13 @@ function Directory({
                   aria-label={badgeFor(s) > 0 ? `${s.label}, ${badgeFor(s)} waiting on you` : undefined}
                   onClick={onClose}
                 >
-                  <span>{s.label}</span>
+                  <span className="ch-dir-name">
+                    {(() => {
+                      const Icon = iconFor(s.to);
+                      return <Icon className="nav-ico" size={17} aria-hidden />;
+                    })()}
+                    {s.label}
+                  </span>
                   <span className="ch-dir-meta">
                     {badgeFor(s) > 0 && <span className="ch-badge">{badgeFor(s)} waiting</span>}
                     <span aria-hidden>›</span>

@@ -47,9 +47,9 @@
   gap: 8px;
 }
 .ns-pick > span {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-muted);
 }
 .ns-pick-control {

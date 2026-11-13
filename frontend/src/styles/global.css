@@ -63,8 +63,10 @@
 
   /* ---- surfaces ---- */
   --bg: #f4ede1;
-  --surface: #fbf8f2;
-  --surface-2: #f7f1e6;
+  --surface: #fffdf9;
+  --surface-2: #f8f2e8;
+  /* The sidebar: a step lighter than the page. */
+  --rail: #faf5ec;
   --surface-3: #ebe1cf;
   --border: #ddd0b9;
   --border-strong: #8f8270;
@@ -108,7 +110,7 @@
   /* ---- depth ----
      Panels rest on a 1px edge. Nothing floats except what was summoned
      (menus, sheets, dialogs). */
-  --paper-shadow: 0 0 0 1px #e6dccb, 0 1px 2px rgba(28, 25, 22, 0.06);
+  --paper-shadow: 0 0 0 1px rgba(91, 26, 36, 0.07), 0 1px 2px rgba(64, 30, 20, 0.05), 0 8px 20px -12px rgba(64, 30, 20, 0.16);
   --sheet-shadow: -24px 0 60px -20px rgba(42, 12, 17, 0.3);
   --shadow-sm: var(--paper-shadow);
   --shadow: var(--paper-shadow);
@@ -122,17 +124,15 @@
   --series-2: #a8823a;
 
   /* ---- shape · density · motion (theme-independent) ----
-     Small, even corners: 3px on tags and inputs, 4px on buttons, 6px on
-     panels. */
-  --radius-sm: 3px;
-  --radius: 4px;
-  --radius-lg: 6px;
-  /* A thing that must be round (an avatar, a count bubble) says so with its
-     own radius. */
-  --radius-pill: 3px;
+     Modern Chambers: soft corners. 8px on inputs and small controls, 10px on
+     buttons, 14px on panels; tags and counts are pills. */
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
 
   --sidebar-w: 256px;
-  --topbar-h: 60px;
+  --topbar-h: 56px;
 
   --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
@@ -163,7 +163,7 @@
   --privileged: #5a3f86;
   --chrome-edge: #47141c;
   --raised: 0 12px 32px -12px rgba(42, 12, 17, 0.28);
-  --panel: 0 1px 0 rgba(28, 25, 22, 0.06);
+  --panel: 0 0 0 1px rgba(91, 26, 36, 0.07), 0 1px 2px rgba(64, 30, 20, 0.05), 0 8px 20px -12px rgba(64, 30, 20, 0.16);
 }
 
 [data-theme="dark"] {
@@ -200,6 +200,7 @@
   --tab: #1d1915;
   --surface: #1d1915;
   --surface-2: #231e19;
+  --rail: #181410;
   --surface-3: #28221d;
   --border: #3a322b;
   --border-strong: #7d6f60;
@@ -233,7 +234,7 @@
   --chart-grid: #2c251f;
 
   /* By night a panel is edged rather than shadowed. */
-  --paper-shadow: 0 0 0 1px #3a322b;
+  --paper-shadow: 0 0 0 1px #342c26, 0 8px 20px -12px rgba(0, 0, 0, 0.6);
   --sheet-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.7);
   --shadow-sm: var(--paper-shadow);
   --shadow: var(--paper-shadow);
@@ -249,7 +250,7 @@
   --privileged: #bba6e6;
   --chrome-edge: #160608;
   --raised: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
-  --panel: 0 0 0 1px #3a322b;
+  --panel: 0 0 0 1px #342c26, 0 8px 20px -12px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -672,7 +673,8 @@ select option:checked {
    bold is narrow, so it takes a touch of tracking to keep it from setting
    tighter than the 500 beside it. */
 .brand-lockup-suffix {
-  margin-left: 0.26em;
+  margin-left: 0.22em;
+  font-style: italic;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--brand);

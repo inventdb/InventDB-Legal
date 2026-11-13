@@ -468,8 +468,8 @@
 
 .an-you {
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .an-question-text {
@@ -861,9 +861,9 @@ button.an-cite-file:focus-visible {
   text-align: left;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 11.5px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-faint);
   background: var(--surface-2);
   border-bottom: 1px solid var(--border);
@@ -965,10 +965,10 @@ button.an-cite-file:focus-visible {
 
 .an-card-label {
   margin: 4px 0 0;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-faint);
 }
 
@@ -1483,9 +1483,9 @@ button.an-cite-file:focus-visible {
 .an-receipt-key {
   min-width: 72px;
   color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
 }
 
 .an-sql {
