@@ -13,23 +13,10 @@ import { useTheme } from "../theme/ThemeContext";
 // there rather than in this app.
 const INVENTDB_URL = "https://www.inventdb.com";
 
-const WALKIN_KEY = "legal.desk.walkin";
-/** The opening plays once per device, for someone new, and never with reduced motion. */
-function firstVisit(): boolean {
+/** The opening is short, so it plays on every visit to the sign-in page, except with reduced motion. */
+function playOpening(): boolean {
   if (typeof window === "undefined") return false;
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
-  try {
-    return localStorage.getItem(WALKIN_KEY) !== "1" && localStorage.getItem("legal.desk.seen") !== "1";
-  } catch {
-    return false;
-  }
-}
-function markWalkIn() {
-  try {
-    localStorage.setItem(WALKIN_KEY, "1");
-  } catch {
-    /* a private window: it plays again next time */
-  }
+  return !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** True on a phone, where the booklet turns one page at a time. */
@@ -61,9 +48,8 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
   const narrow = useNarrow();
-  // A first visit opens with the mark; never with reduced motion, and
-  // never for someone who has already read the booklet.
-  const [intro, setIntro] = useState(firstVisit);
+  // Every visit opens with the mark, except with reduced motion.
+  const [intro, setIntro] = useState(playOpening);
   const [skipped, setSkipped] = useState(false);
 
   if (user && token) return <Navigate to="/" replace />;
@@ -177,7 +163,6 @@ export default function Login() {
         <DeskIntro
           narrow={narrow}
           onDone={(skip) => {
-            markWalkIn();
             setIntro(false);
             if (skip) setSkipped(true);
           }}

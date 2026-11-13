@@ -273,12 +273,13 @@ export function DeskBook({
     goTo(LAST, 90);
   }, [skipToSignIn, goTo]);
 
-  // Someone who has read it before is taken straight to sign in.
+  // Someone who has read it before is taken straight to sign in, once the
+  // opening has handed the booklet over.
   useEffect(() => {
-    if (reduce || !returning) return;
+    if (reduce || !returning || hold) return;
     const t = window.setTimeout(() => goTo(LAST, 150), 650);
     return () => window.clearTimeout(t);
-  }, [reduce, returning, goTo]);
+  }, [reduce, returning, hold, goTo]);
 
   // The tour: the cover opens, then each spread is given time to be read.
   useEffect(() => {

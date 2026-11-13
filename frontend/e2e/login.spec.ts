@@ -151,7 +151,7 @@ test.describe("The guide on the desk", () => {
     await expect(guide(page).getByRole("heading", { name: "No deadline missed" })).toBeVisible();
   });
 
-  test("a first visit opens with the firm's mark, and Skip goes straight to sign in", async ({ browser }) => {
+  test("every visit opens with the firm's mark, and Skip goes straight to sign in", async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: "no-preference",
       storageState: { cookies: [], origins: [] },
@@ -166,11 +166,9 @@ test.describe("The guide on the desk", () => {
     await expect(walkIn).toHaveCount(0);
     await expect(where(page)).toHaveText("Sign in");
     await expect(page.getByLabel("Username", { exact: true })).toBeVisible();
-    expect(await page.evaluate(() => localStorage.getItem("legal.desk.walkin"))).toBe("1");
-    // Once seen, it does not play again.
+    // It is short, so it plays again on the next visit.
     await page.reload();
-    await expect(where(page)).toHaveText(/./);
-    await expect(walkIn).toHaveCount(0);
+    await expect(walkIn).toBeVisible();
     await context.close();
   });
 
@@ -180,9 +178,9 @@ test.describe("The guide on the desk", () => {
       storageState: { cookies: [], origins: [] },
     });
     const page = await context.newPage();
-    await page.addInitScript(() => localStorage.setItem("legal.desk.walkin", "1"));
     await page.goto("/login");
-    await expect(where(page)).toHaveText("The cover");
+    // The opening hands the booklet over closed; it then opens by itself.
+    await expect(page.locator(".dk-intro")).toHaveCount(0, { timeout: 15000 });
     await expect(where(page)).toHaveText("Foreword", { timeout: 6000 });
     await page.getByRole("button", { name: "Pause the tour" }).click();
     await expect(page.getByRole("button", { name: "Play the tour" })).toBeVisible();
