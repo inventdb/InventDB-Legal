@@ -17,7 +17,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
   background: var(--surface);
-  /* A sheet laid over the casebook: edged in sunflower like every summoned
+  /* A sheet laid over the casebook: edged in brass like every summoned
      sheet, falling away to the left. */
   border-top: 4px solid var(--accent);
   box-shadow: var(--sheet-shadow);

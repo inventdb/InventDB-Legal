@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, signedOut, test } from "./fixtures";
 
 test.use(signedOut);
@@ -12,8 +14,10 @@ test.describe("Login page", () => {
       page.getByRole("heading", { name: "Legal practice, modernised." })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
-    // The practice is drawn as the firm's floors.
-    await expect(page.locator('[data-floor="matters"]')).toBeVisible();
+    // The sign-in is the last spread of a guide to the firm, open on the desk.
+    const guide = page.getByRole("region", { name: "A guide to InventDB Legal" });
+    await expect(guide).toBeVisible();
+    await expect(guide.getByRole("heading", { name: "New to InventDB Legal?" })).toBeVisible();
     await expect(page.getByText("Powered by InventDB SOAR — secure & real-time")).toBeVisible();
   });
 
@@ -113,6 +117,58 @@ test.describe("Login page", () => {
 
     await expect(page.locator(".alert.error")).toBeVisible();
     await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
+  });
+});
+
+test.describe("The guide on the desk", () => {
+  const guide = (page: Page) => page.getByRole("region", { name: "A guide to InventDB Legal" });
+  const where = (page: Page) => page.locator(".dk-where-now");
+
+  test("with reduced motion, opens straight at sign in, and turns back through the chapters", async ({ page }) => {
+    await page.goto("/login");
+    await expect(where(page)).toHaveText("Sign in");
+    await expect(page.getByRole("button", { name: "Skip to sign in" })).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Previous page" }).click();
+    await expect(where(page)).toContainText("Compliance");
+    await expect(guide(page).getByRole("heading", { name: "Client money, by the book" })).toBeVisible();
+    // Pages that are not open are out of reach: the sign-in form is behind the page now.
+    await expect(guide(page).getByRole("heading", { name: "Welcome back" })).toHaveCount(0);
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(where(page)).toContainText("Profitability");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect(where(page)).toHaveText("Sign in");
+    await expect(guide(page).getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  });
+
+  test("the contents jump to a chapter", async ({ page }) => {
+    await page.goto("/login");
+    for (let i = 0; i < 7; i++) await page.getByRole("button", { name: "Previous page" }).click();
+    await expect(where(page)).toHaveText("Foreword");
+    await guide(page).getByRole("button", { name: /Risk & Deadlines/ }).click();
+    await expect(guide(page).getByRole("heading", { name: "No deadline missed" })).toBeVisible();
+  });
+
+  test("on a first visit the booklet opens on its own, and can be skipped to sign in", async ({ browser }) => {
+    const context = await browser.newContext({
+      reducedMotion: "no-preference",
+      storageState: { cookies: [], origins: [] },
+    });
+    const page = await context.newPage();
+    await page.goto("/login");
+    await expect(where(page)).toHaveText("The cover");
+    await expect(where(page)).toHaveText("Foreword", { timeout: 6000 });
+    await page.getByRole("button", { name: "Pause the tour" }).click();
+    await expect(page.getByRole("button", { name: "Play the tour" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Skip to sign in" }).click();
+    await expect(where(page)).toHaveText("Sign in");
+    await expect(page.getByLabel("Username", { exact: true })).toBeVisible();
+    // Having seen it, the next visit goes straight to sign in.
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("legal.desk.seen"))).toBe("1");
+    await context.close();
   });
 });
 

@@ -18,22 +18,22 @@ from __future__ import annotations
 #: kit's classes and normalises the page box, and leaves everything else alone.
 VIEW_KIT_CSS = """
 :root {
-  --vk-fg: #201e21;
-  --vk-muted: #56515c;
-  --vk-faint: #857f8c;
-  --vk-line: #e4e2e5;
-  --vk-surface: #ffffff;
-  --vk-inset: #faf7fc;
-  --vk-brand: #48176a;
-  --vk-ok-bg: #e6f3eb; --vk-ok-fg: #1d7a4b;
-  --vk-warn-bg: #fdf4e4; --vk-warn-fg: #8a5300;
-  --vk-bad-bg: #f9edee; --vk-bad-fg: #b23a42;
+  --vk-fg: #1c1916;
+  --vk-muted: #4a4239;
+  --vk-faint: #675c50;
+  --vk-line: #e6dccb;
+  --vk-surface: #fbf8f2;
+  --vk-inset: #f4ede1;
+  --vk-brand: #5b1a24;
+  --vk-ok-bg: #e3ecf4; --vk-ok-fg: #235a8a;
+  --vk-warn-bg: #f4ead3; --vk-warn-fg: #7a5c22;
+  --vk-bad-bg: #f7e4dc; --vk-bad-fg: #b23a12;
 }
 * { box-sizing: border-box; }
 html, body {
   height: auto; min-height: 0; max-height: none; overflow: visible;
   margin: 0; padding: 0; background: transparent;
-  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--vk-fg); font-size: 13.5px; line-height: 1.5;
 }
 

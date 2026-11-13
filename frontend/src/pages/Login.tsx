@@ -1,22 +1,37 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { ArrowRight, ExternalLink, Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react";
 
 import { useAuth } from "../auth/AuthContext";
 import { BrandLockup } from "../components/BrandLockup";
+import { DeskPen } from "../components/DeskArt";
+import { DeskBook } from "../components/DeskBook";
 import { Alert } from "../components/ui";
-import { FLOORS } from "../config/floors";
 import { useTheme } from "../theme/ThemeContext";
 
 // InventDB is the identity provider, so new users register their workspace
 // there rather than in this app.
 const INVENTDB_URL = "https://www.inventdb.com";
 
+/** True on a phone, where the booklet turns one page at a time. */
+function useNarrow(): boolean {
+  const query = "(max-width: 760px)";
+  const [narrow, setNarrow] = useState(() => !!window.matchMedia?.(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener?.("change", on);
+    return () => mq.removeEventListener?.("change", on);
+  }, []);
+  return narrow;
+}
+
 /**
- * The sign-in page, in the Chambers style: the oxblood bench across the top,
- * the headline and what the firm holds on the left, and the sign-in card on
- * the right. On a phone it stacks — headline, card, then the list — so the
- * form is on the first screen.
+ * The sign-in page: a lawyer's desk, seen from above, with a booklet on it —
+ * a short guide to the firm that opens and turns its own pages, and ends with
+ * signing in on the left page and signing up on the right. See DeskBook for
+ * how the pages turn, and styles/desk.css for the desk.
  */
 export default function Login() {
   const { user, token, login, loading } = useAuth();
@@ -25,6 +40,7 @@ export default function Login() {
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
+  const narrow = useNarrow();
 
   if (user && token) return <Navigate to="/" replace />;
 
@@ -38,111 +54,112 @@ export default function Login() {
     }
   };
 
+  const signIn = (
+    <div className="dk-signin">
+      <div className="dk-chapter">Sign in</div>
+      <h2>Welcome back</h2>
+      <p className="dk-lead">Sign in with your InventDB credentials.</p>
+      <form onSubmit={onSubmit}>
+        {error && <Alert kind="error">{error}</Alert>}
+        <div className="dk-field">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            autoComplete="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="your.username"
+            required
+          />
+        </div>
+        <div className="dk-field">
+          <label htmlFor="password">Password</label>
+          <div className="dk-pass">
+            <input
+              id="password"
+              type={show ? "text" : "password"}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShow((s) => !s)}
+              aria-label={show ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </div>
+        <button className="dk-btn solid dk-submit" type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 size={16} className="spin" /> Signing in…
+            </>
+          ) : (
+            <>
+              Sign in <ArrowRight size={16} aria-hidden />
+            </>
+          )}
+        </button>
+      </form>
+    </div>
+  );
+
+  const signUp = (
+    <div className="dk-signup">
+      <div className="dk-chapter">Sign up</div>
+      <h3>New to InventDB Legal?</h3>
+      <p className="dk-lead">
+        Your firm's workspace is created on InventDB, the database the app runs on. Register there,
+        then come back here and sign in.
+      </p>
+      <ul className="dk-points">
+        <li>One workspace for the whole firm</li>
+        <li>Your InventDB username and password sign you in here</li>
+        <li>Authentication is handled directly by InventDB</li>
+      </ul>
+      <div className="dk-actions">
+        <a className="dk-btn" href={INVENTDB_URL} target="_blank" rel="noreferrer noopener">
+          Register on InventDB
+          <ExternalLink size={13} />
+        </a>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="ch-login">
-      <header className="ch-login-bar">
-        <BrandLockup className="ch-login-lockup" />
+    <div className={`dk-room${narrow ? " is-narrow" : ""}`}>
+      {/* The desk's own furniture, set about the booklet. */}
+      <div className="dk-decor dk-lamp" aria-hidden />
+      <div className="dk-decor dk-watch" aria-hidden />
+      <div className="dk-decor dk-files" aria-hidden />
+      <div className="dk-decor dk-pen" aria-hidden>
+        <DeskPen />
+      </div>
+      <div className="dk-decor dk-tea" aria-hidden />
+
+      <header className="dk-top">
+        <BrandLockup />
         <button
           type="button"
-          className="ch-ibtn"
+          className="dk-theme"
           onClick={toggle}
           aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           title={theme === "dark" ? "Day" : "Night"}
         >
-          {theme === "dark" ? <Sun key="sun" size={18} /> : <Moon key="moon" size={18} />}
+          {theme === "dark" ? <Sun key="sun" size={17} /> : <Moon key="moon" size={17} />}
         </button>
       </header>
 
-      <main className="ch-login-main">
-        <div className="ch-login-intro">
-          <div className="ch-overline">Legal practice management</div>
-          <h1>
-            Legal practice, <em>modernised.</em>
-          </h1>
-          <p>
-            Every part of the practice under one roof: matters, deadlines, time, billing and client
-            trust money. Built on the InventDB SOAR database.
-          </p>
-        </div>
+      {/* The headline is set on the booklet's title page; this is the page's own heading. */}
+      <h1 className="sr-only">Legal practice, modernised.</h1>
 
-        <section className="ch-signin" aria-labelledby="signin-title">
-          <h2 id="signin-title">Welcome back</h2>
-          <p className="lead">Sign in with your InventDB credentials.</p>
-          <form onSubmit={onSubmit}>
-            {error && <Alert kind="error">{error}</Alert>}
-            <div className="ls-field">
-              <label htmlFor="username">Username</label>
-              <input
-                id="username"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="your.username"
-                required
-              />
-            </div>
-            <div className="ls-field">
-              <label htmlFor="password">Password</label>
-              <div className="ls-pass">
-                <input
-                  id="password"
-                  type={show ? "text" : "password"}
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="ls-toggle"
-                  onClick={() => setShow((s) => !s)}
-                  aria-label={show ? "Hide password" : "Show password"}
-                  tabIndex={-1}
-                >
-                  {show ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-            <button className="btn btn-primary ls-submit" type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 size={16} className="spin" /> Signing in…
-                </>
-              ) : (
-                <>
-                  Sign in <ArrowRight size={16} aria-hidden />
-                </>
-              )}
-            </button>
-          </form>
-          <p className="login-meta">
-            No workspace yet?{" "}
-            <a href={INVENTDB_URL} target="_blank" rel="noreferrer noopener">
-              Register on InventDB
-              <ExternalLink size={12} />
-            </a>
-          </p>
-        </section>
+      <DeskBook narrow={narrow} signIn={signIn} signUp={signUp} />
 
-        <section className="ch-login-firm" aria-label="Inside the firm">
-          <h2 className="ch-overline">Inside the firm</h2>
-          <ol>
-            {FLOORS.map((f) => (
-              <li key={f.num} data-floor={f.sections[0].to.slice(1) || "dashboard"}>
-                <span className="ch-date code">
-                  <span className="d">{f.num}</span>
-                </span>
-                <span>
-                  <b>{f.name}</b>
-                  <span>{f.sections.map((s) => s.label).join(" · ")}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </main>
-
-      <footer className="ch-login-foot">
+      <footer className="dk-foot">
         <span>InventDB Legal</span>
         <span>{"Powered by InventDB SOAR — secure & real-time"}</span>
         <span>Authentication is handled directly by InventDB</span>

@@ -135,20 +135,28 @@ test.describe("Mobile shell", () => {
 test.describe("Mobile login", () => {
   test.use(signedOut);
 
-  test("stacks the headline, the sign-in card and the firm", async ({ page }) => {
+  test("turns one page at a time, with nothing cut off", async ({ page }) => {
     await page.goto("/login");
 
     const headline = page.getByRole("heading", { name: "Legal practice, modernised." });
     const card = page.getByRole("heading", { name: "Welcome back" });
     await expect(card).toBeVisible();
-    // The card comes straight after the headline, before the list of groups.
-    const [h, c, f] = await Promise.all([
-      headline.boundingBox(),
-      card.boundingBox(),
-      page.getByRole("region", { name: "Inside the firm" }).boundingBox(),
-    ]);
+    const [h, c] = await Promise.all([headline.boundingBox(), card.boundingBox()]);
     expect(h!.y).toBeLessThan(c!.y);
-    expect(c!.y).toBeLessThan(f!.y);
+    // On a phone sign in and sign up share the last page.
+    await expect(page.getByRole("heading", { name: "New to InventDB Legal?" })).toBeVisible();
+
+    // Every page fits its content: nothing runs past the bottom or the side.
+    for (let i = 0; i < 8; i++) {
+      const cut = await page.evaluate(() => {
+        const faces = Array.from(document.querySelectorAll(".dk-face")) as HTMLElement[];
+        const front = faces.find((f) => !f.hasAttribute("aria-hidden"));
+        const p = front ? (front.querySelector(".dk-page") as HTMLElement | null) : null;
+        return p ? Math.max(p.scrollHeight - p.clientHeight, p.scrollWidth - p.clientWidth) : 0;
+      });
+      expect(cut, `page ${8 - i} runs past its edge by ${cut}px`).toBeLessThanOrEqual(1);
+      await page.getByRole("button", { name: "Previous page" }).click();
+    }
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth

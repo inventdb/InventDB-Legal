@@ -73,8 +73,8 @@ export function PieChart({
   const [hov, setHov] = useState<number | null>(null);
   const rows = data.filter((d) => Number.isFinite(d.value));
   const total = rows.reduce((s, d) => s + (d.value || 0), 0) || 1;
-  // Distinct flat hues stepped around the brand indigo — theme-aware, no 3D.
-  const hue = (i: number) => `hsl(${(264 + i * 47) % 360} 52% ${58 - (i % 3) * 9}%)`;
+  // The theme's categorical chart colours, in slot order — theme-aware, no 3D.
+  const hue = (i: number) => `var(--chart-${(i % 8) + 1})`;
   const C = 100;
   const R = 92;
   let acc = 0;
@@ -169,12 +169,12 @@ export function GroupedBars({
   const [hov, setHov] = useState<string | null>(null);
   const max = Math.max(1, ...series.flatMap((s) => s.values.map((v) => v || 0)));
   const palette = [
-    "var(--brand-solid)",
-    "var(--brand-strong)",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
+    "var(--chart-6)",
   ];
   const colorOf = (s: { color?: string }, i: number) => s.color || palette[i % palette.length];
 
@@ -412,7 +412,11 @@ export function Heatmap({
   const lo = Math.min(...flat);
   const hi = Math.max(...flat);
   const span = hi - lo || 1;
-  const color = (v: number) => `hsl(264 60% ${(92 - ((v - lo) / span) * 46).toFixed(0)}%)`;
+  // A single-hue scale in the brand colour, from a tint to the full colour;
+  // the figure turns to the on-brand ink once the cell is dark enough to need it.
+  const share = (v: number) => Math.round(10 + ((v - lo) / span) * 80);
+  const color = (v: number) => `color-mix(in srgb, var(--brand-solid) ${share(v)}%, var(--surface))`;
+  const ink = (v: number) => (share(v) > 55 ? "var(--on-brand)" : "var(--text)");
   const fmt = (v: number) => (Math.abs(v) >= 1000 ? `${(v / 1000).toFixed(1)}k` : `${Math.round(v)}`);
 
   return (
@@ -426,7 +430,7 @@ export function Heatmap({
                 <td
                   key={ci}
                   title={String(v)}
-                  style={{ background: color(v) }}
+                  style={Number.isFinite(v) ? { background: color(v), color: ink(v) } : undefined}
                   {...(Number.isFinite(v)
                     ? pickProps(onPick, xLabels[ci], `${yLabels[ri]} · ${axisLabel(xLabels[ci])}: ${v}`, yLabels[ri])
                     : {})}

@@ -3,8 +3,7 @@ import { useMemo } from "react";
 import { useTheme, type Theme } from "./ThemeContext";
 
 /**
- * Chart colours for the InventDB Legal theme (Midnight Navy · Powder Blue ·
- * Sunflower Yellow).
+ * Chart colours for the Chambers theme (oxblood · parchment · brass).
  *
  * Recharts writes colours into SVG attributes and into its own legend/tooltip
  * markup, so charts need concrete values rather than `var(--chart-1)`. These
@@ -13,55 +12,49 @@ import { useTheme, type Theme } from "./ThemeContext";
  *
  * The palette is CATEGORICAL: it encodes which series a mark belongs to, never
  * how large it is. Slots are handed out in fixed order and never cycled, so a
- * category keeps its colour when the series count changes. Slot 1 is the brand
- * blue: navy itself is too dark to hold the light-mode lightness band, so the
- * series uses the palette's validated blue, and the purple moved to slot 7.
- * The swap keeps every adjacent pair and the first-three all-pairs gate at the
- * figures recorded at the foot of global.css.
+ * category keeps its colour when the series count changes. The order keeps
+ * neighbouring slots apart for red-green colour vision; the figures are in the
+ * palette note at the foot of global.css.
  *
- * Validated in both modes for lightness band, chroma floor, colour-vision
- * separation (Machado 2009 protan/deutan at full severity), a normal-vision
- * floor and contrast against the card surface. Two consequences bind callers:
- *
- *  - In light mode slots 3, 4 and 5 fall below 3:1 on white, which is only
- *    legal alongside a relief channel. Every chart here ships a legend plus
- *    direct labels or the same figures in a table.
+ *  - Every slot holds 3:1 or better against the chart's surface in both
+ *    modes, and every chart here still ships a legend plus direct labels or
+ *    the same figures in a table.
  *  - Forms where any two marks can touch (scatter, bubble) are capped at
- *    `SCATTER_MAX_SERIES` slots, the set that clears the harder all-pairs gate.
+ *    `SCATTER_MAX_SERIES` slots, the set that clears the all-pairs gate.
  */
 const SERIES: Record<Theme, readonly string[]> = {
   light: [
-    "#2a78d6", // brand blue
-    "#eb6834", // orange
-    "#1baf7a", // aqua
-    "#eda100", // yellow
-    "#e87ba4", // magenta
-    "#008300", // green
-    "#6d25a2", // purple
-    "#e34948", // red
+    "#5b1a24", // oxblood
+    "#a8823a", // brass
+    "#235a8a", // blue ink
+    "#2f6b4f", // trust green
+    "#5a3f86", // violet
+    "#a3505e", // rose
+    "#4f7a8a", // slate teal
+    "#8f8270", // stone
   ],
   dark: [
-    "#3987e5",
-    "#d95926",
-    "#199e70",
-    "#c98500",
-    "#d55181",
-    "#008300",
-    "#a67ce0",
-    "#e66767",
+    "#e6a7b0",
+    "#d9b871",
+    "#8fbbe3",
+    "#86c9a8",
+    "#bba6e6",
+    "#d98a97",
+    "#7fb3c0",
+    "#c3b6a4",
   ],
 };
 
 /** Everything past the last slot folds into one neutral "Other". */
-const OTHER: Record<Theme, string> = { light: "#586a84", dark: "#9fb6d3" };
+const OTHER: Record<Theme, string> = { light: "#675c50", dark: "#9d907f" };
 
 /**
  * Axis ink, gridlines and the hover cursor wash, per mode. Axis ticks are
  * text, so they carry the same 4.5:1 bar as captions (--text-faint).
  */
 const CHROME: Record<Theme, { axis: string; grid: string; cursor: string }> = {
-  light: { axis: "#586a84", grid: "#e8eff6", cursor: "rgba(31,74,133,0.06)" },
-  dark: { axis: "#879ebd", grid: "#1e3152", cursor: "rgba(185,214,238,0.10)" },
+  light: { axis: "#675c50", grid: "#e6dccb", cursor: "rgba(91,26,36,0.06)" },
+  dark: { axis: "#9d907f", grid: "#2c251f", cursor: "rgba(230,167,176,0.10)" },
 };
 
 /** Reserved state colours — never reused as a series colour. */
@@ -70,18 +63,18 @@ const STATUS: Record<
   { success: string; warn: string; danger: string; neutral: string; brand: string }
 > = {
   light: {
-    success: "#1d7a4b",
-    warn: "#7a5a00",
-    danger: "#b3261e",
-    neutral: "#586a84",
-    brand: "#1f4a85",
+    success: "#235a8a",
+    warn: "#7a5c22",
+    danger: "#b23a12",
+    neutral: "#675c50",
+    brand: "#5b1a24",
   },
   dark: {
-    success: "#5cc492",
-    warn: "#ffd66b",
-    danger: "#f08a84",
-    neutral: "#9fb6d3",
-    brand: "#b9d6ee",
+    success: "#8fbbe3",
+    warn: "#d9b871",
+    danger: "#f2895f",
+    neutral: "#9d907f",
+    brand: "#e6a7b0",
   },
 };
 

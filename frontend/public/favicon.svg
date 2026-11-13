@@ -1,24 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="InventDB Legal">
   <!--
-    InventDB Legal — the Counsel mark, solid cut, on no background.
+    InventDB Legal — the Counsel mark, solid cut, on no background, in the
+    Chambers colourway.
 
-    Derived from inventdb-legal-logo/favicon/favicon-transparent.svg. The one
-    addition is the colour-scheme switch: with no navy tile behind it, a single
-    fixed colourway would go invisible on half the browsers in the world —
-    Midnight Navy vanishes into a dark tab strip, Powder Blue washes out on
-    a light one. So the mark carries both of the package's colourways and takes
-    whichever the tab strip calls for. The hexes are the package's own; nothing
-    is invented here.
+    Derived from inventdb-legal-logo/favicon/favicon-transparent.svg; only the
+    colours differ. With no tile behind it, one fixed colourway would vanish on
+    half the tab strips there are — oxblood into a dark strip, the light pink
+    into a pale one — so the mark carries both and takes whichever the tab
+    strip calls for: oxblood with brass pans by day, rose with gilt pans by
+    night.
 
     The solid cut, not the full one: below 20px the full cut's 5.5-unit pan
     outlines close up into a smudge. See the package README's two-cuts rule.
   -->
   <style>
-    .ink { fill: #14233f; } /* Midnight Navy */
-    .pan { fill: #7fa9cf; } /* the light colourway's second tone */
+    .ink { fill: #5b1a24; } /* oxblood */
+    .pan { fill: #a8823a; } /* brass */
     @media (prefers-color-scheme: dark) {
-      .ink { fill: #b9d6ee; } /* Powder Blue */
-      .pan { fill: #7fa9cf; } /* the dark colourway's second tone */
+      .ink { fill: #e6a7b0; } /* oxblood, by night */
+      .pan { fill: #d9b871; } /* gilt */
     }
   </style>
   <!-- The glyph's ink spans y 12–120, so it sits 2 units high in the box. -->

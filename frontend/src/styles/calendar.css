@@ -109,8 +109,7 @@
 }
 button.cal-date { cursor: pointer; }
 button.cal-date:hover { background: var(--neutral-soft); }
-/* Today: the sunflower rule across the top of the day, as a folder tab
-   marks the open floor — one of sunflower's few jobs. */
+/* Today: the brass rule across the top of the day — one of brass's few jobs. */
 .cal-day.is-today {
   box-shadow: inset 0 3px 0 var(--accent);
 }

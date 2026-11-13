@@ -464,7 +464,7 @@
   width: 38px;
   height: 24px;
   text-align: center;
-  color: #111;
+  color: var(--text);
   border-radius: 3px;
   font-variant-numeric: tabular-nums;
 }

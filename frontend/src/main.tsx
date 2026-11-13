@@ -23,6 +23,7 @@ import "./styles/views.css";
 import "./styles/drill.css";
 import "./styles/calendar.css";
 import "./styles/chambers.css";
+import "./styles/desk.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

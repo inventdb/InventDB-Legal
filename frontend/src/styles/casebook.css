@@ -7,10 +7,10 @@
    · Paper lies flat. Square corners (2px), a hairline at the foot and a long
      soft fall beneath (--paper-shadow). Nothing floats unless it was summoned.
    · Titles are set in the wordmark serif, the way a brief sets its headings;
-     labels, numbers and ids in monospace; everything read or typed in Poppins.
-   · Sunflower is a fill — the open folder's edge, a selected tab's rule, a
+     labels, numbers and ids in monospace; everything read or typed in the sans.
+   · Brass (--accent) is a fill — the open folder's edge, a selected tab's rule, a
      badge, the one key action. Gold text uses --gold / --accent-ink, never
-     sunflower on white.
+     brass on paper.
    · Restrained motion: a page fade, a sheet sliding in. No pulsing.
 
    Every class introduced for the casebook carries a `cb-` prefix so it can't
@@ -91,8 +91,8 @@
   border-color: var(--brand-solid-hover);
   color: var(--on-brand);
 }
-/* Sunflower: at most one per screen — the action that starts the screen's main
-   job. Navy ink on yellow (10:1); never white. */
+/* Brass: at most one per screen — the action that starts the screen's main
+   job. Ink on brass; never white. */
 .btn-accent {
   background: var(--accent);
   border-color: var(--accent);
@@ -311,7 +311,7 @@ td.cb-key {
 
 /* ---- Sheets and dialogs ------------------------------------------------- */
 /* A form, a file or a workflow opens as a sheet sliding in from the right,
-   its top edged in sunflower. A question ("Delete this?") is a dialog. */
+   its top edged in brass. A question ("Delete this?") is a dialog. */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -417,7 +417,7 @@ td.cb-key {
   padding: 8px;
 }
 
-/* ---- Toasts: a navy slip with a sunflower edge -------------------------- */
+/* ---- Toasts: a dark slip with a brass edge -------------------------- */
 .toast-wrap {
   position: fixed;
   left: max(20px, env(safe-area-inset-left, 0px));

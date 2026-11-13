@@ -96,12 +96,12 @@
   /* ---- chart series (see the palette note at the foot of this file) ---- */
   --chart-1: #5b1a24;
   --chart-2: #a8823a;
-  --chart-3: #2f6b4f;
-  --chart-4: #235a8a;
-  --chart-5: #a3505e;
-  --chart-6: #5a3f86;
-  --chart-7: #8f8270;
-  --chart-8: #4f7a8a;
+  --chart-3: #235a8a;
+  --chart-4: #2f6b4f;
+  --chart-5: #5a3f86;
+  --chart-6: #a3505e;
+  --chart-7: #4f7a8a;
+  --chart-8: #8f8270;
   --chart-axis: #675c50;
   --chart-grid: #e6dccb;
 
@@ -223,12 +223,12 @@
 
   --chart-1: #e6a7b0;
   --chart-2: #d9b871;
-  --chart-3: #86c9a8;
-  --chart-4: #8fbbe3;
-  --chart-5: #d98a97;
-  --chart-6: #bba6e6;
-  --chart-7: #c3b6a4;
-  --chart-8: #7fb3c0;
+  --chart-3: #8fbbe3;
+  --chart-4: #86c9a8;
+  --chart-5: #bba6e6;
+  --chart-6: #d98a97;
+  --chart-7: #7fb3c0;
+  --chart-8: #c3b6a4;
   --chart-axis: #9d907f;
   --chart-grid: #2c251f;
 
@@ -589,8 +589,8 @@ select optgroup {
 /* The chosen row. Opaque on purpose — the popup paints the platform's own
    field colour behind it, so a translucent brand tint would composite over
    whatever that happens to be rather than over the menu. `--surface-3` is
-   already the token for one step raised, and reads as powder in light and a
-   lifted navy in dark. Where the engine honours this it replaces the
+   already the token for one step raised, and reads as deep parchment in light and a
+   lifted walnut in dark. Where the engine honours this it replaces the
    platform's accent blue; where it doesn't, nothing is lost. */
 select option:checked {
   background-color: var(--surface-3);
@@ -654,8 +654,8 @@ select option:checked {
   min-width: 0;
   text-align: center;
 }
-/* Cormorant Garamond 500, the package's wordmark face. Its x-height sits well
-   below Poppins', so the sizes below run ~20% larger than the sans wordmark
+/* The wordmark is set in the serif (Source Serif 4). Its x-height sits below
+   the sans, so the sizes below run ~20% larger than the sans wordmark
    they replace just to hold the same optical weight; the sans' -0.02em
    tightening comes off, since the serif is already narrow. */
 .brand-lockup-name {
@@ -668,7 +668,7 @@ select option:checked {
 }
 /* "Legal" stays in the wordmark face and steps up to bold instead of the
    asset's italic 300 — the product word carries the weight, and the accent
-   colour separates it from "InventDB" without a change of voice. Cormorant's
+   colour separates it from "InventDB" without a change of voice. The serif's
    bold is narrow, so it takes a touch of tracking to keep it from setting
    tighter than the 500 beside it. */
 .brand-lockup-suffix {
@@ -1518,24 +1518,18 @@ select option:checked {
 /* ============================================================================
    Chart palette note
    ----------------------------------------------------------------------------
-   --chart-1..8 are a categorical (identity) palette, assigned in fixed slot
-   order and never cycled. Slot 1 is the brand blue; Midnight Navy itself is
-   too dark for the light-mode lightness band, so the series takes the
-   palette's validated blue, and the purple moved to slot 7. The swap leaves
-   every figure below unchanged (re-measured).
+   --chart-1..8 are a categorical (identity) palette from Chambers, assigned in
+   fixed slot order and never cycled: oxblood, brass, blue ink, trust green,
+   violet, rose, slate teal, stone. The order keeps neighbours apart for
+   red-green colour vision (Machado 2009, protan and deutan at full severity):
 
-   Validated with the data-viz six checks in both modes — lightness band,
-   chroma floor, CVD separation (Machado 2009, protan/deutan at severity 1.0),
-   normal-vision floor and surface contrast:
+     light on #fbf8f2  worst adjacent CVD ΔE 15.7 · first three all pairs 40.2
+     dark  on #1d1915  worst adjacent CVD ΔE 13.2 · first three all pairs 23.5
 
-     light on #ffffff  worst adjacent CVD ΔE 9.1 · normal-vision ΔE 19.6
-     dark  on #111e36  worst adjacent CVD ΔE 8.4 · normal-vision ΔE 19.3
-
-   In light mode slots 3, 4 and 5 sit below 3:1 against white (2.82 / 2.17 /
-   2.69). That is legal only with a relief channel, so every chart using them
-   ships a legend plus either direct labels or a table view of the same
-   figures — never colour alone.
+   Every slot holds 3:1 or better against its surface in both modes (light:
+   brass 3.35 and stone 3.54 are the lowest). Charts still ship a legend plus
+   labels or a table of the same figures, never colour alone.
 
    Scatter/bubble charts (any two marks can touch) are capped at the first
-   three slots, which clear the harder all-pairs gate in both modes.
+   three slots, which clear the all-pairs gate in both modes.
    ============================================================================ */

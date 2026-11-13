@@ -1,0 +1,1644 @@
+/* ============================================================================
+   The Desk — the sign-in page
+   ----------------------------------------------------------------------------
+   A lawyer's desk seen from above: oak by day, walnut under the lamp at night.
+   A leather-bound booklet lies on it. It opens on its own, and its pages turn
+   one at a time: a foreword, then a spread for each of six parts of the
+   practice (an illustration on the left, what the app does on the right), and
+   last, sign in on the left and sign up on the right.
+
+   Every class here carries the dk- prefix. Paper stays paper by night; only
+   the desk and the light change.
+   ============================================================================ */
+.dk-room {
+  --dk-desk: #c7a47a;
+  --dk-grain: rgba(110, 70, 30, 0.08);
+  --dk-label: #3a2a1d;
+  --dk-label-2: #5b4633;
+  --dk-pool: rgba(255, 230, 170, 0);
+  --dk-shadow: rgba(52, 28, 12, 0.3);
+  --dk-paper: #fbf8f2;
+  --dk-paper-2: #f3ecdf;
+  --dk-edge: #e3d8c4;
+  --dk-ink: #1c1916;
+  --dk-ink-2: #4a4239;
+  --dk-ink-3: #675c50;
+  --dk-rule: #ddd0b9;
+  --dk-leather: #5b1a24;
+  --dk-leather-2: #3e1018;
+  --dk-gilt: #d9b871;
+  --dk-brass: #a8823a;
+  --dk-brass-ink: #7a5c22;
+  --dk-manila: #dcc08c;
+  --dk-manila-2: #cfb07a;
+  --dk-stamp: #8e2433;
+  --dk-trust: #2f6b4f;
+  --dk-danger: #b23a12;
+  --dk-turn: 900ms;
+  --dk-ease: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  color: var(--dk-label);
+  background:
+    radial-gradient(ellipse 60% 55% at 18% 14%, var(--dk-pool), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.08)),
+    repeating-linear-gradient(91deg, var(--dk-grain) 0 2px, transparent 2px 11px, var(--dk-grain) 11px 12px, transparent 12px 29px),
+    repeating-linear-gradient(89.4deg, transparent 0 57px, var(--dk-grain) 57px 59px, transparent 59px 140px),
+    var(--dk-desk);
+}
+[data-theme="dark"] .dk-room {
+  --dk-desk: #2b2019;
+  --dk-grain: rgba(0, 0, 0, 0.22);
+  --dk-label: #e3d6c1;
+  --dk-label-2: #b8a68c;
+  --dk-pool: rgba(255, 214, 140, 0.16);
+  --dk-shadow: rgba(0, 0, 0, 0.55);
+  --dk-paper: #ece3d2;
+  --dk-paper-2: #e2d8c4;
+  --dk-edge: #cdbfa6;
+  --dk-leather: #4a1520;
+  --dk-leather-2: #2e0b12;
+  --dk-manila: #b89c68;
+  --dk-manila-2: #a88d5c;
+}
+.dk-room :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ---- The top of the desk: the firm's name, day or night ---- */
+/* The firm's name at the head of the desk, centred; day or night on the right. */
+.dk-top {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+}
+.dk-top .brand-lockup-name,
+.dk-top .brand-lockup-suffix {
+  color: var(--dk-label);
+}
+.dk-top .brand-lockup-tag {
+  color: var(--dk-label-2);
+}
+.dk-top .brand-lockup {
+  --mark-tone: var(--dk-brass);
+  color: var(--dk-leather);
+}
+[data-theme="dark"] .dk-top .brand-lockup {
+  color: var(--dk-label);
+}
+.dk-top .brand-lockup {
+  grid-column: 2;
+  animation: dk-rise 700ms var(--ease-out) both;
+}
+.dk-top .brand-lockup-name {
+  font-size: 24px;
+}
+.dk-theme {
+  grid-column: 3;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(28, 25, 22, 0.35);
+  color: #f4ede1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.dk-theme:hover {
+  background: rgba(28, 25, 22, 0.55);
+}
+
+/* ---- The stage: the booklet on the desk, with the desk's furniture about it ---- */
+.dk-stage {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 22px 16px 10px;
+  --dk-bw: min(1060px, calc(100vw - 140px), calc((100vh - 190px) * 1.62));
+  --dk-bh: calc(var(--dk-bw) / 1.62);
+}
+.dk-book {
+  position: relative;
+  width: var(--dk-bw);
+  height: var(--dk-bh);
+  transition: transform 1000ms var(--dk-ease);
+  animation: dk-settle 900ms var(--ease-out) both;
+}
+/* Closed, the booklet shows its cover alone: it sits so that the cover is centred. */
+.dk-book.is-closed {
+  transform: translateX(-25%);
+}
+/* The page block under the leaves: its edges show along the fore-edge. */
+.dk-block {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 50%;
+  border-radius: 0 4px 4px 0;
+  background: var(--dk-paper);
+  box-shadow:
+    1px 1px 0 var(--dk-edge),
+    2px 2px 0 var(--dk-paper-2),
+    3px 3px 0 var(--dk-edge),
+    4px 4px 0 var(--dk-paper-2),
+    5px 5px 0 var(--dk-edge),
+    0 24px 40px -16px var(--dk-shadow);
+}
+.dk-book.is-closed .dk-block {
+  box-shadow: 0 24px 40px -16px var(--dk-shadow);
+  background: transparent;
+}
+.dk-board {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  left: -6px;
+  right: -6px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--dk-leather), var(--dk-leather-2));
+  box-shadow: 0 30px 50px -20px var(--dk-shadow);
+  transition: opacity 600ms ease;
+}
+.dk-book.is-closed .dk-board {
+  opacity: 0;
+}
+
+/* A leaf: one sheet of the booklet, a page on each side, turning on the spine. */
+.dk-leaf {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 50%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform: perspective(2600px) rotateY(0deg);
+  transition: transform var(--dk-turn) var(--dk-ease);
+}
+.dk-leaf.is-flipped {
+  transform: perspective(2600px) rotateY(-180deg);
+}
+.dk-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--dk-paper);
+  color: var(--dk-ink);
+}
+.dk-face.front {
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, rgba(60, 40, 20, 0.14) 0, rgba(60, 40, 20, 0) 34px), var(--dk-paper);
+}
+.dk-face.back {
+  transform: rotateY(180deg);
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(270deg, rgba(60, 40, 20, 0.14) 0, rgba(60, 40, 20, 0) 34px), var(--dk-paper);
+}
+/* The light across a turning page. */
+.dk-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.08) 60%, rgba(0, 0, 0, 0.06));
+}
+.dk-leaf.is-turning .dk-face::after {
+  animation: dk-shade var(--dk-turn) var(--dk-ease) both;
+}
+/* A filter would flatten the turning page, so its shadow is a box-shadow. */
+.dk-leaf.is-turning .dk-face {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+.dk-page {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 7% 9% 5%;
+  min-width: 0;
+}
+.dk-face.front .dk-page {
+  padding-left: 11%;
+}
+.dk-face.back .dk-page {
+  padding-right: 11%;
+}
+.dk-folio {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--dk-ink-3);
+}
+.dk-face.clickable {
+  cursor: pointer;
+}
+
+/* ---- The cover ---- */
+.dk-face.cover {
+  border-radius: 0 6px 6px 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.08), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.03) 0 2px, transparent 2px 5px),
+    linear-gradient(135deg, var(--dk-leather), var(--dk-leather-2));
+  color: var(--dk-gilt);
+  box-shadow: inset 6px 0 10px -4px rgba(0, 0, 0, 0.45);
+}
+.dk-cover {
+  position: absolute;
+  inset: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1.5px solid rgba(217, 184, 113, 0.7);
+  outline: 1px solid rgba(217, 184, 113, 0.45);
+  outline-offset: -8px;
+  text-align: center;
+}
+.dk-cover svg {
+  width: 64px;
+  height: 64px;
+  color: var(--dk-gilt);
+}
+.dk-cover .nm {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.dk-cover .nm em {
+  font-weight: 400;
+}
+.dk-cover .sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: rgba(241, 233, 220, 0.85);
+}
+.dk-cover .foot {
+  position: absolute;
+  bottom: 22px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(217, 184, 113, 0.8);
+}
+
+/* ---- The inside cover: the contents ---- */
+.dk-face.endpaper {
+  background:
+    linear-gradient(270deg, rgba(60, 40, 20, 0.14) 0, rgba(60, 40, 20, 0) 34px),
+    repeating-linear-gradient(135deg, rgba(168, 130, 58, 0.07) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(45deg, rgba(168, 130, 58, 0.05) 0 1px, transparent 1px 9px),
+    var(--dk-paper-2);
+}
+.dk-k {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dk-ink-3);
+}
+/* The title page: the headline at the top, the contents below it. */
+.dk-book-title {
+  margin: 4px 0 30px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--dk-rule);
+  font-family: var(--serif);
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--dk-ink);
+}
+.dk-book-title em {
+  font-weight: 400;
+  color: var(--dk-leather);
+}
+.dk-contents {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dk-contents button {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px dotted var(--dk-rule);
+  background: none;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--dk-ink);
+  cursor: pointer;
+}
+.dk-contents button:hover {
+  color: var(--dk-leather);
+}
+.dk-contents .n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dk-brass-ink);
+}
+.dk-contents .p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dk-ink-3);
+}
+
+/* ---- Text pages ---- */
+.dk-chapter {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dk-brass-ink);
+}
+.dk-page h2,
+.dk-page h3 {
+  margin: 8px 0 10px;
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--dk-ink);
+  text-wrap: balance;
+}
+.dk-lead {
+  margin: 0 0 14px;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--dk-ink-2);
+}
+.dk-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--dk-rule);
+}
+.dk-points li {
+  position: relative;
+  padding: 9px 0 9px 22px;
+  border-bottom: 1px solid var(--dk-rule);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--dk-ink);
+}
+.dk-points li::before {
+  content: "§";
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  font-family: var(--serif);
+  color: var(--dk-brass-ink);
+}
+.dk-where {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--dk-ink-3);
+}
+.dk-where b {
+  font-weight: 600;
+  color: var(--dk-ink-2);
+}
+.dk-turn-hint {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--dk-ink-3);
+}
+.dk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.dk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--dk-ink-3);
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--dk-ink);
+  cursor: pointer;
+  text-decoration: none;
+}
+.dk-btn:hover {
+  background: rgba(91, 26, 36, 0.06);
+}
+.dk-btn.solid {
+  border-color: var(--dk-leather);
+  background: var(--dk-leather);
+  color: #fbf8f2;
+}
+.dk-btn.solid:hover {
+  background: #47141c;
+}
+
+/* ---- Plate pages: the illustration for the chapter ---- */
+.dk-plate {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.dk-plate-cap {
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--dk-ink-2);
+}
+.dk-plate-cap b {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--font);
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dk-brass-ink);
+}
+
+/* ---- Sign in and sign up ---- */
+.dk-signin form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+.dk-field label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dk-ink-3);
+}
+.dk-field input {
+  width: 100%;
+  height: 40px;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 1.5px solid var(--dk-ink-3);
+  background: transparent;
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--dk-ink);
+  outline: none;
+  transition: border-color 160ms ease;
+}
+.dk-field input::placeholder {
+  color: #a39686;
+  font-style: italic;
+}
+.dk-field input:focus {
+  border-bottom-color: var(--dk-leather);
+  box-shadow: 0 1px 0 var(--dk-leather);
+}
+.dk-pass {
+  position: relative;
+}
+.dk-pass input {
+  padding-right: 38px;
+}
+.dk-pass button {
+  position: absolute;
+  right: 0;
+  bottom: 5px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: none;
+  color: var(--dk-ink-3);
+  cursor: pointer;
+}
+.dk-submit {
+  width: 100%;
+  height: 46px;
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.dk-signin .alert {
+  margin-bottom: 10px;
+}
+.dk-signup .dk-btn {
+  align-self: flex-start;
+}
+.dk-small {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--dk-ink-3);
+}
+
+/* ---- The desk's furniture, set about the booklet ---- */
+.dk-decor {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 12px var(--dk-shadow));
+}
+.dk-lamp {
+  left: -10px;
+  top: 40px;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #e8d29a 0 14%, #b48b3e 15% 18%, #8a6528 19% 46%, #c49a4c 47% 50%, transparent 51%);
+}
+.dk-tea {
+  right: 28px;
+  bottom: 40px;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #6b3d1d 0 23%, #f6f1e6 24% 31%, rgba(0, 0, 0, 0.06) 32% 33%, #fbf8f2 34% 49%, transparent 50%);
+}
+.dk-tea::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 48px;
+  width: 20px;
+  height: 14px;
+  border: 5px solid #f6f1e6;
+  border-left: 0;
+  border-radius: 0 10px 10px 0;
+}
+.dk-pen {
+  right: 40px;
+  top: 34%;
+  width: 190px;
+  height: 22px;
+  transform: rotate(-62deg);
+}
+.dk-files {
+  left: 30px;
+  bottom: 60px;
+  width: 150px;
+  height: 112px;
+  border-radius: 3px 6px 6px 6px;
+  background: linear-gradient(160deg, var(--dk-manila), var(--dk-manila-2));
+  transform: rotate(-8deg);
+  box-shadow: 6px -6px 0 -1px var(--dk-manila-2);
+}
+.dk-files::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: -12px;
+  width: 56px;
+  height: 14px;
+  border-radius: 4px 4px 0 0;
+  background: var(--dk-manila-2);
+}
+.dk-files::after {
+  content: "MT-2018";
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  padding: 4px 8px;
+  background: var(--dk-paper);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--dk-ink);
+}
+.dk-watch {
+  right: 34px;
+  top: 64px;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--dk-paper) 0 62%, #c9a65e 63% 69%, #8a6528 70% 72%, #c9a65e 73% 100%);
+}
+.dk-watch::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 30px;
+  margin-left: -1px;
+  background: var(--dk-leather);
+  transform-origin: 50% 100%;
+  transform: translateY(-100%) rotate(140deg);
+}
+.dk-watch::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 22px;
+  margin-left: -1.5px;
+  background: var(--dk-ink);
+  transform-origin: 50% 100%;
+  transform: translateY(-100%) rotate(70deg);
+}
+
+/* ---- The controls under the booklet ---- */
+.dk-controls {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: 6px 16px 4px;
+}
+.dk-round {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(58, 42, 29, 0.35);
+  border-radius: 50%;
+  background: rgba(251, 248, 242, 0.5);
+  color: var(--dk-label);
+  cursor: pointer;
+}
+[data-theme="dark"] .dk-round {
+  border-color: rgba(227, 214, 193, 0.3);
+  background: rgba(28, 25, 22, 0.4);
+}
+.dk-round:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.dk-where-now {
+  min-width: 230px;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--dk-label);
+}
+.dk-where-now b {
+  font-family: var(--font);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dk-label-2);
+  margin-right: 8px;
+}
+.dk-skip {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--dk-leather);
+  color: #fbf8f2;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dk-skip:hover {
+  background: #47141c;
+}
+.dk-foot {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 24px;
+  padding: 8px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  font-size: 12px;
+  color: var(--dk-label-2);
+}
+.dk-foot span:first-child {
+  font-weight: 600;
+  color: var(--dk-label);
+}
+
+/* ============================================================================
+   The six illustrations
+   ============================================================================ */
+.dk-art {
+  position: relative;
+  filter: drop-shadow(0 6px 9px rgba(52, 28, 12, 0.28));
+}
+.dk-ln {
+  display: block;
+  height: 4px;
+  margin: 0 0 7px;
+  border-radius: 2px;
+  background: var(--dk-rule);
+}
+
+/* 1 — The engagement letter and the pen (room on the right for the pen) */
+.dk-art--letter {
+  padding-right: 96px;
+}
+.dk-letter {
+  position: relative;
+  width: 196px;
+  height: 222px;
+  padding: 16px 16px 0;
+  background: #fffdf8;
+  border: 1px solid var(--dk-edge);
+  border-radius: 2px;
+  transform: rotate(-4deg);
+}
+.dk-letter .t {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dk-letter .s {
+  margin-bottom: 10px;
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dk-ink-3);
+}
+.dk-sigbox {
+  position: absolute;
+  left: 16px;
+  bottom: 30px;
+  width: 160px;
+  height: 50px;
+}
+.dk-sigbox svg {
+  width: 160px;
+  height: 50px;
+  overflow: visible;
+}
+.dk-sig {
+  fill: none;
+  stroke: #1f2b5c;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.dk-sigline {
+  position: absolute;
+  left: 16px;
+  right: 20px;
+  bottom: 26px;
+  border-top: 1px solid var(--dk-ink-3);
+}
+.dk-sigcap {
+  position: absolute;
+  left: 16px;
+  bottom: 10px;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dk-ink-3);
+}
+.dk-nib {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 22px;
+  offset-path: path("M6,36 C14,8 26,8 22,30 S32,46 40,24 S54,6 56,30 S66,42 74,22 S88,14 92,30 S106,40 114,24 S128,16 134,32 S146,34 156,20");
+  offset-rotate: 0deg;
+  offset-anchor: 0% 50%;
+  offset-distance: 100%;
+  transform: rotate(28deg);
+  transform-origin: 0% 50%;
+}
+.dk-nib svg {
+  display: block;
+  width: 150px;
+  height: 22px;
+}
+.dk-art--letter.is-on .dk-sig {
+  animation: dk-sign 1900ms cubic-bezier(0.55, 0.1, 0.35, 1) var(--dk-after) both;
+}
+.dk-art--letter.is-on .dk-nib {
+  animation: dk-write 1900ms cubic-bezier(0.55, 0.1, 0.35, 1) var(--dk-after) both;
+}
+
+/* 2 — The case file */
+.dk-folder {
+  position: relative;
+  width: 240px;
+  height: 178px;
+  perspective: 900px;
+  transform: rotate(3deg);
+}
+.dk-folder::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: -14px;
+  width: 78px;
+  height: 18px;
+  border-radius: 4px 4px 0 0;
+  background: var(--dk-manila-2);
+}
+.dk-folder .inside {
+  position: absolute;
+  inset: 0;
+  padding: 16px 18px;
+  border-radius: 2px 6px 6px 6px;
+  background: var(--dk-manila-2);
+}
+.dk-folder .sheet {
+  height: 100%;
+  padding: 12px 14px;
+  border-radius: 1px;
+  background: #fffdf8;
+}
+.dk-folder .sheet b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 14px;
+}
+.dk-folder .sheet small {
+  display: block;
+  margin: 2px 0 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--dk-ink-3);
+}
+.dk-track {
+  display: flex;
+  gap: 3px;
+  margin-top: 8px;
+}
+.dk-track i {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--dk-rule);
+}
+.dk-track i.d {
+  background: var(--dk-leather);
+}
+.dk-track i.n {
+  background: var(--dk-brass);
+}
+/* The cover lifts up and over on its top edge, so an open file stays inside its page. */
+.dk-art--folder {
+  padding-top: 150px;
+}
+.dk-folder .cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px 6px 2px 2px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 22px, rgba(122, 92, 34, 0.14) 22px 23px) 18px 30px / calc(100% - 36px) calc(100% - 50px) no-repeat,
+    linear-gradient(160deg, var(--dk-manila), var(--dk-manila-2));
+  transform-origin: top center;
+  transform: rotateX(160deg);
+  transform-style: preserve-3d;
+}
+.dk-folder .cover .lbl {
+  position: absolute;
+  left: 22px;
+  top: 26px;
+  padding: 6px 10px;
+  background: #fffdf8;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  backface-visibility: hidden;
+}
+.dk-folder .cover .lbl b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dk-art--folder.is-on .cover {
+  animation: dk-open-folder 1200ms cubic-bezier(0.2, 0.75, 0.2, 1) var(--dk-after) both;
+}
+
+/* 3 — The desk calendar */
+.dk-cal {
+  position: relative;
+  width: 156px;
+  height: 180px;
+  perspective: 700px;
+  transform: rotate(-3deg);
+}
+.dk-cal .pg {
+  position: absolute;
+  inset: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  border-radius: 3px;
+  background: #fffdf8;
+}
+.dk-cal .pg small {
+  align-self: stretch;
+  margin: -10px 0 6px;
+  padding: 5px 0;
+  border-radius: 3px 3px 0 0;
+  background: var(--dk-leather);
+  color: #fbf8f2;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+.dk-cal .pg b {
+  position: relative;
+  font-family: var(--serif);
+  font-size: 58px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+}
+.dk-cal .pg span {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--dk-ink-2);
+}
+.dk-cal .pg em {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 9px;
+  color: var(--dk-ink-3);
+}
+.dk-cal .ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96px;
+  height: 76px;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
+.dk-cal .ring ellipse {
+  fill: none;
+  stroke: var(--dk-stamp);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.dk-cal .top {
+  transform-origin: top center;
+  transform: rotateX(-178deg);
+  backface-visibility: hidden;
+}
+.dk-cal .rings {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 4px;
+  z-index: 3;
+  height: 14px;
+  background: radial-gradient(circle, #7d6f60 0 3px, transparent 3.5px) 0 0 / 18px 14px repeat-x;
+}
+.dk-art--cal.is-on .top {
+  animation: dk-flip-cal 1000ms cubic-bezier(0.3, 0.7, 0.2, 1) var(--dk-after) both;
+}
+.dk-art--cal.is-on .ring ellipse {
+  animation: dk-sign 900ms ease-out calc(var(--dk-after) + 900ms) both;
+}
+
+/* 4 — The stamp, the ink pad and the notice */
+.dk-stampset {
+  position: relative;
+  width: 240px;
+  height: 176px;
+  transform: rotate(2deg);
+}
+.dk-notice {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 140px;
+  height: 176px;
+  padding: 14px 12px;
+  border-radius: 2px;
+  background: #fffdf8;
+}
+.dk-notice b {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--serif);
+  font-size: 12px;
+}
+.dk-imprint {
+  position: absolute;
+  left: 20px;
+  top: 86px;
+  padding: 4px 8px;
+  border: 2.5px solid var(--dk-stamp);
+  border-radius: 3px;
+  color: var(--dk-stamp);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-align: center;
+  transform: rotate(-11deg);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+}
+.dk-imprint small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+.dk-pad {
+  position: absolute;
+  right: 0;
+  bottom: 6px;
+  width: 80px;
+  height: 60px;
+  border-radius: 4px;
+  background: #2a2523;
+  box-shadow: inset 0 0 0 5px #3d3532;
+}
+.dk-pad::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 2px;
+  background: #5b1a24;
+  opacity: 0.85;
+}
+.dk-stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  width: 56px;
+  height: 44px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #b48b3e, #7a5c22);
+  box-shadow: 0 6px 10px rgba(52, 28, 12, 0.3);
+}
+.dk-stamp::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #8a5a33, #4a2c17);
+  transform: translate(-50%, -50%);
+}
+.dk-art--stamp.is-on .dk-stamp {
+  animation: dk-stamp 2300ms cubic-bezier(0.45, 0, 0.25, 1) var(--dk-after) both;
+}
+.dk-art--stamp.is-on .dk-imprint {
+  animation: dk-inked 2300ms linear var(--dk-after) both;
+}
+
+/* 5 — The pocket watch and the time slip */
+.dk-timeset {
+  position: relative;
+  width: 240px;
+  height: 156px;
+  transform: rotate(-2deg);
+}
+.dk-pocket {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf8 0 62%, #c9a65e 63% 69%, #8a6528 70% 72%, #c9a65e 73% 100%);
+}
+.dk-pocket::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  width: 18px;
+  height: 18px;
+  transform: translateX(-50%);
+  border: 4px solid #b48b3e;
+  border-radius: 50%;
+}
+.dk-pocket .ticks {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -1deg, var(--dk-ink-3) 0 2deg, transparent 2deg 30deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 74%, #000 75%);
+  mask: radial-gradient(circle, transparent 0 74%, #000 75%);
+}
+.dk-pocket .h {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--dk-ink);
+  transform-origin: 50% 100%;
+}
+.dk-pocket .hr {
+  height: 27px;
+  transform: rotate(72deg);
+}
+.dk-pocket .mn {
+  width: 2px;
+  height: 40px;
+  margin-left: -1px;
+  background: var(--dk-leather);
+  transform: rotate(144deg);
+}
+.dk-pocket .pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--dk-brass);
+}
+.dk-chit {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  width: 106px;
+  padding: 10px 10px 9px;
+  border-radius: 2px;
+  background: #fffdf8;
+  transform: rotate(5deg);
+}
+.dk-chit small {
+  display: block;
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--dk-ink-3);
+}
+.dk-chit b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+}
+.dk-chit span {
+  display: block;
+  font-size: 9.5px;
+  color: var(--dk-ink-2);
+}
+.dk-chit em {
+  display: block;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid var(--dk-rule);
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dk-leather);
+}
+.dk-art--watch.is-on .mn {
+  animation: dk-sweep-m 1900ms cubic-bezier(0.5, 0, 0.2, 1) var(--dk-after) both;
+}
+.dk-art--watch.is-on .hr {
+  animation: dk-sweep-h 1900ms cubic-bezier(0.5, 0, 0.2, 1) var(--dk-after) both;
+}
+.dk-art--watch.is-on .dk-chit {
+  animation: dk-slide-chit 900ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--dk-after) + 1400ms) both;
+}
+
+/* 6 — The trust ledger */
+.dk-ledger {
+  display: flex;
+  width: 260px;
+  height: 168px;
+  padding: 6px;
+  border-radius: 4px;
+  background: #3a1219;
+  transform: rotate(2deg);
+}
+.dk-ledger .pg {
+  flex: 1;
+  padding: 10px 9px;
+  background: #fffdf8;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 17px, var(--dk-rule) 17px 18px);
+  background-position: 0 30px;
+}
+.dk-ledger .pg + .pg {
+  border-left: 1px solid #c9bba2;
+}
+.dk-ledger small {
+  display: block;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--dk-ink-3);
+}
+.dk-ledger .acc {
+  display: block;
+  margin: 2px 0 6px;
+  font-family: var(--serif);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.dk-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 4px;
+  height: 18px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  clip-path: inset(0 0 0 0);
+}
+.dk-row .in {
+  color: var(--dk-trust);
+}
+.dk-row .out {
+  color: var(--dk-danger);
+}
+.dk-bal {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-top: 3px;
+  border-top: 3px double var(--dk-ink);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+}
+.dk-bal b {
+  color: var(--dk-trust);
+}
+.dk-ok {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--dk-trust);
+  border-radius: 2px;
+  color: var(--dk-trust);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.dk-art--ledger.is-on .dk-row:nth-of-type(1) {
+  animation: dk-write-in 600ms ease-out calc(var(--dk-after) + 100ms) both;
+}
+.dk-art--ledger.is-on .dk-row:nth-of-type(2) {
+  animation: dk-write-in 600ms ease-out calc(var(--dk-after) + 600ms) both;
+}
+.dk-art--ledger.is-on .dk-row:nth-of-type(3) {
+  animation: dk-write-in 600ms ease-out calc(var(--dk-after) + 1100ms) both;
+}
+.dk-art--ledger.is-on .dk-bal {
+  animation: dk-write-in 700ms ease-out calc(var(--dk-after) + 1600ms) both;
+}
+.dk-art--ledger.is-on .dk-ok {
+  animation: dk-rise 500ms ease-out calc(var(--dk-after) + 2200ms) both;
+}
+
+/* The illustrations wait for the page that carries them to finish turning, and
+   are sized to the page they sit on, so none ever runs off its page. */
+.dk-art {
+  --dk-after: 750ms;
+  zoom: 1.25;
+}
+.dk-page {
+  container-type: inline-size;
+}
+@container (max-width: 469px) {
+  .dk-art {
+    zoom: 1;
+  }
+}
+@container (max-width: 400px) {
+  .dk-art {
+    zoom: 0.85;
+  }
+}
+@container (max-width: 320px) {
+  .dk-art {
+    zoom: 0.72;
+  }
+}
+
+/* ---- Motion ---- */
+@keyframes dk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes dk-settle {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+@keyframes dk-shade {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes dk-sign {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes dk-write {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  92%,
+  100% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+@keyframes dk-open-folder {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(160deg);
+  }
+}
+@keyframes dk-flip-cal {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(-178deg);
+  }
+}
+@keyframes dk-stamp {
+  0% {
+    transform: translate(0, 0);
+  }
+  14% {
+    transform: translate(0, -6px) scale(1.06);
+  }
+  42% {
+    transform: translate(-120px, -62px) scale(1.1);
+  }
+  52% {
+    transform: translate(-120px, -62px) scale(0.94);
+  }
+  62% {
+    transform: translate(-120px, -62px) scale(1.1);
+  }
+  90% {
+    transform: translate(0, -6px) scale(1.04);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes dk-inked {
+  0%,
+  51% {
+    opacity: 0;
+    transform: rotate(-11deg) scale(1.08);
+  }
+  56% {
+    opacity: 0.9;
+    transform: rotate(-11deg) scale(1);
+  }
+  100% {
+    opacity: 0.85;
+    transform: rotate(-11deg) scale(1);
+  }
+}
+@keyframes dk-sweep-m {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(864deg);
+  }
+}
+@keyframes dk-sweep-h {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(72deg);
+  }
+}
+@keyframes dk-slide-chit {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) rotate(5deg);
+  }
+}
+@keyframes dk-write-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---- Narrower desks ---- */
+@media (max-width: 1240px) {
+  .dk-pen,
+  .dk-watch,
+  .dk-files {
+    display: none;
+  }
+  .dk-stage {
+    --dk-bw: min(1000px, calc(100vw - 48px), calc((100vh - 190px) * 1.62));
+  }
+}
+@media (max-width: 1000px) {
+  .dk-page h2,
+  .dk-page h3 {
+    font-size: 25px;
+  }
+  .dk-lead {
+    font-size: 15px;
+  }
+  .dk-points li {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 12.5px;
+  }
+  .dk-lamp,
+  .dk-tea {
+    display: none;
+  }
+}
+
+/* ---- Phones: one page at a time ---- */
+.dk-room.is-narrow .dk-stage {
+  --dk-bw: min(440px, calc(100vw - 32px));
+  --dk-bh: 320px;
+  padding: 16px max(16px, env(safe-area-inset-left, 0px)) 12px max(16px, env(safe-area-inset-right, 0px));
+}
+.dk-room.is-narrow .dk-book.is-closed {
+  transform: none;
+}
+/* One page at a time, the booklet takes the height of the page in front. */
+.dk-room.is-narrow .dk-book {
+  transition: height 450ms var(--dk-ease);
+}
+.dk-room.is-narrow .dk-block,
+.dk-room.is-narrow .dk-leaf {
+  left: 0;
+  width: 100%;
+}
+.dk-room.is-narrow .dk-board {
+  display: none;
+}
+.dk-room.is-narrow .dk-block {
+  border-radius: 4px;
+}
+.dk-room.is-narrow .dk-leaf.is-flipped {
+  transform: perspective(2600px) rotateY(-110deg);
+  opacity: 0;
+  transition: transform var(--dk-turn) var(--dk-ease), opacity 300ms ease calc(var(--dk-turn) - 300ms);
+}
+.dk-room.is-narrow .dk-face.front {
+  border-radius: 4px;
+  background: var(--dk-paper);
+}
+.dk-room.is-narrow .dk-face.cover {
+  border-radius: 6px;
+}
+.dk-room.is-narrow .dk-page {
+  padding: 26px 22px 18px;
+}
+.dk-room.is-narrow .dk-plate {
+  flex: none;
+  padding: 6px 0 14px;
+}
+.dk-room.is-narrow .dk-book-title {
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  font-size: 30px;
+}
+.dk-room.is-narrow .dk-page h2,
+.dk-room.is-narrow .dk-page h3 {
+  font-size: 25px;
+}
+.dk-room.is-narrow .dk-lead {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.dk-room.is-narrow .dk-points li {
+  padding: 6px 0 6px 20px;
+  font-size: 12.5px;
+}
+.dk-split {
+  height: 0;
+  margin: 22px 0 18px;
+  border-top: 1px solid var(--dk-rule);
+}
+/* On a phone the page controls stay within reach of a thumb. */
+.dk-room.is-narrow .dk-controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  padding: 10px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px))
+    max(12px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--dk-desk) 82%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+.dk-room.is-narrow .dk-round {
+  width: 42px;
+  height: 42px;
+}
+.dk-room.is-narrow .dk-skip {
+  height: 42px;
+  border-radius: 21px;
+}
+@media (max-width: 760px) {
+  .dk-top {
+    padding-left: max(14px, env(safe-area-inset-left, 0px));
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+  }
+  .dk-top .brand-lockup-tag {
+    display: none;
+  }
+  .dk-where-now {
+    min-width: 0;
+    flex: 1 1 100%;
+    order: -1;
+  }
+  .dk-decor {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dk-room *,
+  .dk-room *::before,
+  .dk-room *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}

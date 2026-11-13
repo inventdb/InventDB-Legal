@@ -4,8 +4,8 @@ import { BrandMark } from "./BrandMark";
  * The full brand lockup — Counsel mark, wordmark, and the expanded product
  * name — following inventdb-legal-logo/lockup/lockup-horizontal-*.svg.
  *
- * The asset sets the wordmark in Cormorant Garamond 500 with "Legal" in
- * italic 300, a hairline rule beneath it, and an all-caps Poppins tagline
+ * The asset sets the wordmark in the serif with "Legal" set apart, a hairline
+ * rule beneath it, and an all-caps sans tagline
  * under that. Those relationships are kept and scaled down for in-app use;
  * the colours come from theme tokens instead of the asset's own hexes so the
  * lockup follows light/dark. The one exception is the login hero, where the

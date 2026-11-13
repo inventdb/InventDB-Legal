@@ -122,7 +122,7 @@ function forwardEscape(doc: Document, page: Document): () => void {
 const CLICKABLE_CSS = `
 [data-record-id] { cursor: pointer; }
 [data-record-id]:hover, [data-record-id]:focus-visible {
-  outline: 2px solid rgba(31, 74, 133, 0.45);
+  outline: 2px solid rgba(91, 26, 36, 0.45);
   outline-offset: 2px;
 }`;
 
@@ -174,9 +174,9 @@ function wireRecordClicks(doc: Document, open: (id: string) => void): () => void
 const ROW_CSS = `
 tr[data-record-number] { cursor: pointer; }
 tr[data-record-number]:hover > td, tr[data-record-number]:focus-visible > td {
-  background: rgba(31, 74, 133, 0.07);
+  background: rgba(91, 26, 36, 0.07);
 }
-tr[data-record-number]:focus-visible { outline: 2px solid rgba(31, 74, 133, 0.45); outline-offset: -2px; }`;
+tr[data-record-number]:focus-visible { outline: 2px solid rgba(91, 26, 36, 0.45); outline-offset: -2px; }`;
 
 /**
  * Make every table row that is about one record open it.
