@@ -79,16 +79,39 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  padding-top: calc(30px + env(safe-area-inset-top, 0px));
   padding-left: max(24px, env(safe-area-inset-left, 0px));
   padding-right: max(18px, env(safe-area-inset-right, 0px));
 }
-.dk-top .brand-lockup-name,
-.dk-top .brand-lockup-suffix {
+.dk-top .brand-lockup-name {
   color: var(--dk-label);
 }
+/* "Legal" is set like "modernised." on the title page: italic, in oxblood,
+   day and night alike. */
+.dk-top .brand-lockup-suffix {
+  font-style: italic;
+  font-weight: 600;
+  color: #5b1a24;
+}
+/* By night the same oxblood sits on a dark desk, so it is edged in gilt, as
+   tooling on a leather spine, to stay legible. */
+[data-theme="dark"] .dk-top .brand-lockup-suffix {
+  -webkit-text-stroke: 0.6px #d9b871;
+  paint-order: stroke fill;
+}
 .dk-top .brand-lockup-tag {
+  margin-top: 6px;
+  padding-top: 6px;
+  font-size: 11px;
   color: var(--dk-label-2);
+  border-top-color: color-mix(in srgb, var(--dk-label-2) 55%, transparent);
+}
+.dk-top .brand-lockup {
+  gap: 14px;
+}
+.dk-top .brand-lockup > svg {
+  width: 46px;
+  height: 46px;
 }
 .dk-top .brand-lockup {
   --mark-tone: var(--dk-brass);
@@ -102,11 +125,12 @@
   animation: dk-rise 700ms var(--ease-out) both;
 }
 .dk-top .brand-lockup-name {
-  font-size: 24px;
+  font-size: 34px;
 }
 .dk-theme {
   grid-column: 3;
   justify-self: end;
+  align-self: start;
   display: grid;
   place-items: center;
   width: 38px;
@@ -129,7 +153,8 @@
   display: grid;
   place-items: center;
   padding: 22px 16px 10px;
-  --dk-bw: min(1060px, calc(100vw - 140px), calc((100vh - 190px) * 1.62));
+  /* 190px either side keeps the lamp, watch, pen, files and tea clear of it. */
+  --dk-bw: min(1060px, calc(100vw - 380px), calc((100vh - 230px) * 1.62));
   --dk-bh: calc(var(--dk-bw) / 1.62);
 }
 .dk-book {
@@ -247,6 +272,9 @@
   padding-top: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  /* One line height for every folio, so facing pages end level. */
+  line-height: 16px;
   font-family: var(--font-mono);
   font-size: 10.5px;
   color: var(--dk-ink-3);
@@ -653,7 +681,7 @@
 }
 .dk-watch {
   right: 34px;
-  top: 64px;
+  top: 104px;
   width: 104px;
   height: 104px;
   border-radius: 50%;
@@ -685,15 +713,37 @@
 }
 
 /* ---- The controls under the booklet ---- */
+/* On a desk the booklet and its controls sit together, centred in the room,
+   rather than the controls being pushed to the foot of a tall window. */
+.dk-room:not(.is-narrow) .dk-stage {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+.dk-room:not(.is-narrow) .dk-controls {
+  margin-bottom: auto;
+}
 .dk-controls {
   position: relative;
   z-index: 4;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
   gap: 8px 14px;
   padding: 6px 16px 4px;
+}
+/* The arrows and the page name keep the centre whether or not the extras show. */
+.dk-ctl-main {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.dk-ctl-extra {
+  grid-column: 3;
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .dk-round {
   display: grid;
@@ -1504,11 +1554,13 @@
 @media (max-width: 1240px) {
   .dk-pen,
   .dk-watch,
-  .dk-files {
+  .dk-files,
+  .dk-lamp,
+  .dk-tea {
     display: none;
   }
   .dk-stage {
-    --dk-bw: min(1000px, calc(100vw - 48px), calc((100vh - 190px) * 1.62));
+    --dk-bw: min(1000px, calc(100vw - 48px), calc((100vh - 230px) * 1.62));
   }
 }
 @media (max-width: 1000px) {
@@ -1523,10 +1575,6 @@
     padding-top: 6px;
     padding-bottom: 6px;
     font-size: 12.5px;
-  }
-  .dk-lamp,
-  .dk-tea {
-    display: none;
   }
 }
 
@@ -1559,9 +1607,12 @@
   opacity: 0;
   transition: transform var(--dk-turn) var(--dk-ease), opacity 300ms ease calc(var(--dk-turn) - 300ms);
 }
-.dk-room.is-narrow .dk-face.front {
+.dk-room.is-narrow .dk-face.front:not(.cover) {
   border-radius: 4px;
   background: var(--dk-paper);
+}
+.dk-room.is-narrow .dk-face.cover .dk-page {
+  min-height: min(500px, calc(100svh - 230px));
 }
 .dk-room.is-narrow .dk-face.cover {
   border-radius: 6px;
@@ -1621,6 +1672,25 @@
   }
   .dk-top .brand-lockup-tag {
     display: none;
+  }
+  .dk-top {
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  }
+  .dk-top .brand-lockup-name {
+    font-size: 27px;
+  }
+  .dk-top .brand-lockup > svg {
+    width: 36px;
+    height: 36px;
+  }
+  .dk-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .dk-ctl-main,
+  .dk-ctl-extra {
+    display: contents;
   }
   .dk-where-now {
     min-width: 0;

@@ -137,12 +137,33 @@ const markSeen = () => {
 const COUNSEL = (
   <svg viewBox="0 0 128 128" aria-hidden>
     <circle cx="64" cy="28" r="13.5" fill="currentColor" />
-    <path d="M55 41 C57 60 60 86 64 117 C68 86 71 60 73 41 Z" fill="currentColor" />
-    <path d="M64 46 C50 44 34 40 22 34 L22 41.5 C36 48.5 52 54 64 57 Z" fill="currentColor" />
-    <path d="M64 46 C78 44 94 40 106 34 L106 41.5 C92 48.5 76 54 64 57 Z" fill="currentColor" />
-    <path d="M22 35 L8 67 L36 67 Z" fill="none" stroke="currentColor" strokeWidth="5.5" strokeLinejoin="round" />
+    <path
+      d="M55 41 C57 60 60 86 64 117 C68 86 71 60 73 41 Z"
+      fill="currentColor"
+    />
+    <path
+      d="M64 46 C50 44 34 40 22 34 L22 41.5 C36 48.5 52 54 64 57 Z"
+      fill="currentColor"
+    />
+    <path
+      d="M64 46 C78 44 94 40 106 34 L106 41.5 C92 48.5 76 54 64 57 Z"
+      fill="currentColor"
+    />
+    <path
+      d="M22 35 L8 67 L36 67 Z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="5.5"
+      strokeLinejoin="round"
+    />
     <path d="M8 67 A14 14 0 0 0 36 67 Z" fill="currentColor" />
-    <path d="M106 35 L92 67 L120 67 Z" fill="none" stroke="currentColor" strokeWidth="5.5" strokeLinejoin="round" />
+    <path
+      d="M106 35 L92 67 L120 67 Z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="5.5"
+      strokeLinejoin="round"
+    />
     <path d="M92 67 A14 14 0 0 0 120 67 Z" fill="currentColor" />
   </svg>
 );
@@ -190,7 +211,9 @@ function Face({
 
 /** Clicks on a page turn it, unless they land on something the page itself does. */
 const onControl = (e: ReactMouseEvent) =>
-  !!(e.target as HTMLElement).closest("a, button, input, label, form, select, textarea");
+  !!(e.target as HTMLElement).closest(
+    "a, button, input, label, form, select, textarea",
+  );
 
 export function DeskBook({
   narrow,
@@ -202,7 +225,8 @@ export function DeskBook({
   signUp: ReactNode;
 }) {
   const reduce = useRef(
-    typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    typeof window !== "undefined" &&
+      !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
   ).current;
   const returning = useRef(seen()).current;
 
@@ -215,7 +239,10 @@ export function DeskBook({
 
   const turn = (leaf: number) => {
     setTurning((t) => [...t, leaf]);
-    window.setTimeout(() => setTurning((t) => t.filter((x) => x !== leaf)), TURN_MS + 80);
+    window.setTimeout(
+      () => setTurning((t) => t.filter((x) => x !== leaf)),
+      TURN_MS + 80,
+    );
   };
 
   /** Turn the pages one at a time until the booklet is open at `target`. */
@@ -271,7 +298,8 @@ export function DeskBook({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (t.closest("input, textarea, select, [contenteditable='true']"))
+        return;
       if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
     };
@@ -282,7 +310,8 @@ export function DeskBook({
   // A swipe turns a page on a touch screen.
   const touch = useRef<{ x: number; y: number } | null>(null);
   const onPointerDown = (e: ReactPointerEvent) => {
-    if (e.pointerType !== "mouse") touch.current = { x: e.clientX, y: e.clientY };
+    if (e.pointerType !== "mouse")
+      touch.current = { x: e.clientX, y: e.clientY };
   };
   const onPointerUp = (e: ReactPointerEvent) => {
     const start = touch.current;
@@ -313,7 +342,9 @@ export function DeskBook({
     };
     let most = 0;
     if (where.current.narrow) {
-      const front = el.querySelector<HTMLElement>(`.dk-face[data-at="${where.current.flipped}"] .dk-page`);
+      const front = el.querySelector<HTMLElement>(
+        `.dk-face[data-at="${where.current.flipped}"] .dk-page`,
+      );
       if (front) most = natural(front);
     } else {
       el.querySelectorAll<HTMLElement>(".dk-page").forEach((page) => {
@@ -363,31 +394,31 @@ export function DeskBook({
     </p>
   );
   const contentsList = (
-      <ul className="dk-contents">
-        <li>
-          <button type="button" onClick={() => jump(1)}>
-            <span className="n">—</span>
-            <span>Foreword</span>
-            <span className="p">i</span>
+    <ul className="dk-contents">
+      <li>
+        <button type="button" onClick={() => jump(1)}>
+          <span className="n">—</span>
+          <span>Foreword</span>
+          <span className="p">i</span>
+        </button>
+      </li>
+      {CHAPTERS.map((c, i) => (
+        <li key={c.group}>
+          <button type="button" onClick={() => jump(i + 2)}>
+            <span className="n">{ROMAN[i]}</span>
+            <span>{c.group}</span>
+            <span className="p">{2 + i * 2}</span>
           </button>
         </li>
-        {CHAPTERS.map((c, i) => (
-          <li key={c.group}>
-            <button type="button" onClick={() => jump(i + 2)}>
-              <span className="n">{ROMAN[i]}</span>
-              <span>{c.group}</span>
-              <span className="p">{2 + i * 2}</span>
-            </button>
-          </li>
-        ))}
-        <li>
-          <button type="button" onClick={() => jump(LAST)}>
-            <span className="n">—</span>
-            <span>Signing in and signing up</span>
-            <span className="p">14</span>
-          </button>
-        </li>
-      </ul>
+      ))}
+      <li>
+        <button type="button" onClick={() => jump(LAST)}>
+          <span className="n">—</span>
+          <span>Signing in and signing up</span>
+          <span className="p">14</span>
+        </button>
+      </li>
+    </ul>
   );
   const contents = (
     <div className="dk-page">
@@ -402,8 +433,9 @@ export function DeskBook({
     <div className="dk-page">
       {bookTitle}
       <p className="dk-lead">
-        InventDB Legal keeps a firm's matters, deadlines, papers, time and client money in one place,
-        on the InventDB SOAR database. The pages that follow show how a matter moves through the firm.
+        InventDB Legal keeps a firm's matters, deadlines, papers, time and
+        client money in one place, on the InventDB SOAR database. The pages that
+        follow show how a matter moves through the firm.
       </p>
       <div className="dk-k">Contents</div>
       {contentsList}
@@ -415,14 +447,19 @@ export function DeskBook({
       <div className="dk-chapter">Foreword</div>
       <h3>Every part of the practice, under one roof</h3>
       <p className="dk-lead">
-        InventDB Legal keeps a firm's matters, deadlines, papers, time and client money in one place,
-        on the InventDB SOAR database. The pages that follow show how a matter moves through the firm.
+        InventDB Legal keeps a firm's matters, deadlines, papers, time and
+        client money in one place, on the InventDB SOAR database. The pages that
+        follow show how a matter moves through the firm.
       </p>
       <div className="dk-actions">
         <button type="button" className="dk-btn" onClick={next}>
           Turn the page <ChevronRight size={15} aria-hidden />
         </button>
-        <button type="button" className="dk-btn solid" onClick={() => jump(LAST)}>
+        <button
+          type="button"
+          className="dk-btn solid"
+          onClick={() => jump(LAST)}
+        >
           Go to sign in
         </button>
       </div>
@@ -478,14 +515,24 @@ export function DeskBook({
   );
 
   /* ---- The leaves: a page on each side on a desktop, one page on a phone ---- */
-  const leaves: { front: ReactNode; back?: ReactNode; frontKind?: "cover"; backKind?: "endpaper" }[] = narrow
+  const leaves: {
+    front: ReactNode;
+    back?: ReactNode;
+    frontKind?: "cover";
+    backKind?: "endpaper";
+  }[] = narrow
     ? [
         { front: cover, frontKind: "cover" },
         { front: opening },
         ...CHAPTERS.map((_, i) => ({ front: text(i, true) })),
       ]
     : [
-        { front: cover, frontKind: "cover", back: contents, backKind: "endpaper" },
+        {
+          front: cover,
+          frontKind: "cover",
+          back: contents,
+          backKind: "endpaper",
+        },
         { front: foreword, back: plate(0) },
         ...CHAPTERS.map((_, i) => ({
           front: text(i),
@@ -497,10 +544,10 @@ export function DeskBook({
     flipped === 0
       ? "The cover"
       : flipped === 1
-      ? "Foreword"
-      : flipped >= LAST
-      ? "Sign in"
-      : `${CHAPTERS[flipped - 2].group}`;
+        ? "Foreword"
+        : flipped >= LAST
+          ? "Sign in"
+          : `${CHAPTERS[flipped - 2].group}`;
 
   return (
     <>
@@ -565,37 +612,53 @@ export function DeskBook({
       </div>
 
       <nav className="dk-controls" aria-label="The guide's pages">
-        <button type="button" className="dk-round" onClick={prev} disabled={flipped === 0} aria-label="Previous page">
-          <ChevronLeft size={18} />
-        </button>
-        <span className="dk-where-now" aria-live="polite">
-          {flipped >= 2 && flipped <= 7 && <b>Chapter {ROMAN[flipped - 2]}</b>}
-          {label}
-        </span>
-        <button
-          type="button"
-          className="dk-round"
-          onClick={next}
-          disabled={flipped >= LAST}
-          aria-label="Next page"
-        >
-          <ChevronRight size={18} />
-        </button>
-        {flipped < LAST && !reduce && (
+        <div className="dk-ctl-main">
           <button
             type="button"
             className="dk-round"
-            onClick={() => setAuto((a) => !a)}
-            aria-label={auto ? "Pause the tour" : "Play the tour"}
+            onClick={prev}
+            disabled={flipped === 0}
+            aria-label="Previous page"
           >
-            {auto ? <Pause size={15} /> : <Play size={15} />}
+            <ChevronLeft size={18} />
           </button>
-        )}
-        {flipped < LAST && (
-          <button type="button" className="dk-skip" onClick={() => jump(LAST)}>
-            Skip to sign in
+          <span className="dk-where-now" aria-live="polite">
+            {flipped >= 2 && flipped <= 7 && (
+              <b>Chapter {ROMAN[flipped - 2]}</b>
+            )}
+            {label}
+          </span>
+          <button
+            type="button"
+            className="dk-round"
+            onClick={next}
+            disabled={flipped >= LAST}
+            aria-label="Next page"
+          >
+            <ChevronRight size={18} />
           </button>
-        )}
+        </div>
+        <div className="dk-ctl-extra">
+          {flipped < LAST && !reduce && (
+            <button
+              type="button"
+              className="dk-round"
+              onClick={() => setAuto((a) => !a)}
+              aria-label={auto ? "Pause the tour" : "Play the tour"}
+            >
+              {auto ? <Pause size={15} /> : <Play size={15} />}
+            </button>
+          )}
+          {flipped < LAST && (
+            <button
+              type="button"
+              className="dk-skip"
+              onClick={() => jump(LAST)}
+            >
+              Skip to sign in
+            </button>
+          )}
+        </div>
       </nav>
     </>
   );
