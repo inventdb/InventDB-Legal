@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, openSection, test } from "./fixtures";
 
 /**
@@ -45,35 +47,48 @@ const DESTINATIONS = [
   { link: "Settings", path: "/settings", title: "Settings" },
 ] as const;
 
-/** The floors, in the order the folder tabs run, with what each opens on. */
-const FLOORS = [
-  { tab: "Reception", opens: "/" },
-  { tab: "New Business", opens: "/intake_and_leads" },
-  { tab: "Client Care", opens: "/clients" },
-  { tab: "Case Management", opens: "/matters" },
-  { tab: "Profitability", opens: "/time_entries" },
-  { tab: "Compliance", opens: "/trust_ledger_cta" },
-  { tab: "Risk & Deadlines", opens: "/court_calendar" },
-  { tab: "Documents", opens: "/files" },
-  { tab: "Practice Insight", opens: "/reports" },
-  { tab: "Lookups & Settings", opens: "/lookups" },
+/** The groups, in the order the sidebar runs, with the sections under each. */
+const GROUPS = [
+  { name: "Reception", first: "/" },
+  { name: "New Business", first: "/intake_and_leads" },
+  { name: "Client Care", first: "/clients" },
+  { name: "Case Management", first: "/matters" },
+  { name: "Profitability", first: "/time_entries" },
+  { name: "Compliance", first: "/trust_ledger_cta" },
+  { name: "Risk & Deadlines", first: "/court_calendar" },
+  { name: "Documents", first: "/files" },
+  { name: "Practice Insight", first: "/reports" },
+  { name: "Lookups & Settings", first: "/lookups" },
 ] as const;
 
-test.describe("The building", () => {
+const sidebar = (page: Page) => page.getByRole("navigation", { name: "Sections", exact: true });
+
+/** "All sections" on a desktop lives in the account menu. */
+async function openDirectory(page: Page) {
+  await page.getByRole("button", { name: "Your account" }).click();
+  await page.getByRole("menuitem", { name: "All sections" }).click();
+  return page.getByRole("dialog", { name: "All sections" });
+}
+
+test.describe("The sidebar", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
   });
 
-  test("files every destination under a floor", async ({ page }) => {
-    const floors = page.getByRole("navigation", { name: "Floors" });
-    await expect(floors.getByRole("link")).toHaveCount(FLOORS.length);
-    for (const { tab } of FLOORS) {
-      await expect(floors.getByRole("link", { name: new RegExp(tab) })).toBeVisible();
+  test("lists every destination under its group", async ({ page }) => {
+    const side = sidebar(page);
+    await expect(side.getByRole("link")).toHaveCount(DESTINATIONS.length);
+    for (const { name, first } of GROUPS) {
+      const group = side.getByRole("group", { name, exact: true });
+      await expect(group).toBeVisible();
+      await expect(group.locator("a").first()).toHaveAttribute("href", first);
+    }
+    for (const { link, path } of DESTINATIONS) {
+      await expect(side.locator(`a[href="${path}"]`)).toContainText(link);
     }
 
-    // "All sections" is the whole building on one sheet: every destination.
-    await page.getByRole("button", { name: "All sections" }).click();
-    const directory = page.getByRole("dialog", { name: "All sections" });
+    // "All sections" is the whole firm on one sheet: every destination.
+    const directory = await openDirectory(page);
     await expect(directory.getByRole("link")).toHaveCount(DESTINATIONS.length);
     for (const { link, path } of DESTINATIONS) {
       await expect(directory.locator(`a[href="${path}"]`)).toContainText(link);
@@ -82,16 +97,6 @@ test.describe("The building", () => {
     await expect(directory.getByRole("link", { name: "Workflows, 2 waiting on you" })).toBeVisible();
   });
 
-  for (const { tab, opens } of FLOORS) {
-    test(`the ${tab} tab opens its first section`, async ({ page }) => {
-      await page
-        .getByRole("navigation", { name: "Floors" })
-        .getByRole("link", { name: new RegExp(tab) })
-        .click();
-      await expect(page).toHaveURL(opens);
-    });
-  }
-
   for (const { link, path, title } of DESTINATIONS) {
     test(`navigates to ${link}`, async ({ page }) => {
       await openSection(page, link);
@@ -99,7 +104,7 @@ test.describe("The building", () => {
       await expect(page).toHaveURL(path);
       // The frame's h1 is the one heading guaranteed on every page.
       await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
-      // Arrived, the section is the one marked on its floor's strip. Located
+      // Arrived, the section is the one marked in the sidebar. Located
       // by href rather than accessible name: an entry carrying a count badge —
       // Workflows, when a run is parked — has the count in its name by design.
       const entry = page.locator("nav.nav").locator(`a[href="${path}"]`);
@@ -111,19 +116,11 @@ test.describe("The building", () => {
   test("marks the current destination active", async ({ page }) => {
     const nav = page.locator("nav.nav");
     await expect(nav.locator(".nav-item.active")).toHaveText("Dashboard");
-    await expect(
-      page.getByRole("navigation", { name: "Floors" }).getByRole("link", { name: /Reception/ })
-    ).toHaveAttribute("aria-current", "page");
+    await expect(sidebar(page).getByRole("group", { name: "Reception" })).toHaveClass(/is-open/);
 
-    await page
-      .getByRole("navigation", { name: "Floors" })
-      .getByRole("link", { name: /Profitability/ })
-      .click();
     await nav.getByRole("link", { name: "Costs & Disbursements", exact: true }).click();
     await expect(nav.locator(".nav-item.active")).toHaveText("Costs & Disbursements");
-    await expect(
-      page.getByRole("navigation", { name: "Floors" }).getByRole("link", { name: /Profitability/ })
-    ).toHaveAttribute("aria-current", "page");
+    await expect(sidebar(page).getByRole("group", { name: "Profitability" })).toHaveClass(/is-open/);
 
     // One section lit at a time.
     await expect(nav.locator(".nav-item.active")).toHaveCount(1);
@@ -151,8 +148,7 @@ test.describe("The building", () => {
   });
 
   test("finds a section by name in the directory", async ({ page }) => {
-    await page.getByRole("button", { name: "All sections" }).click();
-    const directory = page.getByRole("dialog", { name: "All sections" });
+    const directory = await openDirectory(page);
     await directory.getByPlaceholder("Find a section").fill("trust");
     await expect(directory.getByRole("link")).toHaveCount(1);
     await directory.getByRole("link", { name: "Trust Ledger (CTA)" }).click();

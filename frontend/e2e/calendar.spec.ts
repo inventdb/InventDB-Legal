@@ -43,11 +43,11 @@ test.beforeEach(async ({ page, store }) => {
   );
 });
 
-test("the court calendar offers a calendar beside its index and ledger, other modules do not", async ({ page }) => {
+test("the court calendar offers a calendar beside its docket and table, other modules do not", async ({ page }) => {
   await page.goto("/court_calendar");
   const mode = page.getByRole("group", { name: "Show as" });
-  // Every module opens on its casebook index; only a dated one adds Calendar.
-  await expect(mode.getByRole("button", { name: "Index" })).toHaveAttribute("aria-pressed", "true");
+  // Every module opens on its docket; only a dated one adds Calendar.
+  await expect(mode.getByRole("button", { name: "Docket" })).toHaveAttribute("aria-pressed", "true");
   await mode.getByRole("button", { name: "Calendar" }).click();
   await expect(page).toHaveURL(/view=calendar/);
   await expect(page.locator(".cal-title")).toHaveText("October 2026");
@@ -57,7 +57,7 @@ test("the court calendar offers a calendar beside its index and ledger, other mo
 
   await page.goto("/matters");
   const matters = page.getByRole("group", { name: "Show as" });
-  await expect(matters.getByRole("button", { name: "Ledger" })).toBeVisible();
+  await expect(matters.getByRole("button", { name: "Table" })).toBeVisible();
   await expect(matters.getByRole("button", { name: "Calendar" })).toHaveCount(0);
 });
 
@@ -128,9 +128,9 @@ test("the page's search narrows the calendar, and a day's list too", async ({ pa
   await expect(panel(page).locator("tbody tr")).toContainText("Deposition");
 });
 
-test("Ledger goes back to the table", async ({ page }) => {
+test("Table goes back to the table", async ({ page }) => {
   await page.goto("/court_calendar?view=calendar&month=2026-10");
-  await page.getByRole("group", { name: "Show as" }).getByRole("button", { name: "Ledger" }).click();
+  await page.getByRole("group", { name: "Show as" }).getByRole("button", { name: "Table" }).click();
   await expect(page.locator("table.data")).toBeVisible();
   await expect(page).not.toHaveURL(/view=calendar/);
 });

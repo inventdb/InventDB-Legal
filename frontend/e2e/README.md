@@ -19,7 +19,7 @@ npm run typecheck:e2e     # type-check the suite (not part of `npm run build`)
 | --- | --- |
 | `auth.setup.ts` | Signs in once; every project starts from the saved state |
 | `login.spec.ts` | Login form, validation, error paths, route protection |
-| `navigation.spec.ts` | All 16 sidebar destinations, active state, history, unmatched routes |
+| `navigation.spec.ts` | Every sidebar destination under its group, active state, history, unmatched routes |
 | `dashboard.spec.ts` | Eight stat tiles, four charts, empty and error branches |
 | `entity-list.spec.ts` | All ten modules; table rendering, badges, refs, search, sort |
 | `entity-crud.spec.ts` | Create / edit / delete, payload coercion, modal behaviour |
@@ -32,7 +32,8 @@ npm run typecheck:e2e     # type-check the suite (not part of `npm run build`)
 | `settings.spec.ts` | Account, connection, theme, password change, sign-out |
 | `errors.spec.ts` | 401 auto-logout, 5xx surfaces, network failure, recovery |
 | `table-scroll.spec.ts` | The sideways-scroll rail — when it appears, and that the thumb reports and reaches the whole range by drag, click and keyboard — and the locked column heads, including the fill layout that makes them possible |
-| `mobile.spec.ts` | Drawer, login reflow, horizontal-overflow guard (Pixel 7) |
+| `chambers.spec.ts` | The docket, the dossier, docket vs table, firm-wide search |
+| `mobile.spec.ts` | Bottom bar, All sections, sign-in stacking, horizontal-overflow guard (Pixel 7) |
 
 ## How the mocking works
 

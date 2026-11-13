@@ -107,11 +107,18 @@ export async function preferLedger(page: Page): Promise<void> {
 }
 
 /**
- * Go to a section the way someone would from any floor: "All sections", then
- * its name. The strip under the floor tabs only lists the open floor's own
- * sections, so a section on another floor is not a link on screen until then.
+ * Go to a section the way someone would: on a desktop, its link in the
+ * sidebar; where the sidebar has stepped aside (a tablet, a phone), "All
+ * sections", then its name.
  */
 export async function openSection(page: Page, label: string): Promise<void> {
+  // A section with something waiting on it carries the count after its name.
+  const name = new RegExp(`^${escapeRegExp(label)}(,| |$)`);
+  const side = page.getByRole("navigation", { name: "Sections", exact: true }).getByRole("link", { name });
+  if (await side.isVisible()) {
+    await side.click();
+    return;
+  }
   await page.getByRole("button", { name: /^All sections/ }).filter({ visible: true }).first().click();
   await page
     .getByRole("dialog", { name: "All sections" })

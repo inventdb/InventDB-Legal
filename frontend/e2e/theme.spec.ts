@@ -95,7 +95,7 @@ const SURFACES: { name: string; open: (page: Page) => Promise<void> }[] = [
 ];
 
 for (const theme of ["light", "dark"] as const) {
-  const ink = theme === "dark" ? "rgb(233, 241, 249)" : "rgb(20, 35, 63)";
+  const ink = theme === "dark" ? "rgb(241, 233, 220)" : "rgb(28, 25, 22)";
 
   test.describe(`${theme} theme`, () => {
     for (const surface of SURFACES) {
@@ -126,8 +126,8 @@ for (const theme of ["light", "dark"] as const) {
       const nodes = (await dropdownColours(page)).filter((n) =>
         n.where.startsWith("f-status")
       );
-      const surface = theme === "dark" ? "rgb(23, 39, 67)" : "rgb(255, 255, 255)";
-      const chosen = theme === "dark" ? "rgb(30, 49, 82)" : "rgb(228, 239, 248)";
+      const surface = theme === "dark" ? "rgb(35, 30, 25)" : "rgb(251, 248, 242)";
+      const chosen = theme === "dark" ? "rgb(40, 34, 29)" : "rgb(235, 225, 207)";
 
       for (const node of nodes) {
         expect(node.bg, node.where).toBe(node.checked ? chosen : surface);

@@ -33,7 +33,8 @@ test.describe("Dashboard", () => {
   });
 
   test("greets the operator and says where the figures come from", async ({ page }) => {
-    await expect(page.getByText("Today · Legal")).toBeVisible();
+    // Today's date sits over the greeting.
+    await expect(page.locator(".room-kicker")).toHaveText(/^(Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day,? \d{1,2} \w+ \d{4}$/);
     await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)/ })).toBeVisible();
     await expect(page.getByText(/Every figure shows the query behind it/)).toBeVisible();
   });

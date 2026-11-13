@@ -1,20 +1,21 @@
 /* ============================================================================
    InventDB Legal — global styles & design tokens
    ----------------------------------------------------------------------------
-   Themed to the InventDB Legal design system: Midnight Navy, Powder Blue and
-   Sunflower Yellow in a 60 · 30 · 10 split.
+   Themed to Chambers: an oxblood bench over parchment, with brass for the one
+   thing that matters on a screen.
 
-   60%  Midnight Navy     #14233f   chrome (sidebar, top bar), ink, primary
-                                    actions
-   30%  Powder Blue       #b9d6ee   page ground tints, selection, the
-                                    interactive colour in dark mode
-   10%  Sunflower Yellow  #ffc72c   attention only: the active-nav rail, today,
-                                    due-soon flags, one hero action per screen
+   Oxblood    #5b1a24   the bench bar, the one filled action, links
+   Parchment  #f4ede1   the ground; panels sit on #fbf8f2
+   Brass      #a8823a   attention only: today, due soon, the primary "new"
+                        action. Brass is a fill; brass-family text is
+                        --accent-ink (#7a5c22, 5.6:1 on parchment).
 
-   Sunflower is a FILL, never text — it is 1.6:1 on white. Text on it is
-   --on-accent (navy, 10:1); yellow-family text uses --accent-ink.
-   Typeface         Poppins — SemiBold headings · Medium labels · Regular body
-                    · Light subtitles
+   States carry their own inks so red and green never have to be told apart:
+   done is blue ink (#235a8a), overdue is vermilion (#b23a12), client money in
+   trust is green (#2f6b4f), privileged is violet (#5a3f86).
+
+   Typefaces   Source Serif 4 for titles and figures, IBM Plex Sans for
+               everything read or typed, IBM Plex Mono for numbers and ids.
 
    Components reference tokens only — never a raw hex. Theme-aware (light/dark
    via [data-theme]) and fully responsive.
@@ -29,121 +30,117 @@
   accent-color: var(--brand);
 
   /* ---- brand ---- */
-  --brand: #1f4a85; /* Navy 500 — links, active tab, acting icons (8.8:1 on white) */
-  --brand-strong: #14233f; /* Midnight Navy — link hover */
-  --brand-solid: #14233f; /* the one filled action */
-  --brand-solid-hover: #1e3357;
-  --brand-soft: #e4eff8; /* Powder 100 — selected row, icon tiles, focus halo */
-  --brand-tint: #eef5fb; /* row hover, soft fills */
-  --brand-line: rgba(31, 74, 133, 0.28);
-  --on-brand: #ffffff;
-  /* The Counsel mark's second tone — the pan outlines. Contexts that reverse
-     the mark (the sidebar tile, the login hero) override it locally. */
-  --mark-tone: #7fa9cf;
-  --brand-grad: linear-gradient(145deg, #14233f 0%, #1e3357 100%);
+  --brand: #5b1a24;
+  --brand-strong: #47141c;
+  --brand-solid: #5b1a24;
+  --brand-solid-hover: #47141c;
+  --brand-soft: #f9eef0;
+  --brand-tint: #f6ebe8;
+  --brand-line: rgba(91, 26, 36, 0.28);
+  --on-brand: #fbf8f2;
+  /* The Counsel mark's second tone: the pan outlines, in brass. */
+  --mark-tone: #d9b871;
+  --brand-grad: linear-gradient(145deg, #5b1a24 0%, #47141c 100%);
 
-  /* ---- accent: Sunflower, the 10% ---- */
-  --accent: #ffc72c;
-  --accent-hover: #f2b705;
-  --on-accent: #14233f;
-  --accent-soft: #fff3cc;
-  --accent-ink: #7a5a00; /* yellow-family text, 6.4:1 on white */
+  /* ---- accent: brass, for attention only ---- */
+  --accent: #a8823a;
+  --accent-hover: #b99550;
+  --on-accent: #1c1916;
+  --accent-soft: #f4ead3;
+  --accent-ink: #7a5c22;
 
-  /* ---- chrome: the navy sidebar and top bar ---- */
-  --chrome: #14233f;
-  --chrome-hover: #1e3357;
-  --chrome-active: #2b4673;
-  --chrome-line: rgba(185, 214, 238, 0.14);
-  --on-chrome: #ffffff;
-  --on-chrome-muted: #b9d6ee; /* Powder Blue on navy, 10.4:1 */
+  /* ---- chrome: the oxblood bench bar ---- */
+  --chrome: #5b1a24;
+  --chrome-hover: #6b2430;
+  --chrome-active: #7a2d3a;
+  --chrome-line: rgba(230, 167, 176, 0.18);
+  --on-chrome: #fbf8f2;
+  --on-chrome-muted: #e6a7b0;
 
   /* ---- focus ---- */
-  --focus: #1f4a85;
-  --focus-on-chrome: #ffc72c;
+  --focus: #5b1a24;
+  --focus-on-chrome: #d9b871;
 
   /* ---- surfaces ---- */
-  --bg: #e9f1f8; /* Powder 75: the desk the papers lie on */
-  --surface: #ffffff;
-  --surface-2: #f8fbfe;
-  --surface-3: #e4eff8; /* Powder 100 */
-  --border: #d5e2ee;
-  --border-strong: #7891ad; /* control edges — 3:1 on surface */
-  --card-border: transparent; /* light cards are borderless — shadow instead */
-  /* The casebook's folder tabs, one step darker than the desk. */
-  --tab: #dbe8f3;
-  --scrim: rgba(10, 20, 38, 0.55);
+  --bg: #f4ede1;
+  --surface: #fbf8f2;
+  --surface-2: #f7f1e6;
+  --surface-3: #ebe1cf;
+  --border: #ddd0b9;
+  --border-strong: #8f8270;
+  --card-border: #e6dccb;
+  /* Date blocks and stat strips, one step darker than the ground. */
+  --tab: #ebe1cf;
+  --scrim: rgba(28, 25, 22, 0.5);
 
   /* ---- ink ---- */
-  --text: #14233f; /* Midnight Navy, 15.6:1 on white */
-  --text-muted: #43546f; /* 7.7:1 on white */
-  --text-faint: #586a84; /* 4.7:1 or better on every light surface */
+  --text: #1c1916;
+  --text-muted: #4a4239;
+  --text-faint: #675c50;
 
   /* ---- functional state colours ----
-     "Warn" shares the sunflower family on purpose (due soon = needs
-     attention); "info" is the brand navy, so no extra hue enters. */
-  --success: #1d7a4b;
-  --success-soft: #e3f3ea;
-  --warn: #7a5a00;
-  --warn-soft: #fff3cc;
-  --danger: #b3261e;
-  --danger-soft: #fbeceb;
-  --info: #1f4a85;
-  --info-soft: #e4eff8;
-  --neutral: #586a84;
-  --neutral-soft: #e9eef4;
+     "Warn" shares the brass family on purpose (due soon = needs attention).
+     Success is blue ink and danger vermilion, so the two never rely on
+     red-versus-green. */
+  --success: #235a8a;
+  --success-soft: #e3ecf4;
+  --warn: #7a5c22;
+  --warn-soft: #f4ead3;
+  --danger: #b23a12;
+  --danger-soft: #f7e4dc;
+  --info: #4a4239;
+  --info-soft: #ebe1cf;
+  --neutral: #675c50;
+  --neutral-soft: #ece5d8;
 
   /* ---- chart series (see the palette note at the foot of this file) ---- */
-  --chart-1: #2a78d6; /* brand blue */
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-4: #eda100;
-  --chart-5: #e87ba4;
-  --chart-6: #008300;
-  --chart-7: #6d25a2;
-  --chart-8: #e34948;
-  --chart-axis: #586a84; /* axis ticks are text — same 4.5:1 bar as captions */
-  --chart-grid: #e8eff6;
+  --chart-1: #5b1a24;
+  --chart-2: #a8823a;
+  --chart-3: #2f6b4f;
+  --chart-4: #235a8a;
+  --chart-5: #a3505e;
+  --chart-6: #5a3f86;
+  --chart-7: #8f8270;
+  --chart-8: #4f7a8a;
+  --chart-axis: #675c50;
+  --chart-grid: #e6dccb;
 
-  /* ---- depth: paper on a desk ----
-     A sheet lies flat: a hairline at its foot and a long, soft fall below it.
-     Nothing floats except what was summoned (menus, sheets, dialogs). */
-  --paper-shadow: 0 1px 0 #d5e2ee, 0 18px 40px -18px rgba(20, 35, 63, 0.28);
-  --sheet-shadow: -24px 0 60px -20px rgba(20, 35, 63, 0.35);
+  /* ---- depth ----
+     Panels rest on a 1px edge. Nothing floats except what was summoned
+     (menus, sheets, dialogs). */
+  --paper-shadow: 0 0 0 1px #e6dccb, 0 1px 2px rgba(28, 25, 22, 0.06);
+  --sheet-shadow: -24px 0 60px -20px rgba(42, 12, 17, 0.3);
   --shadow-sm: var(--paper-shadow);
   --shadow: var(--paper-shadow);
-  --shadow-lg: 0 30px 70px rgba(2, 6, 14, 0.3);
+  --shadow-lg: 0 24px 60px -16px rgba(42, 12, 17, 0.32);
 
-  /* ---- the casebook's rules ----
-     --gold is sunflower's text-and-line form (deep gold by day, sunflower by
-     night), the same rule the login page follows. --rule-red is the double
-     margin line of pleading paper. --series-2 is the second series in the
-     small inline charts. */
-  --gold: #b07f00;
-  --rule-red: #cf9a9b;
-  --series-2: #7fa9cf;
+  /* ---- older names, kept for the components that still use them ----
+     --gold is brass as a line colour, --rule-red a soft oxblood rule,
+     --series-2 the second series in small inline charts. */
+  --gold: #a8823a;
+  --rule-red: #e6a7b0;
+  --series-2: #a8823a;
 
   /* ---- shape · density · motion (theme-independent) ----
-     Paper has square corners. 2px only takes the edge off a pixel. */
-  --radius-sm: 2px;
-  --radius: 2px;
-  --radius-lg: 2px;
-  /* Pills become tabs and tallies with square shoulders; a thing that must be
-     round (an avatar, a count bubble) says so with its own radius. */
-  --radius-pill: 2px;
+     Small, even corners: 3px on tags and inputs, 4px on buttons, 6px on
+     panels. */
+  --radius-sm: 3px;
+  --radius: 4px;
+  --radius-lg: 6px;
+  /* A thing that must be round (an avatar, a count bubble) says so with its
+     own radius. */
+  --radius-pill: 3px;
 
   --sidebar-w: 256px;
   --topbar-h: 60px;
 
-  --font: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  /* The logo package's wordmark face. The casebook also sets its titles in it
-     — page titles, record captions, big figures — the way a brief sets its
-     headings; everything that is read or typed stays in Poppins. Fallbacks
-     mirror the lockup SVG's own. */
-  --font-wordmark: "Cormorant Garamond", Cormorant, Garamond, Georgia,
-    "Times New Roman", serif;
+  /* Titles, record captions and big figures are set in the serif; everything
+     read or typed stays in Plex Sans. */
+  --font-wordmark: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
   --serif: var(--font-wordmark);
-  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
 
   /* ---- motion ----
      `--ease` drives state changes (hover, focus, colour). `--ease-out` is a
@@ -154,87 +151,105 @@
   --ease: cubic-bezier(0.25, 0.6, 0.35, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
-  --dur-1: 120ms; /* colour / micro-state */
-  --dur-2: 200ms; /* component in-out */
-  --dur-3: 320ms; /* page + card entrances */
-  --stagger: 45ms; /* gap between siblings in a staggered group */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --stagger: 45ms;
+
+  /* ---- Chambers: selection, client money, privilege, the bench bar's edge, raised layers ---- */
+  --surface-sel: #f9eef0;
+  --trust: #2f6b4f;
+  --trust-soft: #e2efe7;
+  --privileged: #5a3f86;
+  --chrome-edge: #47141c;
+  --raised: 0 12px 32px -12px rgba(42, 12, 17, 0.28);
+  --panel: 0 1px 0 rgba(28, 25, 22, 0.06);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --brand: #b9d6ee; /* Powder Blue becomes the interactive colour on navy */
-  --brand-strong: #e4eff8;
-  --brand-solid: #b9d6ee; /* filled actions are powder with navy text */
-  --brand-solid-hover: #d4e6f5;
-  --brand-soft: rgba(185, 214, 238, 0.16);
-  --brand-tint: rgba(185, 214, 238, 0.08);
-  --brand-line: rgba(185, 214, 238, 0.34);
-  --on-brand: #14233f;
-  --mark-tone: #7fa9cf;
-  --brand-grad: linear-gradient(145deg, #14233f 0%, #1e3357 100%);
+  --brand: #e6a7b0;
+  --brand-strong: #f0c0c7;
+  --brand-solid: #e6a7b0;
+  --brand-solid-hover: #f0c0c7;
+  --brand-soft: rgba(230, 167, 176, 0.14);
+  --brand-tint: rgba(230, 167, 176, 0.07);
+  --brand-line: rgba(230, 167, 176, 0.32);
+  --on-brand: #2a0c11;
+  --mark-tone: #d9b871;
+  --brand-grad: linear-gradient(145deg, #2a0c11 0%, #1d1915 100%);
 
-  --accent: #ffc72c;
-  --accent-hover: #ffd65c;
-  --on-accent: #14233f;
-  --accent-soft: rgba(255, 199, 44, 0.14);
-  --accent-ink: #ffd66b;
+  --accent: #d9b871;
+  --accent-hover: #e5c88a;
+  --on-accent: #1c1916;
+  --accent-soft: rgba(217, 184, 113, 0.13);
+  --accent-ink: #d9b871;
 
-  --chrome: #0d182e;
-  --chrome-hover: #16264a;
-  --chrome-active: #1e3152;
-  --chrome-line: rgba(185, 214, 238, 0.1);
-  --on-chrome: #e9f1f9;
-  --on-chrome-muted: #9fb6d3;
+  --chrome: #2a0c11;
+  --chrome-hover: #3a1219;
+  --chrome-active: #4a1a22;
+  --chrome-line: rgba(230, 167, 176, 0.12);
+  --on-chrome: #f1e9dc;
+  --on-chrome-muted: #c9a3a9;
 
-  --focus: #ffc72c;
-  --focus-on-chrome: #ffc72c;
+  --focus: #d9b871;
+  --focus-on-chrome: #d9b871;
 
-  --bg: #0a1426;
-  --tab: #0f1b33;
-  --surface: #111e36;
-  --surface-2: #172743;
-  --surface-3: #1e3152;
-  --border: #24375a;
-  --border-strong: #5a78a6;
-  --card-border: #1e3152;
-  --scrim: rgba(4, 9, 18, 0.7);
+  --bg: #14110e;
+  --tab: #1d1915;
+  --surface: #1d1915;
+  --surface-2: #231e19;
+  --surface-3: #28221d;
+  --border: #3a322b;
+  --border-strong: #7d6f60;
+  --card-border: #3a322b;
+  --scrim: rgba(0, 0, 0, 0.65);
 
-  --text: #e9f1f9;
-  --text-muted: #a9bdd6;
-  --text-faint: #879ebd;
+  --text: #f1e9dc;
+  --text-muted: #c3b6a4;
+  --text-faint: #9d907f;
 
-  --success: #5cc492;
-  --success-soft: rgba(92, 196, 146, 0.14);
-  --warn: #ffd66b;
-  --warn-soft: rgba(255, 199, 44, 0.14);
-  --danger: #f08a84;
-  --danger-soft: rgba(240, 138, 132, 0.14);
-  --info: #b9d6ee;
-  --info-soft: rgba(185, 214, 238, 0.14);
-  --neutral: #9fb6d3;
-  --neutral-soft: rgba(159, 182, 211, 0.14);
+  --success: #8fbbe3;
+  --success-soft: rgba(143, 187, 227, 0.13);
+  --warn: #d9b871;
+  --warn-soft: rgba(217, 184, 113, 0.13);
+  --danger: #f2895f;
+  --danger-soft: rgba(242, 137, 95, 0.13);
+  --info: #c3b6a4;
+  --info-soft: rgba(195, 182, 164, 0.12);
+  --neutral: #9d907f;
+  --neutral-soft: rgba(157, 144, 127, 0.14);
 
-  --chart-1: #3987e5;
-  --chart-2: #d95926;
-  --chart-3: #199e70;
-  --chart-4: #c98500;
-  --chart-5: #d55181;
-  --chart-6: #008300;
-  --chart-7: #a67ce0;
-  --chart-8: #e66767;
-  --chart-axis: #879ebd;
-  --chart-grid: #1e3152;
+  --chart-1: #e6a7b0;
+  --chart-2: #d9b871;
+  --chart-3: #86c9a8;
+  --chart-4: #8fbbe3;
+  --chart-5: #d98a97;
+  --chart-6: #bba6e6;
+  --chart-7: #c3b6a4;
+  --chart-8: #7fb3c0;
+  --chart-axis: #9d907f;
+  --chart-grid: #2c251f;
 
-  /* By night a sheet is edged rather than shadowed: the fall is lost on navy. */
-  --paper-shadow: 0 0 0 1px #1e3152, 0 18px 40px -18px rgba(0, 0, 0, 0.6);
-  --sheet-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.6);
+  /* By night a panel is edged rather than shadowed. */
+  --paper-shadow: 0 0 0 1px #3a322b;
+  --sheet-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.7);
   --shadow-sm: var(--paper-shadow);
   --shadow: var(--paper-shadow);
-  --shadow-lg: 0 30px 70px rgba(0, 0, 0, 0.55);
-  --gold: #ffc72c;
-  --rule-red: #7d4b57;
-  --series-2: #5a78a6;
+  --shadow-lg: 0 30px 70px rgba(0, 0, 0, 0.6);
+  --gold: #d9b871;
+  --rule-red: #6b3a42;
+  --series-2: #d9b871;
+
+  /* ---- Chambers, by night ---- */
+  --surface-sel: rgba(230, 167, 176, 0.12);
+  --trust: #86c9a8;
+  --trust-soft: rgba(134, 201, 168, 0.12);
+  --privileged: #bba6e6;
+  --chrome-edge: #160608;
+  --raised: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+  --panel: 0 0 0 1px #3a322b;
 }
 
 * {
@@ -268,7 +283,7 @@ a:hover {
   color: var(--brand-strong);
 }
 
-/* Poppins: SemiBold/Bold for headings, per the brand book's type hierarchy. */
+/* Headings default to the sans; titles opt into the serif. */
 h1,
 h2,
 h3,
@@ -1171,393 +1186,6 @@ select option:checked {
   color: var(--warn);
 }
 
-/* ---- Login ---------------------------------------------------------------
-   One full-screen scene: the firm, cut open so every floor shows
-   (components/FirmScene.tsx), the headline over the sky, a quiet footer on
-   the street, and the sign-in sheet hanging from the line that runs out of
-   the lobby. By night in dark mode, by day in light mode.
-
-   The page speaks in four colours, set once per mode below and used
-   everywhere on it:
-     --lp-text    the lockup's name and the page's plain text
-     --lp-muted   supporting copy
-     --lp-gold    the yellow: "Legal", the headline, small gold details.
-                  Sunflower by night; by day a deeper gold of the same hue,
-                  because Sunflower itself is a fill, not text, on pale
-                  paper (1.6:1). The drawing uses the same rule.
-     --lp-rule    hairlines and control edges
-   Fills stay true Sunflower in both modes: the button, the sheet's top edge.
-
-   `--u` is the size of one drawing unit on screen. The drawing is 1800 × 1000
-   and slices to fill, bottom-aligned, so a point `n` units above its bottom
-   edge sits `n × --u` above the bottom of the screen. The lobby's line is at
-   y 825, 175 units up — that is where the sign-in sheet's bottom edge goes. */
-.login-page {
-  --u: max(calc(100vw / 1800), calc(100vh / 1000));
-  --lp-text: #ffffff;
-  --lp-muted: rgba(228, 239, 248, 0.78);
-  --lp-gold: #ffc72c;
-  --lp-rule: rgba(185, 214, 238, 0.3);
-  --lp-chip: rgba(5, 11, 23, 0.4);
-  --mark-tone: rgba(255, 255, 255, 0.55);
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  isolation: isolate;
-  color: var(--lp-text);
-  /* Night sky: deep at the zenith, lifting toward the horizon, with the
-     corners vignetted so the eye settles on the firm. */
-  background-color: #050b17;
-  background-image: radial-gradient(130% 90% at 50% 40%, transparent 55%, rgba(2, 5, 12, 0.6) 100%),
-    linear-gradient(180deg, #050b17 0%, #0a1630 50%, #15284d 88%, #1a2f57 100%);
-}
-[data-theme="light"] .login-page {
-  --lp-text: #14233f;
-  --lp-muted: #43546f;
-  --lp-gold: #b07f00;
-  --lp-rule: rgba(20, 35, 63, 0.2);
-  --lp-chip: rgba(255, 255, 255, 0.6);
-  --mark-tone: #7fa9cf;
-  /* Day sky: powder at the top, paper at the street. */
-  background-color: #f3f8fc;
-  background-image: radial-gradient(130% 90% at 50% 40%, transparent 60%, rgba(185, 214, 238, 0.35) 100%),
-    linear-gradient(180deg, #d4e6f6 0%, #e8f1fa 45%, #f6f9fc 88%, #f3f8fc 100%);
-}
-.login-scene {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-}
-.login-scene .firm {
-  width: 100%;
-  height: 100%;
-}
-
-/* ---- the copy, over the sky ---- */
-.login-hero {
-  position: absolute;
-  top: 44px;
-  left: 56px;
-  max-width: 440px;
-  z-index: 1;
-}
-.login-hero .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  animation: fade-in var(--dur-3) var(--ease-out) both;
-}
-.login-hero .brand-lockup-name {
-  color: var(--lp-text);
-}
-.login-hero .brand-lockup-suffix {
-  color: var(--lp-gold);
-}
-.login-hero .brand-lockup-tag {
-  color: var(--lp-muted);
-  border-top-color: var(--lp-rule);
-}
-/* The headline borrows the wordmark's Cormorant Garamond — the one place
-   outside the lockup that the product speaks in a legal serif — and the
-   wordmark's gold. Two set lines, close-leaded, sitting a measured step
-   below the lockup and above the copy. */
-.login-hero h1 {
-  margin-top: 30px;
-  font-family: var(--font-wordmark);
-  font-size: clamp(44px, 4.4vw, 64px);
-  font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.01em;
-  color: var(--lp-gold);
-  animation: rise var(--dur-3) var(--ease-out) 200ms both;
-}
-.login-hero h1 span {
-  display: block;
-}
-.login-hero p {
-  margin-top: 16px;
-  max-width: 34ch;
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1.6;
-  color: var(--lp-muted);
-  animation: rise var(--dur-3) var(--ease-out) 260ms both;
-}
-
-/* ---- the sign-in sheet, hung from the lobby's leader ---- */
-.login-form-wrap {
-  position: absolute;
-  right: clamp(24px, 6vw, 112px);
-  bottom: calc(var(--u) * 175);
-  z-index: 1;
-  width: min(380px, calc(100vw - 48px));
-}
-/* Two sheets beneath the top one, offset, so it reads as a stack of paper on
-   the desk rather than a card floating on the screen. */
-.login-form-wrap::before,
-.login-form-wrap::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #c9d8e7;
-  animation: sheet-in 650ms var(--ease-out) 2500ms both;
-}
-.login-form-wrap::before {
-  transform: translate(14px, 14px);
-  background: #8ea6c2;
-  box-shadow: 0 40px 90px rgba(2, 6, 14, 0.7);
-}
-.login-form-wrap::after {
-  transform: translate(7px, 7px);
-}
-.login-sheet {
-  position: relative;
-  z-index: 1;
-  padding: 26px 28px 22px;
-  background: #f6f9fc;
-  color: #14233f;
-  border-top: 4px solid #ffc72c;
-  box-shadow: 0 18px 40px rgba(2, 6, 14, 0.45);
-  animation: sheet-in 650ms var(--ease-out) 2500ms both;
-}
-.ls-annot {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #586a84;
-}
-.ls-annot span {
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  background: #14233f;
-  color: #ffc72c;
-  letter-spacing: 0;
-}
-.login-sheet .lc-head {
-  margin: 16px 0 22px;
-}
-.login-sheet .lc-head h2 {
-  font-family: var(--font-wordmark);
-  font-size: 36px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: #14233f;
-}
-.login-sheet .lc-head p {
-  margin-top: 8px;
-  font-size: 13px;
-  font-weight: 300;
-  color: #43546f;
-}
-.login-sheet form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.ls-field label {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #43546f;
-}
-.ls-field input {
-  width: 100%;
-  padding: 8px 0 9px;
-  border: 0;
-  border-bottom: 1.5px solid #7891ad;
-  border-radius: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 15px;
-  color: #14233f;
-  outline: none;
-  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
-}
-.ls-field input::placeholder {
-  color: #9aabbf;
-}
-.ls-field input:focus {
-  border-bottom-color: #14233f;
-  box-shadow: 0 2px 0 #ffc72c;
-}
-.ls-pass {
-  position: relative;
-}
-.ls-pass input {
-  padding-right: 32px;
-}
-.ls-toggle {
-  position: absolute;
-  right: 0;
-  bottom: 8px;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 24px;
-  border: 0;
-  background: none;
-  color: #586a84;
-  cursor: pointer;
-}
-.ls-toggle:hover {
-  color: #14233f;
-}
-.ls-submit {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 4px;
-  padding: 13px 16px;
-  border: 0;
-  border-radius: 0;
-  background: #ffc72c;
-  color: #14233f;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: background-color var(--dur-1) var(--ease);
-}
-.ls-submit svg {
-  transition: transform var(--dur-1) var(--ease);
-}
-.ls-submit:hover:not(:disabled) {
-  background: #f2b705;
-}
-.ls-submit:hover:not(:disabled) svg {
-  transform: translateX(3px);
-}
-.ls-submit:focus-visible {
-  outline: 2px solid #14233f;
-  outline-offset: 2px;
-}
-.ls-submit:disabled {
-  justify-content: center;
-  opacity: 0.75;
-  cursor: progress;
-}
-.login-meta {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid #d5e2ee;
-  font-size: 12.5px;
-  color: #43546f;
-}
-.login-meta a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #1f4a85;
-  font-weight: 500;
-}
-.login-meta a:hover {
-  text-decoration: underline;
-}
-
-/* ---- the footer, on the street ---- */
-.hero-foot {
-  position: absolute;
-  left: 56px;
-  bottom: 26px;
-  z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  font-size: 12px;
-  color: var(--lp-muted);
-  animation: fade-in var(--dur-3) var(--ease-out) 600ms both;
-}
-.hero-foot span + span::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  margin: 0 12px 2px;
-  border-radius: 50%;
-  background: var(--lp-gold);
-}
-.hero-foot span:first-child {
-  color: var(--lp-text);
-  font-weight: 500;
-}
-
-/* ---- the light / dark switch ---- */
-.login-theme {
-  position: absolute;
-  top: 40px;
-  right: 40px;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--lp-rule);
-  border-radius: 50%;
-  background: var(--lp-chip);
-  color: var(--lp-text);
-  cursor: pointer;
-  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-  animation: fade-in var(--dur-3) var(--ease-out) 300ms both;
-}
-.login-theme:hover {
-  border-color: var(--lp-gold);
-  color: var(--lp-gold);
-}
-.login-theme:focus-visible {
-  outline: 2px solid var(--lp-gold);
-  outline-offset: 2px;
-}
-.login-theme svg {
-  animation: icon-swap var(--dur-2) var(--ease-spring);
-}
-
-/* By day the sign-in sheet is white paper on a paler stack. */
-[data-theme="light"] .login-sheet {
-  background: #ffffff;
-  box-shadow: 0 18px 40px rgba(20, 35, 63, 0.16);
-}
-[data-theme="light"] .login-form-wrap::before {
-  background: #c3d5e7;
-  box-shadow: 0 30px 70px rgba(20, 35, 63, 0.2);
-}
-[data-theme="light"] .login-form-wrap::after {
-  background: #e1ebf4;
-}
-
-/* Between the phone layout and a full desktop the drawing is narrower than
-   the sheet's usual inset allows; tucking the sheet to the edge keeps it off
-   the firm's floors. */
-@media (min-width: 961px) and (max-width: 1240px) {
-  .login-form-wrap {
-    right: 24px;
-    width: 320px;
-  }
-}
-
-@keyframes sheet-in {
-  from {
-    opacity: 0;
-    transform: translateY(-14px);
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    clip-path: inset(0 0 0 0);
-  }
-}
-
 /* ---- Reports ------------------------------------------------------------
    A gallery of the reports saved on the InventDB instance, beside the sheet
    the selected one renders into. */
@@ -1827,82 +1455,6 @@ select option:checked {
   margin-top: 2px;
 }
 /* ---- Responsive --------------------------------------------------------- */
-/* ---- Login on narrow screens -------------------------------------------
-   The page stacks: lockup and headline, then the whole firm in its own band,
-   then the sign-in sheet hanging just below the street, then the footer.
-   The band is short and wide, so the drawing slices to the firm and the
-   courthouse beside it. The sheet stays above the fold. */
-@media (max-width: 960px) {
-  .login-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100svh;
-    padding: 22px 16px 20px;
-  }
-  .login-scene {
-    position: relative;
-    inset: auto;
-    z-index: 0;
-    order: 2;
-    height: clamp(210px, 36vh, 340px);
-    margin: 4px -16px 0;
-  }
-  .login-form-wrap {
-    order: 3;
-  }
-  .hero-foot {
-    order: 4;
-  }
-  .login-hero {
-    position: static;
-    max-width: none;
-  }
-  .login-hero .hero-badge {
-    display: flex;
-    justify-content: center;
-  }
-  .login-hero p {
-    display: none;
-  }
-  .login-hero h1 {
-    margin: 12px auto 0;
-    font-size: 32px;
-    text-align: center;
-  }
-  .login-hero h1 span {
-    display: inline;
-  }
-  .login-theme {
-    top: 18px;
-    right: 14px;
-    width: 34px;
-    height: 34px;
-  }
-  .login-form-wrap {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: calc(100% - 14px);
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  .login-sheet,
-  .login-form-wrap::before,
-  .login-form-wrap::after {
-    animation-delay: 1400ms;
-  }
-  .hero-foot {
-    position: static;
-    margin: 16px auto 0;
-    justify-content: center;
-  }
-  .hero-foot span:first-child,
-  .hero-foot span:last-child,
-  .hero-foot span:nth-child(2)::before {
-    display: none;
-  }
-}
-
 /* ---- Phone: two-up compact stat tiles -------------------------------------
    `auto-fit`/`minmax(210px)` drops to a single column under 434px, which
    stacks all eight full-width and pushes the first chart ~1000px down. Two

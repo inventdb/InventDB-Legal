@@ -19,7 +19,6 @@ import { useAuth } from "../auth/AuthContext";
 import { agentText as _agentText, isCancel, type AgentStep } from "../analyze/agent";
 import { AgentTimeline } from "../analyze/Timeline";
 import { ActionProgress } from "../analyze/ui";
-import { FirmScene, timeOfDay, type Sky } from "../components/FirmScene";
 import { ConfirmDialog } from "../components/Modal";
 import { Skeleton } from "../analyze/ui";
 import { loadDashboard, saveDashboard } from "../dashboard/dashboardStore";
@@ -33,6 +32,16 @@ import type { Widget } from "../dashboard/types";
 // builds that only reach it through suggestWidgets.
 void _agentText;
 
+type Sky = "morning" | "afternoon" | "evening";
+
+/** Morning until noon, afternoon until 4pm, evening after. */
+export function timeOfDay(now: Date = new Date()): Sky {
+  const h = now.getHours();
+  if (h < 12) return "morning";
+  if (h < 16) return "afternoon";
+  return "evening";
+}
+
 const GREETING: Record<Sky, string> = {
   morning: "Good morning",
   afternoon: "Good afternoon",
@@ -42,10 +51,8 @@ const GREETING: Record<Sky, string> = {
 /**
  * Time-of-day greeting, in the reader's own timezone.
  *
- * The boundaries live in `timeOfDay`, which also picks the banner's sky, so
- * the greeting and the picture can never disagree. Evening starts at 4pm. The
- * date is a parameter so the boundaries can be tested without waiting for one
- * to arrive.
+ * Evening starts at 4pm. The date is a parameter so the boundaries can be
+ * tested without waiting for one to arrive.
  */
 export function greeting(now: Date = new Date()): string {
   return GREETING[timeOfDay(now)];
@@ -551,17 +558,18 @@ function useGridFlip(
   );
 }
 
-/**
- * Room header — the greeting, the dashboard picker, and what the room is, set
- * in a banner beside the firm drawn in section. Each floor of it opens its
- * module, and its sky follows the same time of day as the greeting.
- */
+/** Room header — today's date, the greeting, the dashboard picker, and what the room is. */
 function Head() {
-  const sky = timeOfDay();
+  const today = new Date().toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   return (
-    <div className="room-head room-banner" data-sky={sky}>
-      <div className="room-banner-copy">
-        <div className="room-kicker">Today · Legal</div>
+    <div className="room-head ch-greet">
+      <div>
+        <div className="room-kicker">{today}</div>
         <div className="room-title">
           <h2>{greeting()}</h2>
           <label className="ns-pick">
@@ -586,7 +594,6 @@ function Head() {
           can check where it came from.
         </p>
       </div>
-      <FirmScene variant="banner" sky={sky} />
     </div>
   );
 }

@@ -8,8 +8,9 @@ import { AuthProvider } from "./auth/AuthContext";
 import { ThemeProvider } from "./theme/ThemeContext";
 import { ToastProvider } from "./components/Toast";
 import "./styles/global.css";
-// The casebook skin defines the shared components; module sheets come after
-// it so a module can still refine them, as they did over global.css.
+// casebook.css defines the shared components (buttons, inputs, tables,
+// dialogs); module sheets come after it so a module can still refine them.
+// chambers.css comes last: the frame, the docket and the dossier.
 import "./styles/casebook.css";
 import "./styles/analyze.css";
 import "./styles/notifications.css";
@@ -21,7 +22,7 @@ import "./styles/dashboard.css";
 import "./styles/views.css";
 import "./styles/drill.css";
 import "./styles/calendar.css";
-import "./styles/firm.css";
+import "./styles/chambers.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

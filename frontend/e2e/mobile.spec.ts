@@ -5,7 +5,7 @@ import { expect, signedOut, test } from "./fixtures";
 /**
  * Runs only in the `mobile` project (Pixel 7, 412px wide), which is below both
  * the 720px phone breakpoint — bottom bar, one screen at a time — and the
- * 960px login reflow.
+ * sign-in page's single column.
  */
 test.describe("Mobile shell", () => {
   test.beforeEach(async ({ page }) => {
@@ -16,16 +16,16 @@ test.describe("Mobile shell", () => {
   const directory = (page: Page) => page.getByRole("dialog", { name: "All sections" });
 
   test("puts the main places on a bottom bar, the rest one tap away", async ({ page }) => {
-    // The floor tabs give way to the bar on a phone.
-    await expect(page.getByRole("navigation", { name: "Floors" })).toBeHidden();
-    for (const name of ["Reception", "Matters", "Docket", "Time"]) {
+    // The sidebar gives way to the bar on a phone.
+    await expect(page.getByRole("navigation", { name: "Sections", exact: true })).toBeHidden();
+    for (const name of ["Reception", "Matters", "Calendar", "Time"]) {
       await expect(bar(page).getByRole("link", { name })).toBeVisible();
     }
     await expect(bar(page).getByRole("link", { name: "Reception" })).toHaveClass(/active/);
 
-    await bar(page).getByRole("link", { name: "Docket" }).click();
-    await expect(page).toHaveURL(/\/deadlines_and_sol$/);
-    await expect(bar(page).getByRole("link", { name: "Docket" })).toHaveClass(/active/);
+    await bar(page).getByRole("link", { name: "Calendar" }).click();
+    await expect(page).toHaveURL(/\/court_calendar$/);
+    await expect(bar(page).getByRole("link", { name: "Calendar" })).toHaveClass(/active/);
   });
 
   test("opens every section from All sections, and closes on arrival", async ({ page }) => {
@@ -38,8 +38,10 @@ test.describe("Mobile shell", () => {
     await directory(page).getByRole("link", { name: "Timekeepers", exact: true }).click();
     await expect(page).toHaveURL(/\/timekeepers$/);
     await expect(directory(page)).toHaveCount(0);
-    // A floor with more than one section lists them under its header.
-    await expect(page.locator("nav.nav").getByRole("link", { name: "Matters" })).toBeVisible();
+    // A group with more than one section lists them as tabs above the page.
+    await expect(
+      page.getByRole("navigation", { name: "Sections in Case Management" }).getByRole("link", { name: "Matters" })
+    ).toBeVisible();
   });
 
   test("closes All sections from its close button", async ({ page }) => {
@@ -66,17 +68,18 @@ test.describe("Mobile shell", () => {
     }
   });
 
-  test("shows the index, then the record on its own screen", async ({ page }) => {
+  test("shows the docket, then the record on its own screen", async ({ page }) => {
     await page.goto("/matters");
-    const index = page.getByRole("region", { name: "Matters index" });
-    await expect(index).toBeVisible();
+    const docket = page.getByRole("region", { name: "Matters docket" });
+    await expect(docket).toBeVisible();
 
-    await index.locator(".cb-card", { hasText: "Pineda v. Bright Path" }).click();
-    await expect(index).toBeHidden();
-    await expect(page.locator(".cb-paper .cb-party").first()).toContainText("Pineda");
+    await docket.locator(".ch-drow", { hasText: "Pineda v. Bright Path" }).click();
+    await expect(docket).toBeHidden();
+    const dossier = page.locator("article.ch-dossier");
+    await expect(dossier.getByRole("heading", { name: "Pineda v. Bright Path", level: 2 })).toBeVisible();
 
-    await page.locator(".cb-paper").getByRole("button", { name: "Matters" }).click();
-    await expect(index).toBeVisible();
+    await dossier.getByRole("button", { name: "Matters" }).click();
+    await expect(docket).toBeVisible();
   });
 
   test("keeps the dashboard's starting point reachable", async ({ page }) => {
@@ -123,21 +126,30 @@ test.describe("Mobile shell", () => {
     await search.getByRole("textbox").fill("Pineda");
     await search.getByRole("option", { name: /Pineda v\. Bright Path/ }).first().click();
     await expect(page).toHaveURL(/\/matters/);
-    await expect(page.locator(".cb-paper .cb-party").first()).toContainText("Pineda");
+    await expect(
+      page.locator("article.ch-dossier").getByRole("heading", { name: /Pineda v\. Bright Path/, level: 2 })
+    ).toBeVisible();
   });
 });
 
 test.describe("Mobile login", () => {
   test.use(signedOut);
 
-  test("reflows the hero around the sign-in card", async ({ page }) => {
+  test("stacks the headline, the sign-in card and the firm", async ({ page }) => {
     await page.goto("/login");
 
-    await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
-    await expect(page.locator(".hero-badge")).toBeVisible();
+    const headline = page.getByRole("heading", { name: "Legal practice, modernised." });
+    const card = page.getByRole("heading", { name: "Welcome back" });
+    await expect(card).toBeVisible();
+    // The card comes straight after the headline, before the list of groups.
+    const [h, c, f] = await Promise.all([
+      headline.boundingBox(),
+      card.boundingBox(),
+      page.getByRole("region", { name: "Inside the firm" }).boundingBox(),
+    ]);
+    expect(h!.y).toBeLessThan(c!.y);
+    expect(c!.y).toBeLessThan(f!.y);
 
-    // `.login-hero::after` is switched off at this width because its bloom
-    // would otherwise widen the page once the panel becomes display: contents.
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
