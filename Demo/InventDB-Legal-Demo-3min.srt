@@ -1,0 +1,163 @@
+1
+00:00:00,000 --> 00:00:03,420
+This is InventDB Legal.
+
+2
+00:00:03,500 --> 00:00:08,920
+Practice management for law firms, built on InventDB SOAR.
+
+3
+00:00:09,000 --> 00:00:14,920
+One place for the whole practice: matters, the docket, time, billing and client money.
+
+4
+00:00:15,000 --> 00:00:19,920
+Sign in, and each person lands on their own dashboard.
+
+5
+00:00:20,000 --> 00:00:28,920
+The whole practice at a glance: matters, deadlines, hearings and the money.
+
+6
+00:00:29,000 --> 00:00:31,420
+New business: an enquiry becomes a client.
+
+7
+00:00:31,500 --> 00:00:37,920
+A workflow runs the conflict check, then waits for a person to decide.
+
+8
+00:00:38,000 --> 00:00:40,920
+Case management: one file for every matter.
+
+9
+00:00:41,000 --> 00:00:44,920
+The demo firm has 1,300 matters, shown as a docket or as a table.
+
+10
+00:00:45,000 --> 00:00:50,920
+A matter holds the court, judge, case number, fee terms and its trust balance.
+
+11
+00:00:51,000 --> 00:00:55,920
+Related shows everything that points at it: time, costs, invoices, trust.
+
+12
+00:00:56,000 --> 00:01:00,920
+Click any record, and a read-only panel opens it with its links and files.
+
+13
+00:01:01,000 --> 00:01:04,920
+Describe a new matter in plain English.
+
+14
+00:01:05,000 --> 00:01:09,920
+The form fills itself. Nothing saves until you press Save.
+
+15
+00:01:10,000 --> 00:01:12,420
+Risk and deadlines: nothing missed.
+
+16
+00:01:12,500 --> 00:01:17,420
+Hearings, depositions and mediations on one calendar.
+
+17
+00:01:17,500 --> 00:01:21,920
+Every deadline carries its rule, trigger and owner.
+
+18
+00:01:22,000 --> 00:01:24,420
+Documents: every paper in its place,
+
+19
+00:01:24,500 --> 00:01:27,920
+found by name, by the text inside or by meaning.
+
+20
+00:01:28,000 --> 00:01:30,420
+Profitability: every hour accounted for.
+
+21
+00:01:30,500 --> 00:01:34,420
+Time is recorded against the matter, with UTBMS codes.
+
+22
+00:01:34,500 --> 00:01:38,920
+A live report lists unbilled work, matter by matter.
+
+23
+00:01:39,000 --> 00:01:41,420
+Compliance: client money, by the book.
+
+24
+00:01:41,500 --> 00:01:45,420
+Every trust deposit, transfer and disbursement is recorded,
+
+25
+00:01:45,500 --> 00:01:48,920
+through to settlements and the net to the client.
+
+26
+00:01:49,000 --> 00:01:52,920
+Analyze: ask the practice a question in plain English.
+
+27
+00:01:53,000 --> 00:01:55,920
+It runs the queries and answers with a chart.
+
+28
+00:01:56,000 --> 00:01:59,920
+Business Litigation carries the most unbilled work: $125,158.50.
+
+29
+00:02:00,000 --> 00:02:06,920
+Every answer shows its SQL. Analyze only reads; changes come back as proposals.
+
+30
+00:02:07,000 --> 00:02:13,920
+Live reports re-query on open. Edit one by describing the change.
+
+31
+00:02:14,000 --> 00:02:19,920
+Workflows automate the routine. When one needs a decision, it stops and asks.
+
+32
+00:02:20,000 --> 00:02:25,420
+Rehearse before going live. Every run is kept.
+
+33
+00:02:25,500 --> 00:02:31,420
+Everyone sees only their part of the firm, enforced by InventDB, the API and the app.
+
+34
+00:02:31,500 --> 00:02:34,920
+Search the whole firm from anywhere.
+
+35
+00:02:35,000 --> 00:02:37,920
+Light or dark,
+
+36
+00:02:38,000 --> 00:02:41,920
+and it works on a phone.
+
+37
+00:02:42,000 --> 00:02:46,420
+Under the hood: React and TypeScript, a thin Python API, and InventDB SOAR.
+
+38
+00:02:46,500 --> 00:02:50,920
+InventDB is the database and the identity provider. No second datastore.
+
+39
+00:02:51,000 --> 00:02:53,920
+Row-level security applies to every request.
+
+40
+00:02:54,000 --> 00:02:57,420
+InventDB Legal. The whole practice, in one place.
+
+41
+00:02:57,500 --> 00:02:59,920
+Built on InventDB SOAR. inventdb.com

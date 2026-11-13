@@ -5,12 +5,14 @@
   "type": "module",
   "description": "InventDB Legal demo films (3 and 5 minute cuts), rendered from code with Remotion.",
   "scripts": {
+    "data": "python scripts/build_data.py",
+    "capture": "cd ../../frontend && npx playwright test --config ../Demo/studio/capture/playwright.config.mjs scenes intro",
+    "music": "python scripts/music.py 180 public/music-3min.wav && python scripts/music.py 300 public/music-5min.wav",
+    "subtitles": "node scripts/subtitles.ts",
     "studio": "remotion studio",
-    "capture": "node scripts/capture.mjs",
-    "music": "python scripts/music.py",
-    "render:short": "remotion render LegalDemo3 ../InventDB-Legal-Demo-3min.mp4 --codec=h264 --crf=18 --audio-bitrate=192k",
-    "render:long": "remotion render LegalDemo5 ../InventDB-Legal-Demo-5min.mp4 --codec=h264 --crf=18 --audio-bitrate=192k",
-    "render": "npm run render:short && npm run render:long"
+    "render:short": "remotion render LegalDemo3 ../InventDB-Legal-Demo-3min.mp4 --codec=h264 --crf=20 --audio-bitrate=192k",
+    "render:long": "remotion render LegalDemo5 ../InventDB-Legal-Demo-5min.mp4 --codec=h264 --crf=20 --audio-bitrate=192k",
+    "build": "npm run data && npm run capture && npm run music && npm run subtitles && npm run render:short && npm run render:long"
   },
   "dependencies": {
     "@remotion/cli": "4.0.518",

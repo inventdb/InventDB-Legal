@@ -142,11 +142,12 @@ test("reports", async ({ page }) => {
   await shot(page, "reports-1", {}, { settle: 1500 });
   await page.getByText("Unbilled work by matter", { exact: true }).first().click();
   await shot(page, "reports-2", {}, { settle: 1500 });
-  await page.getByText("Trust balances by matter", { exact: true }).first().click();
-  await page.waitForTimeout(800);
-  const apply = page.getByRole("button", { name: /Render|Apply|Run/i }).first();
-  if (await apply.isVisible().catch(() => false)) await apply.click();
-  await shot(page, "reports-3", {}, { settle: 1500 });
+  // The trust report takes an "As of" date, so it renders once that is submitted.
+  await page.getByText(/^Trust balances by/).first().click();
+  await page.waitForTimeout(900);
+  const render = page.getByRole("button", { name: /^(Render|Run|Apply|Show)/i }).filter({ hasNotText: /instruction/i });
+  if (await render.first().isVisible().catch(() => false)) await render.first().click();
+  await shot(page, "reports-3", {}, { settle: 1800 });
   await page.getByPlaceholder(/Describe the change/i).click();
   await page.keyboard.type("Add a column for the responsible attorney and sort by balance", { delay: 25 });
   await shot(page, "reports-4", {}, { settle: 500 });
