@@ -224,8 +224,7 @@
 }
 .cb-gres .t {
   overflow: hidden;
-  font-family: var(--serif);
-  font-size: 15.5px;
+  font-size: 14.5px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;

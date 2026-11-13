@@ -150,17 +150,18 @@
   width: 100%;
 }
 
-/* ---- Inputs: square ---------------------------------------------------- */
+/* ---- Inputs: soft, rounded fields --------------------------------------- */
 .input,
 .select,
 .textarea {
-  border-radius: 2px;
+  border-color: var(--border);
+  border-radius: var(--radius-sm);
 }
 .input:focus,
 .select:focus,
 .textarea:focus {
-  border-color: var(--text);
-  box-shadow: 0 2px 0 var(--accent);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
 }
 
 /* ---- Paper: cards, slips -------------------------------------------------- */
@@ -397,26 +398,11 @@ td.cb-key {
   }
 }
 
-/* The fields of a form in a sheet are ruled lines with mono labels. */
+/* The fields of a form in a sheet: sans labels over rounded fields. */
 .modal .field label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
+  font-size: 12.5px;
+  font-weight: 600;
   color: var(--text-muted);
-}
-.modal .field .input,
-.modal .field .select,
-.modal .field .textarea {
-  border: 0;
-  border-bottom: 1.5px solid var(--border-strong);
-  padding-left: 0;
-  padding-right: 0;
-}
-.modal .field .textarea {
-  border: 1px solid var(--border);
-  border-bottom-width: 1.5px;
-  border-bottom-color: var(--border-strong);
-  padding: 8px;
 }
 
 /* ---- Toasts: a dark slip with a brass edge -------------------------- */

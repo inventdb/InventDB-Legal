@@ -126,7 +126,7 @@ for (const theme of ["light", "dark"] as const) {
       const nodes = (await dropdownColours(page)).filter((n) =>
         n.where.startsWith("f-status")
       );
-      const surface = theme === "dark" ? "rgb(35, 30, 25)" : "rgb(251, 248, 242)";
+      const surface = theme === "dark" ? "rgb(35, 30, 25)" : "rgb(255, 253, 249)";
       const chosen = theme === "dark" ? "rgb(40, 34, 29)" : "rgb(235, 225, 207)";
 
       for (const node of nodes) {
