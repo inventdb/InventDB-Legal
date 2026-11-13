@@ -1,0 +1,27 @@
+{
+  "name": "inventdb-legal-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "InventDB Legal demo films (3 and 5 minute cuts), rendered from code with Remotion.",
+  "scripts": {
+    "studio": "remotion studio",
+    "capture": "node scripts/capture.mjs",
+    "music": "python scripts/music.py",
+    "render:short": "remotion render LegalDemo3 ../InventDB-Legal-Demo-3min.mp4 --codec=h264 --crf=18 --audio-bitrate=192k",
+    "render:long": "remotion render LegalDemo5 ../InventDB-Legal-Demo-5min.mp4 --codec=h264 --crf=18 --audio-bitrate=192k",
+    "render": "npm run render:short && npm run render:long"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.518",
+    "@remotion/google-fonts": "4.0.518",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.518"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "typescript": "5.7.2"
+  }
+}
