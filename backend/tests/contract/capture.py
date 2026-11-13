@@ -1158,6 +1158,8 @@ _SYNTHETIC_SQL: dict[str, list[dict[str, Any]]] = {
     "SELECT COUNT(*) AS c FROM legal.deadlines_and_sol WHERE lower(status) = 'open'": [{'c': 804}],
     "SELECT COUNT(*) AS c FROM legal.deadlines_and_sol WHERE lower(status) = 'open' AND due_date < '<date>'": [{'c': 39}],
     "SELECT COUNT(*) AS c FROM legal.deadlines_and_sol WHERE lower(status) = 'open' AND due_date >= '<date>' AND due_date <= '<date>'": [{'c': 163}],
+    "SELECT COUNT(*) AS c FROM legal.intake_and_leads": [{'c': 412}],
+    "SELECT COUNT(*) AS c FROM legal.intake_and_leads WHERE YEAR(date_received) = 2026 AND MONTH(date_received) = 8": [{'c': 37}],
     "SELECT COUNT(*) AS c FROM legal.matters": [{'c': 1300}],
     "SELECT COUNT(*) AS c FROM legal.matters WHERE (matter_id LIKE '%a%' ESCAPE '\\' OR matter_caption LIKE '%a%' ESCAPE '\\' OR client_name LIKE '%a%' ESCAPE '\\' OR client_id LIKE '%a%' ESCAPE '\\' OR practice_area LIKE '%a%' ESCAPE '\\' OR matter_type LIKE '%a%' ESCAPE '\\' OR case_number LIKE '%a%' ESCAPE '\\' OR status LIKE '%a%' ESCAPE '\\' OR stage LIKE '%a%' ESCAPE '\\' OR court_short LIKE '%a%' ESCAPE '\\' OR responsible_attorney_name LIKE '%a%' ESCAPE '\\' OR opposing_party LIKE '%a%' ESCAPE '\\' OR opposing_counsel LIKE '%a%' ESCAPE '\\')": [{'c': 1300}],
     "SELECT COUNT(*) AS c FROM legal.matters WHERE lower(status) = 'closed'": [{'c': 570}],

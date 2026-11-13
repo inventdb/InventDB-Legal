@@ -19,6 +19,10 @@
     "collected_month": 849291.93,
     "trust_balance": 1268901.63
   },
+  "intake": {
+    "month": 37,
+    "total": 412
+  },
   "matters": {
     "closed": 570,
     "open": 730,

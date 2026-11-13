@@ -70,6 +70,97 @@ export const AUTH_USER = {
 
 export const AUTH_TOKEN = "e2e-test-token";
 
+/**
+ * What `GET /api/auth/access` answers, per tier. Mirrors the table in
+ * `backend/app/access.py` for the tiers the specs sign in as. The default
+ * signed-in user is an administrator, so every older spec still sees the whole
+ * firm.
+ */
+const ALL_MODULES = [
+  "matters",
+  "clients",
+  "timekeepers",
+  "time_entries",
+  "costs_and_disbursements",
+  "invoices",
+  "payments_and_receipts",
+  "trust_ledger_cta",
+  "court_calendar",
+  "deadlines_and_sol",
+  "intake_and_leads",
+  "settlements_and_liens",
+  "lookups",
+];
+
+export const ACCESS = {
+  admin: {
+    provisioned: true,
+    tier: "admin",
+    sections: [
+      "/",
+      "/intake_and_leads",
+      "/clients",
+      "/matters",
+      "/timekeepers",
+      "/time_entries",
+      "/costs_and_disbursements",
+      "/invoices",
+      "/trust_ledger_cta",
+      "/payments_and_receipts",
+      "/settlements_and_liens",
+      "/court_calendar",
+      "/deadlines_and_sol",
+      "/files",
+      "/import",
+      "/reports",
+      "/analyze",
+      "/workflows",
+      "/lookups",
+      "/settings",
+    ],
+    entities: Object.fromEntries(ALL_MODULES.map((m) => [m, "write"])),
+    reports: ["pnl", "cashflow", "wip", "deadlines", "caseload", "time-entries", "ar-aging", "trust-compliance"],
+    rooms: ["files", "reports", "analyze", "workflows", "import", "admin_settings"],
+  },
+  paralegal: {
+    provisioned: true,
+    tier: "paralegal",
+    sections: [
+      "/",
+      "/clients",
+      "/matters",
+      "/time_entries",
+      "/costs_and_disbursements",
+      "/court_calendar",
+      "/deadlines_and_sol",
+      "/files",
+      "/settings",
+    ],
+    entities: {
+      matters: "read",
+      clients: "read",
+      time_entries: "write",
+      costs_and_disbursements: "write",
+      court_calendar: "write",
+      deadlines_and_sol: "write",
+      lookups: "read",
+    },
+    reports: [],
+    rooms: ["files"],
+  },
+  intake: {
+    provisioned: true,
+    tier: "intake",
+    sections: ["/", "/intake_and_leads", "/clients", "/matters", "/settings"],
+    entities: { intake_and_leads: "write", clients: "write", matters: "read", lookups: "read" },
+    reports: [],
+    rooms: [],
+  },
+  none: { provisioned: false, tier: null, sections: [], entities: {}, reports: [], rooms: [] },
+} as const;
+
+export type AccessKey = keyof typeof ACCESS;
+
 export const HEALTH = {
   ok: true,
   version: "1.0.0",
@@ -687,6 +778,7 @@ export const DASHBOARD_SUMMARY = {
     trust_balance: 316675.64,
   },
   calendar: { upcoming_30d: 1 },
+  intake: { total: 2, month: 1 },
   as_of: "2026-08",
 };
 

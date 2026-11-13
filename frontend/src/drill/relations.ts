@@ -10,6 +10,7 @@
  * points at (this matter's time entries).
  */
 import { ENTITIES, ENTITY_BY_NAME, type EntityConfig, type FieldDef } from "../config/entities";
+import { canRead } from "../config/access";
 import { formatCell } from "../utils/format";
 
 export interface Relation {
@@ -47,7 +48,7 @@ export const RELATIONS: Relation[] = [
 
 /** Links up from a record of `entity`: the records it points at. */
 export function parentsOf(entity: string): Relation[] {
-  return RELATIONS.filter((r) => r.from === entity);
+  return RELATIONS.filter((r) => r.from === entity && canRead(r.to));
 }
 
 /**
@@ -56,14 +57,14 @@ export function parentsOf(entity: string): Relation[] {
  */
 export function childrenOf(entity: string): Relation[] {
   const order = ENTITIES.map((e) => e.name);
-  return RELATIONS.filter((r) => r.to === entity).sort(
+  return RELATIONS.filter((r) => r.to === entity && canRead(r.from)).sort(
     (a, b) => order.indexOf(a.from) - order.indexOf(b.from)
   );
 }
 
 /** The relation behind a field on a record, if the field is a pointer. */
 export function relationFor(entity: string, field: string): Relation | undefined {
-  return RELATIONS.find((r) => r.from === entity && r.field === field);
+  return RELATIONS.find((r) => r.from === entity && r.field === field && canRead(r.to));
 }
 
 /** Section heading for a child grid: "Invoices" — or, when one module points at

@@ -37,6 +37,7 @@ import { RecordDossier } from "../drill/RecordDossier";
 import { Docket } from "../components/Docket";
 import { Alert, Badge, EmptyState, Spinner } from "../components/ui";
 import { ViewSwitcher } from "../views/ViewSwitcher";
+import { canWrite } from "../config/access";
 import { ViewDesigner, type DesignedView } from "../views/ViewDesigner";
 import { ReportFrame } from "../components/ReportFrame";
 import { CalendarView, monthKey, parseMonth } from "../calendar/CalendarView";
@@ -98,6 +99,8 @@ export default function EntityListPage() {
 }
 
 function EntityModule({ config }: { config: EntityConfig }) {
+  // Read-only modules show no New, Edit or Delete; the server refuses them anyway.
+  const editable = canWrite(config.name);
   const toast = useToast();
   const drill = useDrill();
   const [params, setParams] = useSearchParams();
@@ -505,9 +508,11 @@ function EntityModule({ config }: { config: EntityConfig }) {
           </p>
         </div>
         <div className="actions">
-          <button className="btn btn-primary" onClick={openCreate}>
-            <Plus size={16} /> New {config.label}
-          </button>
+          {editable && (
+            <button className="btn btn-primary" onClick={openCreate}>
+              <Plus size={16} /> New {config.label}
+            </button>
+          )}
         </div>
       </div>
 
@@ -702,8 +707,8 @@ function EntityModule({ config }: { config: EntityConfig }) {
             key={selId}
             entity={config.name}
             id={selId}
-            onEdit={openEdit}
-            onDelete={setDeleting}
+            onEdit={editable ? openEdit : undefined}
+            onDelete={editable ? setDeleting : undefined}
             onBack={() => setShowPage(false)}
           />
         ) : (
@@ -787,7 +792,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
                 : `Add your first ${config.label.toLowerCase()} to get started.`
             }
             action={
-              !q && (
+              !q && editable && (
                 <button className="btn btn-primary" onClick={openCreate}>
                   <Plus size={16} /> New {config.label}
                 </button>
@@ -842,7 +847,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
                     </td>
                   ))}
                   <td onClick={(e) => e.stopPropagation()}>
-                    <div className="row-actions">
+                    {editable && <div className="row-actions">
                       <button
                         className="btn-icon"
                         title="Edit"
@@ -857,7 +862,7 @@ function EntityModule({ config }: { config: EntityConfig }) {
                       >
                         <Trash2 size={16} />
                       </button>
-                    </div>
+                    </div>}
                   </td>
                 </tr>
               ))}

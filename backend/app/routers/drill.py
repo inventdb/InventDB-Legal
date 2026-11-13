@@ -22,6 +22,7 @@ from typing import Any
 
 from flask import Blueprint, jsonify, request
 
+from ..access import current_tier
 from ..context import authed_client
 from ..entities import get_entity
 from ..errors import ApiError
@@ -118,10 +119,21 @@ def record_access(entity_name: str, record_id: str):
             )
         raise
 
+    # The tier table comes first: a module the tier only reads stays read-only
+    # whatever InventDB would allow. Wording never names the role or tier.
+    if not current_tier().can_write(entity.name):
+        return jsonify(
+            {
+                "can_view": True,
+                "can_edit": False,
+                "reason": f"You can view {entity.label_plural.lower()} but not change them.",
+                "row_rules": "n/a",
+            }
+        )
     role = _role(client.me())
     if role in _ADMIN_ROLES:
         return jsonify(
-            {"can_view": True, "can_edit": True, "reason": f"Your {role} role can change any record.", "row_rules": "bypassed"}
+            {"can_view": True, "can_edit": True, "reason": "You can change any record.", "row_rules": "bypassed"}
         )
     resource = f"{ident(client.namespace, 'namespace')}.{ident(entity.name, 'type')}"
     allowed = client.permission_check(resource, "write")

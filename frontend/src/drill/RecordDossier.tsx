@@ -98,8 +98,9 @@ export function RecordDossier({
 }: {
   entity: string;
   id: string;
-  onEdit: (record: Rec) => void;
-  onDelete: (record: Rec) => void;
+  /** Left out for a module this person can only read. */
+  onEdit?: (record: Rec) => void;
+  onDelete?: (record: Rec) => void;
   /** Back to the docket. */
   onBack: () => void;
 }) {
@@ -251,12 +252,12 @@ export function RecordDossier({
             </div>
           </div>
           <div className="act">
-            <button type="button" className="btn" onClick={() => onEdit(record)}>
+            {onEdit && <button type="button" className="btn" onClick={() => onEdit(record)}>
               <Pencil size={15} aria-hidden /> Edit
-            </button>
-            <button type="button" className="btn btn-danger" onClick={() => onDelete(record)}>
+            </button>}
+            {onDelete && <button type="button" className="btn btn-danger" onClick={() => onDelete(record)}>
               <Trash2 size={15} aria-hidden /> Delete
-            </button>
+            </button>}
           </div>
         </div>
       </section>

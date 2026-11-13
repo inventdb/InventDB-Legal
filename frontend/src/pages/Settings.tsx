@@ -3,6 +3,7 @@ import { Moon, Sun } from "lucide-react";
 
 import { api, errorMessage } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import { hasRoom } from "../config/access";
 import { useTheme } from "../theme/ThemeContext";
 import { useToast } from "../components/Toast";
 import { Alert } from "../components/ui";
@@ -45,8 +46,6 @@ export default function Settings() {
             <dd>{String(user?.username ?? "—")}</dd>
             <dt>Email</dt>
             <dd>{String(user?.email ?? "—")}</dd>
-            <dt>Role</dt>
-            <dd>{String(user?.role ?? user?.globalRole ?? "—")}</dd>
           </dl>
           <div style={{ marginTop: 16 }}>
             <button className="btn btn-ghost" onClick={logout}>
@@ -68,7 +67,8 @@ export default function Settings() {
         </div>
 
         {/* Connection */}
-        <ConnectionCard health={health} onLogout={logout} />
+        {/* Repointing the app at another instance is an administrator's job. */}
+        {hasRoom("admin_settings") && <ConnectionCard health={health} onLogout={logout} />}
       </div>
     </div>
   );

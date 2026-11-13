@@ -199,6 +199,43 @@ Open **http://localhost:5174** and sign in with your InventDB credentials.
 python backend/check_inventdb.py <username> <password>
 ```
 
+### 4. Roles, access and demo logins
+
+Each person sees only their own part of the firm. Their **InventDB Legal role**
+decides it, and nothing on screen ever names that role. Sign-in goes straight
+to their own dashboard and sidebar.
+
+| Tier | Who | Sections |
+|---|---|---|
+| Admin | InventDB global `admin` / `superadmin` | Everything, including Import, Lookups and the connection settings |
+| Partner | Managing Partner, Partner, Of Counsel, Practice Manager | Every module (money read-only), Files, Reports, Analyze, Workflows |
+| Attorney | Associates, trainees, counsel | Matters and Clients (read), Time, Costs, Court Calendar, Deadlines, Files, docket reports, Analyze |
+| Paralegal | Paralegals, legal assistants, docketing and court clerks | Matters and Clients (read), Time, Costs, Court Calendar, Deadlines, Files |
+| Intake | Front desk, intake, conflicts, business development | Intake & Leads, Clients, Matters (read) |
+| Finance | Billing, accounts, trust officer, CFO, auditor | Time, Costs, Invoices, Payments, Trust Ledger, Settlements, financial reports, Analyze, Workflows |
+
+The tier comes from `GET /api/auth/me?app=legal`. A global admin or superadmin is
+always Admin; otherwise the per-app role `legal:<tier>` (or a job title such as
+"Senior Associate") picks the tier. Someone with no Legal role signs in to a
+"not set up yet" screen. The table lives in `backend/app/access.py`, and it is
+enforced at three levels: InventDB's role grants, the API guard on every request,
+and the frontend.
+
+**Install the roles and the demo logins** (once per instance, as a superadmin):
+
+```bash
+cd backend
+.venv/Scripts/python -m scripts.provision_roles --dry-run   # see what it will send
+.venv/Scripts/python -m scripts.provision_roles             # asks for the superadmin login
+```
+
+It installs the `legal:*` roles, creates `demo.admin` (global superadmin) and one
+demo login per tier (`demo.partner`, `demo.attorney`, `demo.paralegal`,
+`demo.intake`, `demo.finance`), and then checks each login against the table.
+Generated passwords go to `backend/demo-logins.local`, which is git-ignored. To set
+up a real person, give them the matching `legal:*` role on the `legal` app in
+InventDB.
+
 ---
 
 ## ⚙️ Configuration
@@ -325,6 +362,7 @@ All endpoints live under `/api`. Data routes require a bearer token from the log
 |---|---|---|
 | `POST` | `/api/auth/login` | Log in via InventDB, returns JWT + user |
 | `GET` | `/api/auth/me` | Current user profile |
+| `GET` | `/api/auth/access` | The caller's sections, modules, reports and rooms (from their Legal role) |
 | `POST` | `/api/auth/forgot-password` | Password reset request |
 | `GET` | `/api/health` | API + connection status |
 
@@ -335,7 +373,7 @@ All endpoints live under `/api`. Data routes require a bearer token from the log
 | `GET` | `/api/<entity>` | List (`q`, filters, `order_by`, `limit`, `offset`). A filter matches a column (`status=Open`) or bounds it (`date__gte=2026-10-01&date__lt=2026-11-01`) |
 | `POST` | `/api/<entity>` | Create |
 | `GET/PUT/DELETE` | `/api/<entity>/<id>` | Read / update / delete |
-| `GET` | `/api/dashboard/summary` · `/charts` | Aggregated metrics |
+| `GET` | `/api/dashboard/summary` · `/charts` · `/panels?names=` | Aggregated metrics and short lists, limited to what the caller's tier may read |
 
 `<entity>` is one of `matters`, `clients`, `timekeepers`, `time_entries`,
 `costs_and_disbursements`, `invoices`, `payments_and_receipts`,

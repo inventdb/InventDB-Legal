@@ -21,6 +21,7 @@ import { useToast } from "../components/Toast";
 import { errorMessage } from "../api/client";
 import { useAttachFile, useCreate, useList } from "../api/hooks";
 import { ENTITIES, ENTITY_BY_NAME, recordTitle } from "../config/entities";
+import { canWrite } from "../config/access";
 import type { Record as Rec } from "../types";
 
 /**
@@ -66,10 +67,11 @@ export function AttachPanel({
   const attach = useAttachFile();
 
   const [mode, setMode] = useState<"existing" | "new">("existing");
-  const [type, setType] = useState(currentType || ENTITIES[0]?.name || "");
+  const writable = ENTITIES.filter((e) => canWrite(e.name));
+  const [type, setType] = useState(currentType || writable[0]?.name || "");
   const [recordId, setRecordId] = useState("");
   const [newType, setNewType] = useState(
-    ENTITY_BY_NAME[DEFAULT_NEW_TYPE] ? DEFAULT_NEW_TYPE : ENTITIES[0]?.name || ""
+    ENTITY_BY_NAME[DEFAULT_NEW_TYPE] && canWrite(DEFAULT_NEW_TYPE) ? DEFAULT_NEW_TYPE : writable[0]?.name || ""
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -172,7 +174,7 @@ export function AttachPanel({
                   setRecordId("");
                 }}
               >
-                {ENTITIES.map((entity) => (
+                {ENTITIES.filter((entity) => canWrite(entity.name)).map((entity) => (
                   <option key={entity.name} value={entity.name}>
                     {entity.labelPlural}
                   </option>
@@ -211,7 +213,7 @@ export function AttachPanel({
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
               >
-                {ENTITIES.map((entity) => (
+                {ENTITIES.filter((entity) => canWrite(entity.name)).map((entity) => (
                   <option key={entity.name} value={entity.name}>
                     {entity.label}
                   </option>

@@ -97,6 +97,21 @@ export const FLOORS: Floor[] = [
 /** Every section in building order: the order Tab walks them in. */
 export const SECTIONS: Section[] = FLOORS.flatMap((f) => f.sections);
 
+/**
+ * The groups one person sees: only their sections, and only the groups that
+ * still hold one. `allowed` is the access map's `sections`.
+ */
+export function floorsFor(allowed: readonly string[]): Floor[] {
+  const set = new Set(allowed);
+  return FLOORS.map((f) => ({ ...f, sections: f.sections.filter((s) => set.has(s.to)) })).filter(
+    (f) => f.sections.length > 0
+  );
+}
+
+export function sectionsFor(allowed: readonly string[]): Section[] {
+  return floorsFor(allowed).flatMap((f) => f.sections);
+}
+
 /** The first path segment, as a section's `to`. */
 export function sectionPath(pathname: string): string {
   const seg = pathname.split("/").filter(Boolean)[0];

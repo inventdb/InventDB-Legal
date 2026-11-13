@@ -12,6 +12,7 @@ import { Search } from "lucide-react";
 
 import { api } from "../api/client";
 import { ENTITIES, recordTitle } from "../config/entities";
+import { canRead } from "../config/access";
 import type { ListResponse, Record as Rec } from "../types";
 
 const PER_MODULE = 3;
@@ -34,8 +35,10 @@ export function useFirmSearch(term: string) {
   }, [term]);
 
   const enabled = q.length >= 2;
+  // Only the modules this person can read: a search never reaches past them.
+  const modules = ENTITIES.filter((cfg) => canRead(cfg.name));
   const results = useQueries({
-    queries: ENTITIES.map((cfg) => ({
+    queries: modules.map((cfg) => ({
       queryKey: ["firm-search", cfg.name, q],
       enabled,
       staleTime: 30_000,
@@ -52,7 +55,7 @@ export function useFirmSearch(term: string) {
     if (!enabled) return [];
     const out: SearchHit[] = [];
     results.forEach((r, i) => {
-      const cfg = ENTITIES[i];
+      const cfg = modules[i];
       for (const row of r.data ?? []) {
         if (row._id == null) continue;
         out.push({
@@ -165,7 +168,7 @@ export function GlobalSearch() {
         <input
           ref={input}
           value={term}
-          placeholder="Search matters, clients, invoices"
+          placeholder="Search the firm"
           autoComplete="off"
           onFocus={() => setOpen(true)}
           onChange={(e) => {

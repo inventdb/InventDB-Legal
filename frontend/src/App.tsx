@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { useAuth } from "./auth/AuthContext";
 import { Layout } from "./components/Layout";
@@ -8,11 +8,13 @@ import Analyze from "./pages/Analyze";
 import Dashboard from "./pages/Dashboard";
 import EntityListPage from "./pages/EntityListPage";
 import Login from "./pages/Login";
+import NotSetUp from "./pages/NotSetUp";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Workflows from "./pages/Workflows";
 import Files from "./pages/Files";
 import { Spinner } from "./components/ui";
+import { sectionPath } from "./config/floors";
 
 // Import pulls in SheetJS to read workbooks in the browser — around 330 kB
 // that no other room needs. Loading the route on demand keeps it out of the
@@ -20,8 +22,18 @@ import { Spinner } from "./components/ui";
 const ImportPage = lazy(() => import("./pages/Import"));
 
 function ProtectedLayout() {
-  const { user, token } = useAuth();
+  const { user, token, access, accessError } = useAuth();
+  const location = useLocation();
   if (!user || !token) return <Navigate to="/login" replace />;
+  // Nothing of the firm is drawn until we know which part of it is theirs.
+  if (accessError && !access) return <NotSetUp error={accessError} />;
+  if (!access) return <Spinner />;
+  if (!access.provisioned) return <NotSetUp />;
+  // A section outside this person's tier (typed, bookmarked, or left over
+  // from someone else's session) goes to their own dashboard, unexplained.
+  if (!access.sections.includes(sectionPath(location.pathname))) {
+    return <Navigate to="/" replace />;
+  }
   // One drill-down panel for every signed-in page — see drill/DrillContext.
   return (
     <DrillProvider>

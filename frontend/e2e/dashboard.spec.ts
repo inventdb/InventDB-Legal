@@ -36,7 +36,8 @@ test.describe("Dashboard", () => {
     // Today's date sits over the greeting.
     await expect(page.locator(".room-kicker")).toHaveText(/^(Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day,? \d{1,2} \w+ \d{4}$/);
     await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)/ })).toBeVisible();
-    await expect(page.getByText(/Every figure shows the query behind it/)).toBeVisible();
+    // The line under the greeting describes this person's own board.
+    await expect(page.getByText(/The whole practice today/)).toBeVisible();
   });
 
   test("opens on the onboarding state when nothing has been built yet", async ({ page }) => {
@@ -242,6 +243,10 @@ test.describe("Dashboard", () => {
     test("a card can be moved in EITHER direction, and lands where it is dropped", async ({
       page,
     }) => {
+      // The role board sits above the widgets, so two rows of them no longer
+      // fit a 900px window, and a synthetic drag does not auto-scroll. A tall
+      // window keeps every card on screen for the drop.
+      await page.setViewportSize({ width: 1440, height: 1800 });
       // A real dashboard: mixed widths over more than one row, which is what
       // Suggest builds and where reordering used to go wrong.
       for (const [title, span] of [

@@ -31,6 +31,7 @@ import { ActionProgress } from "../analyze/ui";
 import { listTypes } from "../dashboard/api";
 import { NS } from "../dashboard/suggest";
 import { ENTITIES } from "../config/entities";
+import { canRead } from "../config/access";
 import type { FileRow } from "../types";
 import type { DriveSelection } from "./FolderTree";
 import {
@@ -589,7 +590,9 @@ function UploadStage({
   }, []);
 
   const options = useMemo(() => {
-    const names = types.length ? types : ENTITIES.map((e) => e.name);
+    const names = (types.length ? types : ENTITIES.map((e) => e.name)).filter(
+      (n) => n === "files" || canRead(n)
+    );
     return Array.from(new Set([...names, "files", type])).filter(Boolean).sort();
   }, [types, type]);
 

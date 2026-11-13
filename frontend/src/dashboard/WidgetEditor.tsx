@@ -21,6 +21,7 @@ import { AgentTimeline } from "../analyze/Timeline";
 import { ActionProgress, AutoTextarea } from "../analyze/ui";
 import { Modal } from "../components/Modal";
 import { ENTITIES } from "../config/entities";
+import { canWrite } from "../config/access";
 import { buildSchemaSummary, NS } from "./suggest";
 import { generateWidget } from "./reportWidget";
 import { WidgetView } from "./WidgetView";
@@ -486,7 +487,7 @@ export function WidgetEditor({
                   }}
                 >
                   <option value="">pick a type…</option>
-                  {ENTITIES.map((e) => (
+                  {ENTITIES.filter((e) => canWrite(e.name)).map((e) => (
                     <option key={e.name} value={e.name}>
                       {e.labelPlural}
                     </option>

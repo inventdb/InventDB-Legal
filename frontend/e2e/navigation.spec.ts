@@ -158,12 +158,12 @@ test.describe("The sidebar", () => {
 });
 
 test.describe("Unmatched routes", () => {
-  test("shows Unknown module for a single unknown segment", async ({ page }) => {
-    // `:entity` outranks the `*` splat for a one-segment path, so this lands
-    // on EntityListPage with no matching config rather than redirecting.
+  test("sends a single unknown segment back to the dashboard", async ({ page }) => {
+    // Only the person's own sections are reachable, and an unknown one is not
+    // among them: it lands on the dashboard without saying why.
     await page.goto("/not-a-module");
-    await expect(page.getByRole("heading", { name: "Unknown module" })).toBeVisible();
-    await expect(page.getByText('No module named "not-a-module".')).toBeVisible();
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("heading", { name: "Dashboard", level: 1 })).toBeVisible();
   });
 
   test("redirects a deep unknown path back to the dashboard", async ({ page }) => {

@@ -19,7 +19,7 @@ from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
-from . import __version__
+from . import __version__, access
 from .config import get_settings
 from .errors import ApiError
 from .routers import (
@@ -90,6 +90,10 @@ def create_app() -> Flask:
                 "frontend_bundled": dist is not None,
             }
         )
+
+    # --- Role tiers: every API request is checked against the caller's tier
+    # before it reaches a router. See app/access.py.
+    app.before_request(access.guard)
 
     # --- Blueprints (specific prefixes are registered before the generic one) ---
     app.register_blueprint(auth.bp)

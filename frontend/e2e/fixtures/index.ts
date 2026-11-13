@@ -1,6 +1,6 @@
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
 
-import { MODULES, createStore, type Store } from "./data";
+import { MODULES, createStore, type AccessKey, type Store } from "./data";
 import { installMockApi } from "./mock-api";
 
 export * from "./data";
@@ -11,6 +11,8 @@ interface Options {
   liveApi: boolean;
   /** Artificial per-request latency, for asserting on loading states. */
   apiLatency: number;
+  /** The tier the signed-in user lands in. */
+  access: AccessKey;
 }
 
 interface Fixtures {
@@ -31,15 +33,16 @@ interface Fixtures {
 export const test = base.extend<Options & Fixtures>({
   liveApi: [false, { option: true }],
   apiLatency: [0, { option: true }],
+  access: ["admin", { option: true }],
 
   store: async ({}, use) => {
     await use(createStore());
   },
 
   mockApi: [
-    async ({ page, store, liveApi, apiLatency }, use) => {
+    async ({ page, store, liveApi, apiLatency, access }, use) => {
       if (!liveApi) {
-        await installMockApi(page, store, { latencyMs: apiLatency });
+        await installMockApi(page, store, { latencyMs: apiLatency, access });
       }
       await use();
     },
@@ -112,6 +115,9 @@ export async function preferLedger(page: Page): Promise<void> {
  * sections", then its name.
  */
 export async function openSection(page: Page, label: string): Promise<void> {
+  // The frame is drawn only once the person's access is known; until then
+  // there is neither a sidebar nor an "All sections" button to look for.
+  await page.locator(".ch-bench").waitFor();
   // A section with something waiting on it carries the count after its name.
   const name = new RegExp(`^${escapeRegExp(label)}(,| |$)`);
   const side = page.getByRole("navigation", { name: "Sections", exact: true }).getByRole("link", { name });

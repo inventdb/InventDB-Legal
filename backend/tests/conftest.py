@@ -76,6 +76,33 @@ def fake(monkeypatch) -> FakeInventDB:
     return stub
 
 
+class TierSwitch:
+    """Which tier the request guard resolves the test caller to.
+
+    Defaults to ``admin`` so tests about a router are not also tests about the
+    tier table. Set ``tier.key = "intake"`` (or ``None`` for "not set up") to
+    exercise the guard; ``test_access.py`` does, and also covers the real
+    resolution from ``/api/auth/me``.
+    """
+
+    def __init__(self) -> None:
+        self.key: str | None = "admin"
+        self.real = False
+
+
+@pytest.fixture(autouse=True)
+def tier(monkeypatch) -> TierSwitch:
+    from app import access
+
+    switch = TierSwitch()
+    real = access.resolve_tier
+    access.clear_cache()
+    monkeypatch.setattr(
+        access, "resolve_tier", lambda client: real(client) if switch.real else switch.key
+    )
+    return switch
+
+
 @pytest.fixture
 def flask_app(monkeypatch):
     """A fresh app with SPA hosting disabled.

@@ -1369,6 +1369,24 @@
       ]
     },
     {
+      "key": "SELECT COUNT(*) AS c FROM legal.intake_and_leads",
+      "status": 200,
+      "rows": [
+        {
+          "c": 412
+        }
+      ]
+    },
+    {
+      "key": "SELECT COUNT(*) AS c FROM legal.intake_and_leads WHERE YEAR(date_received) = 2026 AND MONTH(date_received) = 8",
+      "status": 200,
+      "rows": [
+        {
+          "c": 37
+        }
+      ]
+    },
+    {
       "key": "SELECT COUNT(*) AS c FROM legal.matters",
       "status": 200,
       "rows": [

@@ -11,7 +11,7 @@
  * above the page and the menu button opens "All sections". On a phone a bottom
  * bar holds the places a lawyer reaches for most.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 
 import { ENTITY_BY_NAME } from "../config/entities";
-import { FLOORS, SECTIONS, floorOf, sectionPath, type Floor, type Section } from "../config/floors";
+import { floorsFor, sectionPath, type Floor, type Section } from "../config/floors";
 import { useAuth } from "../auth/AuthContext";
 import { usePendingApprovalCount } from "../api/hooks";
 import { useTheme } from "../theme/ThemeContext";
@@ -58,7 +58,7 @@ const BOTTOM = [
 ];
 
 export function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, access } = useAuth();
   const { theme, toggle } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,8 +71,16 @@ export function Layout() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const floor = floorOf(location.pathname);
+  // Only this person's sections, and only the groups that still hold one.
+  // Nothing here says why a section is missing: it simply is not there.
+  const allowed = access?.sections;
+  const floors = useMemo(() => floorsFor(allowed ?? ["/"]), [allowed]);
+  const sections = useMemo(() => floors.flatMap((f) => f.sections), [floors]);
+  const bottom = BOTTOM.filter((b) => (allowed ?? ["/"]).includes(b.to));
+  const canWorkflows = (allowed ?? []).includes("/workflows");
+
   const here = sectionPath(location.pathname);
+  const floor = floors.find((f) => f.sections.some((s) => s.to === here)) ?? floors[0];
   const title = pageTitle(location.pathname);
 
   // Any move closes whatever was summoned to make it.
@@ -174,7 +182,7 @@ export function Layout() {
         >
           <Search size={18} />
         </button>
-        <Link
+        {canWorkflows && <Link
           to="/workflows"
           className="ch-ibtn ch-bell"
           aria-label={waiting ? `Notifications, ${waiting} waiting on you` : "Notifications"}
@@ -182,7 +190,7 @@ export function Layout() {
         >
           <Bell size={18} />
           {waiting > 0 && <span className="ch-dot">{waiting}</span>}
-        </Link>
+        </Link>}
         <button
           type="button"
           className="ch-ibtn d-only"
@@ -215,22 +223,22 @@ export function Layout() {
             aria-label="Sections"
             onKeyDown={(e) => {
               if (e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
-              const at = SECTIONS.findIndex(
+              const at = sections.findIndex(
                 (s) => s.to === (document.activeElement as HTMLAnchorElement)?.getAttribute("href")
               );
               if (at === -1) return;
               const next = at + (e.shiftKey ? -1 : 1);
               // Off either end of the firm: let Tab do its ordinary job.
-              if (next < 0 || next >= SECTIONS.length) return;
+              if (next < 0 || next >= sections.length) return;
               e.preventDefault();
-              const to = SECTIONS[next].to;
+              const to = sections[next].to;
               pendingFocus.current = to;
               document.querySelector<HTMLAnchorElement>(`nav.nav a.nav-item[href="${to}"]`)?.focus();
               navigate(to);
             }}
           >
-            <div className="ch-groups">{FLOORS.filter((f) => !f.back).map(group)}</div>
-            <div className="ch-groups ch-back">{FLOORS.filter((f) => f.back).map(group)}</div>
+            <div className="ch-groups">{floors.filter((f) => !f.back).map(group)}</div>
+            <div className="ch-groups ch-back">{floors.filter((f) => f.back).map(group)}</div>
           </nav>
         </aside>
 
@@ -264,7 +272,7 @@ export function Layout() {
       </div>
 
       <nav className="ch-tabbar" aria-label="Main">
-        {BOTTOM.map(({ to, label, Icon, end }) => (
+        {bottom.map(({ to, label, Icon, end }) => (
           <NavLink key={to} to={to} end={end} className="ch-tab-item">
             <Icon size={20} aria-hidden />
             <span>{label}</span>
@@ -273,7 +281,7 @@ export function Layout() {
         <button
           type="button"
           className="ch-tab-item"
-          aria-current={dirOpen || !BOTTOM.some((b) => b.to === here) ? "page" : undefined}
+          aria-current={dirOpen || !bottom.some((b) => b.to === here) ? "page" : undefined}
           aria-label={`All sections${waiting ? `, ${waiting} waiting on you` : ""}`}
           onClick={() => setDirOpen(true)}
         >
@@ -283,7 +291,9 @@ export function Layout() {
         </button>
       </nav>
 
-      {dirOpen && <Directory here={here} badgeFor={badgeFor} onClose={() => setDirOpen(false)} />}
+      {dirOpen && (
+        <Directory floors={floors} here={here} badgeFor={badgeFor} onClose={() => setDirOpen(false)} />
+      )}
       {searchOpen && <PhoneSearch onClose={() => setSearchOpen(false)} />}
     </div>
   );
@@ -369,10 +379,12 @@ function AccountMenu({
 
 /** Every section of the app, group by group, on one sheet. */
 function Directory({
+  floors,
   here,
   badgeFor,
   onClose,
 }: {
+  floors: Floor[];
   here: string;
   badgeFor: (s: Section) => number;
   onClose: () => void;
@@ -392,7 +404,7 @@ function Directory({
   }, [onClose]);
 
   const term = q.trim().toLowerCase();
-  const floors = FLOORS.map((f) => ({
+  const groups = floors.map((f) => ({
     f,
     sections: f.sections.filter(
       (s) => !term || s.label.toLowerCase().includes(term) || f.name.toLowerCase().includes(term)
@@ -423,8 +435,8 @@ function Directory({
               onChange={(e) => setQ(e.target.value)}
             />
           </label>
-          {floors.length === 0 && <p className="cb-faint">No section has that name.</p>}
-          {floors.map(({ f, sections }) => (
+          {groups.length === 0 && <p className="cb-faint">No section has that name.</p>}
+          {groups.map(({ f, sections }) => (
             <section key={f.num} className="ch-dir-group" aria-label={f.name}>
               <div className="ch-dir-head">
                 <b>{f.name}</b>
@@ -477,7 +489,7 @@ function PhoneSearch({ onClose }: { onClose: () => void }) {
           <input
             autoFocus
             value={term}
-            placeholder="Search matters, clients, invoices"
+            placeholder="Search the firm"
             autoComplete="off"
             onChange={(e) => setTerm(e.target.value)}
           />
@@ -492,7 +504,7 @@ function PhoneSearch({ onClose }: { onClose: () => void }) {
             onPick={(h) => navigate(hitPath(h))}
           />
         ) : (
-          <p className="cb-gres-none">Type two letters or more: a caption, a client, an invoice number.</p>
+          <p className="cb-gres-none">Type two letters or more: a name, a caption or a number.</p>
         )}
       </div>
     </div>

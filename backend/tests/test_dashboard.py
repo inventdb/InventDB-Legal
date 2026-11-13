@@ -280,6 +280,7 @@ def test_summary_exposes_every_group_the_frontend_reads(api, fake):
         "time",
         "financials",
         "calendar",
+        "intake",
         "as_of",
     }
     assert set(body["financials"]) == {

@@ -27,6 +27,8 @@ import { LayoutDesigner } from "../dashboard/LayoutDesigner";
 import { WidgetEditor } from "../dashboard/WidgetEditor";
 import { WidgetView } from "../dashboard/WidgetView";
 import type { Widget } from "../dashboard/types";
+import { RoleBoard } from "../dashboard/RoleBoard";
+import { BOARDS } from "../dashboard/boards";
 
 // Referenced so the import of the agent module is not tree-shaken away in dev
 // builds that only reach it through suggestWidgets.
@@ -59,8 +61,15 @@ export function greeting(now: Date = new Date()): string {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, access } = useAuth();
   const userId = user?.username;
+  // This person's own board, chosen by the backend's reading of their InventDB
+  // role. The personal widget board below it is offered where the tier has the
+  // query tools behind it.
+  const board = access?.tier ? BOARDS[access.tier] : null;
+  const showWidgets = !!board?.widgets;
+  const intro = board?.intro;
+  const roleBoard = access ? <RoleBoard access={access} /> : null;
 
   const [widgets, setWidgets] = useState<Widget[] | null>(null); // null = loading
   const [proposed, setProposed] = useState<Widget[] | null>(null); // preview, unsaved
@@ -248,11 +257,21 @@ export default function Dashboard() {
       </>
     ) : null;
 
+  if (!showWidgets) {
+    return (
+      <div className="content">
+        <Head intro={intro} picker={false} />
+        {roleBoard}
+      </div>
+    );
+  }
+
   /* ── loading ─────────────────────────────────────────────────────────── */
   if (widgets === null) {
     return (
       <div className="content">
-        <Head />
+        <Head intro={intro} />
+        {roleBoard}
         <div className="bento">
           {[8, 4, 6, 6].map((s, i) => (
             <section key={i} className={`card wg span-${s}`}>
@@ -268,7 +287,7 @@ export default function Dashboard() {
   if (proposed) {
     return (
       <div className="content">
-        <Head />
+        <Head intro={intro} />
         <div className="card bento-preview">
           <span className="preview-tag">PREVIEW</span>
           <span className="preview-text">
@@ -306,7 +325,8 @@ export default function Dashboard() {
   /* ── the room ────────────────────────────────────────────────────────── */
   return (
     <div className="content">
-      <Head />
+      <Head intro={intro} />
+      {roleBoard}
 
       {/* The toolbar only appears once there are widgets: with none, the empty
           state below is the single entry point, and Refresh / Edit layout have
@@ -559,7 +579,7 @@ function useGridFlip(
 }
 
 /** Room header — today's date, the greeting, the dashboard picker, and what the room is. */
-function Head() {
+function Head({ intro, picker = true }: { intro?: string; picker?: boolean }) {
   const today = new Date().toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -572,7 +592,9 @@ function Head() {
         <div className="room-kicker">{today}</div>
         <div className="room-title">
           <h2>{greeting()}</h2>
-          <label className="ns-pick">
+          {/* The picker belongs to the widget board (it names the namespace the
+              widgets query), so a board without widgets leaves it out. */}
+          {picker && <label className="ns-pick">
             <span>Dashboard for</span>
             <span className="ns-pick-control">
               {/* One namespace, so the picker has one option — the same control
@@ -587,11 +609,15 @@ function Head() {
               </select>
               <ChevronDown size={13} aria-hidden />
             </span>
-          </label>
+          </label>}
         </div>
         <p className="room-sub">
-          A live view of your <b>{NS}</b> data. Every figure shows the query behind it, so you
-          can check where it came from.
+          {intro ?? (
+            <>
+              A live view of your <b>{NS}</b> data. Every figure shows the query behind it, so you
+              can check where it came from.
+            </>
+          )}
         </p>
       </div>
     </div>

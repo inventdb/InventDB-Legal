@@ -40,6 +40,8 @@ import {
   sseBody,
   type Rec,
   type Store,
+  ACCESS,
+  type AccessKey,
 } from "./data";
 
 /**
@@ -58,6 +60,8 @@ import {
 export interface MockOptions {
   /** Delay every API response by this many ms, to catch loading states. */
   latencyMs?: number;
+  /** Which tier `/api/auth/access` answers with. Defaults to admin. */
+  access?: AccessKey;
 }
 
 const RESERVED = new Set(["q", "limit", "offset", "order_by", "order_dir"]);
@@ -298,6 +302,7 @@ export async function installMockApi(
         });
       }
       if (action === "me") return json(route, AUTH_USER);
+      if (action === "access") return json(route, ACCESS[options.access ?? "admin"]);
       if (action === "forgot-password") return json(route, { ok: true });
       if (action === "health") return json(route, { ok: true, inventdb: HEALTH });
       return json(route, { error: "Not found" }, 404);
@@ -305,7 +310,45 @@ export async function installMockApi(
 
     // ---- /api/dashboard/* -------------------------------------------------
     if (head === "dashboard") {
-      if (rest[0] === "summary") return json(route, DASHBOARD_SUMMARY);
+      // Filtered the way the backend filters it: a block the tier cannot
+      // read is left out (see backend/app/routers/dashboard.py).
+      const can = ACCESS[options.access ?? "admin"].entities as Record<string, string>;
+      if (rest[0] === "summary") {
+        const need: Record<string, string> = {
+          matters: "matters",
+          clients: "clients",
+          deadlines: "deadlines_and_sol",
+          time: "time_entries",
+          financials: "invoices",
+          calendar: "court_calendar",
+          intake: "intake_and_leads",
+        };
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(DASHBOARD_SUMMARY)) {
+          if (!need[k] || can[need[k]]) out[k] = v;
+        }
+        return json(route, out);
+      }
+      if (rest[0] === "panels") {
+        const panelEntity: Record<string, string> = {
+          deadlines: "deadlines_and_sol",
+          overdue: "deadlines_and_sol",
+          hearings: "court_calendar",
+          matters: "matters",
+          leads: "intake_and_leads",
+          clients: "clients",
+          time: "time_entries",
+          invoices: "invoices",
+          trust: "trust_ledger_cta",
+        };
+        const names = (url.searchParams.get("names") ?? "").split(",").filter(Boolean);
+        const out: Record<string, unknown> = {};
+        for (const n of names) {
+          const entity = panelEntity[n];
+          if (entity && can[entity]) out[n] = { entity, rows: (store[entity] ?? []).slice(0, 8) };
+        }
+        return json(route, out);
+      }
       if (rest[0] === "charts") return json(route, DASHBOARD_CHARTS);
       return json(route, { error: "Not found" }, 404);
     }
@@ -1053,7 +1096,7 @@ export async function installMockApi(
       if (!rowsOf) return json(route, { error: `Unknown entity: ${entity}` }, 404);
       if (method === "GET" && id && action === "access") {
         return rowsOf.some((r) => r._id === id)
-          ? json(route, { can_view: true, can_edit: true, reason: "Your superadmin role can change any record.", row_rules: "bypassed" })
+          ? json(route, { can_view: true, can_edit: true, reason: "You can change any record.", row_rules: "bypassed" })
           : json(route, { can_view: false, can_edit: false, reason: "This record is not visible to you.", row_rules: "n/a" });
       }
       if (method === "GET" && id && action === "files") {

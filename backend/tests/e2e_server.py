@@ -131,7 +131,7 @@ def transport(method: str, url: str, **kw: Any) -> _Response:
             return _Response(401, {"error": "Invalid username or password"})
         return _Response(200, {"token": TOKEN, "user": {"username": creds.get("username"), "role": "manager"}})
     if "/auth/me" in path or path.endswith("/me"):
-        return _Response(200, {"username": "e2e.manager", "email": "e2e@example.com", "role": "manager"})
+        return _Response(200, {"username": "e2e.manager", "email": "e2e@example.com", "role": "manager", "globalRole": "superadmin"})
 
     # ---- sql -------------------------------------------------------------
     if path == "/sql":

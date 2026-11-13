@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
+from .. import access
 from ..context import anon_client, authed_client
 from ..errors import ApiError
 
@@ -45,6 +46,17 @@ def login():
 @bp.get("/me")
 def me():
     return jsonify(authed_client().me())
+
+
+@bp.get("/access")
+def access_map():
+    """What the signed-in person may reach: their sections, modules and rooms.
+
+    Worked out from their InventDB Legal role on every call (briefly cached),
+    so a role changed in InventDB takes effect on the next sign-in or refresh.
+    Someone with no Legal role gets ``provisioned: false`` and nothing else.
+    """
+    return jsonify(access.access_payload(access.resolve_tier(authed_client())))
 
 
 @bp.post("/forgot-password")
