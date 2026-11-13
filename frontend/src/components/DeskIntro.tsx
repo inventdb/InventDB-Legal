@@ -4,10 +4,10 @@
  *   1. The scales draw up in the middle of the page, swing and come to rest;
  *      the name is set beside them, letter by letter, and the line beneath.
  *   2. The lockup glides up into its place in the page's own heading.
- *   3. The booklet's leather spreads from where the booklet lies until it
- *      fills the view; the gilt title is set on it; then the leather draws
- *      back in until it is the real booklet's cover. `onDone` hands over and
- *      the booklet opens.
+ *   3. The booklet is set down on the page: its cover slides up into place,
+ *      its gilt frame is drawn and the mark and title are set on it. It lies
+ *      exactly where the real booklet does, so `onDone` hands over and the
+ *      booklet opens with its own page turn.
  *
  * Everything moves or is drawn; nothing fades. "Skip to sign in" is there
  * throughout. It plays once per device (Login decides), never with reduced
@@ -51,7 +51,7 @@ export function DeskIntro({ narrow, onDone }: { narrow: boolean; onDone: (skippe
     const at = head.getBoundingClientRect();
     const stage = el.querySelector(".in-stage")!;
     stage.innerHTML =
-      '<div class="in-ground"></div><div class="in-leather"></div>' +
+      '<div class="in-ground"></div>' +
       `<div class="dk-top in-top" style="left:${at.left}px;top:${at.top}px"><div class="brand-lockup">${MARK}` +
       `<span class="brand-lockup-text"><span class="brand-lockup-name">${letters("InventDB")}<span class="brand-lockup-suffix">${letters("Legal")}</span></span>` +
       '<span class="brand-lockup-tag">Legal practice management</span></span></div></div>';
@@ -123,36 +123,11 @@ export function DeskIntro({ narrow, onDone }: { narrow: boolean; onDone: (skippe
       "linear",
     );
 
-    // 3. The leather spreads from where the booklet lies until it fills the view.
-    const book = document.querySelector<HTMLElement>(narrow ? ".dk-book" : ".dk-leaf .dk-face.cover");
-    const b = book?.getBoundingClientRect() ?? new DOMRect(vw / 2, vh / 2, 0, 0);
-    const cx = b.left + b.width / 2;
-    const cy = b.top + b.height / 2;
-    const leather = q(".in-leather");
-    const T = 6500;
-    A(leather, [{ visibility: "hidden" }, { visibility: "visible" }], T, 1, "linear");
-    const grow = A(
-      leather,
-      [
-        { clipPath: `inset(${cy.toFixed(1)}px ${(vw - cx).toFixed(1)}px ${(vh - cy).toFixed(1)}px ${cx.toFixed(1)}px round 18px)` },
-        { clipPath: "inset(0px 0px 0px 0px round 0px)" },
-      ],
-      T,
-      1100,
-      "cubic-bezier(0.5, 0, 0.3, 1)",
-    );
-    A(skipBtn.current, [{ visibility: "visible" }, { visibility: "hidden" }], T + 1100, 1, "linear", "forwards");
-    // The name stays legible on the leather: gilt while the leather is under it, ink again after.
-    const inks = [".brand-lockup-name", ".brand-lockup-suffix", ".brand-lockup-tag", ".brand-lockup > svg"]
-      .map((s) => q(s) as HTMLElement | null)
-      .filter((n): n is HTMLElement => !!n)
-      .map((n) => ({ n, c: getComputedStyle(n).color }));
-    inks.forEach(({ n, c }) => A(n, [{ color: c }, { color: "#e3c47e" }], T + 500, 400, "linear", "forwards"));
-
-    // 4. The gilt title is set, and the leather draws in onto the real cover.
-    const coverStage = () => {
+    // 3. The booklet is set down on the page: its cover slides up into place,
+    // the gilt frame is drawn round it, and the mark and title are set on it.
+    // Measured as it is set down, once the page beneath has settled.
+    const setDown = () => {
       if (!alive) return;
-      (q(".in-ground") as HTMLElement).style.display = "none";
       const face = document.querySelector<HTMLElement>(narrow ? ".dk-book" : ".dk-leaf .dk-face.cover");
       if (!face) {
         done.current(false);
@@ -160,35 +135,51 @@ export function DeskIntro({ narrow, onDone }: { narrow: boolean; onDone: (skippe
       }
       const fr = face.getBoundingClientRect();
       const edge = narrow ? 6 : 7;
-      const round = narrow ? 22 : 18;
       const copy = document.createElement("div");
-      copy.className = `in-cover-copy${narrow ? " narrow" : ""}`;
-      copy.style.cssText = `left:${fr.left}px;top:${fr.top}px;width:${fr.width}px;height:${fr.height}px`;
-      copy.innerHTML = `<div class="dk-cover">${COVER_MARK}<div class="nm">InventDB <em>Legal</em></div><div class="sub">Legal practice, modernised.</div><div class="foot">A guide to the firm</div></div>`;
+      copy.className = `in-book${narrow ? " narrow" : ""}`;
+      // The leather as the closed booklet shows it: the cover and the board's edge round it.
+      copy.style.cssText = `left:${fr.left - (narrow ? edge : 0)}px;top:${fr.top - edge}px;width:${fr.width + (narrow ? 2 : 1) * edge}px;height:${fr.height + 2 * edge}px;border-radius:${narrow ? 22 : 18}px`;
+      copy.innerHTML =
+        `<div class="in-face" style="left:${narrow ? edge : 0}px;top:${edge}px;width:${fr.width}px;height:${fr.height}px">` +
+        `<svg class="in-frame" preserveAspectRatio="none"><rect pathLength="1" x="0.5" y="0.5" rx="10"/></svg>` +
+        `<div class="dk-cover">${COVER_MARK}<div class="nm">${letters("InventDB")} <em>${letters("Legal")}</em></div><div class="sub">Legal practice, modernised.</div><div class="foot">A guide to the firm</div></div></div>`;
       stage.appendChild(copy);
-      const L = narrow ? fr.left - edge : fr.left;
-      const Tp = fr.top - edge;
-      const R = vw - (fr.right + edge);
-      const B = vh - (fr.bottom + edge);
-      A(copy.querySelector(".dk-cover"), [{ clipPath: "inset(50% 50% 50% 50% round 10px)" }, { clipPath: "inset(0% 0% 0% 0% round 10px)" }], 0, 900);
-      inks.forEach(({ n, c }) => A(n, [{ color: "#e3c47e" }, { color: c }], 1350, 450, "linear", "forwards"));
+      // The frame is drawn as the cover's own inset rule; size it to match.
+      const cov = copy.querySelector<HTMLElement>(".dk-cover")!;
+      const frame = copy.querySelector<SVGSVGElement>(".in-frame")!;
+      const cr = cov.getBoundingClientRect();
+      const ir = copy.querySelector<HTMLElement>(".in-face")!.getBoundingClientRect();
+      frame.style.cssText = `left:${cr.left - ir.left}px;top:${cr.top - ir.top}px;width:${cr.width}px;height:${cr.height}px`;
+      const rect = frame.querySelector("rect")!;
+      rect.setAttribute("width", String(cr.width - 1));
+      rect.setAttribute("height", String(cr.height - 1));
+
+      const T = 0;
       A(
-        leather,
+        copy,
         [
-          { clipPath: "inset(0px 0px 0px 0px round 0px)" },
-          { clipPath: `inset(${Tp.toFixed(1)}px ${R.toFixed(1)}px ${B.toFixed(1)}px ${L.toFixed(1)}px round ${round}px)` },
+          { transform: "translateY(56px)", clipPath: "inset(100% 0 0 0 round 18px)" },
+          { transform: "none", clipPath: "inset(0 0 0 0 round 18px)" },
         ],
-        1000,
-        1200,
-        undefined,
-        "forwards",
-      )?.finished.then(
+        T,
+        1100,
+        "cubic-bezier(0.2, 0.7, 0.2, 1)",
+      );
+      A(rect, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], T + 700, 1300, "cubic-bezier(0.45, 0, 0.25, 1)");
+      A(cov.querySelector("svg"), [{ clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0 0 0 0)" }], T + 1100, 700);
+      cov.querySelectorAll(".in-ch").forEach((c, i) =>
+        A(c, [{ transform: "translateY(135%)" }, { transform: "none" }], T + 1400 + i * 45, 600, "cubic-bezier(0.2, 0.6, 0.3, 1)"),
+      );
+      A(cov.querySelector(".sub"), [{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }], T + 2000, 700);
+      A(cov.querySelector(".foot"), [{ clipPath: "inset(0 50% 0 50%)" }, { clipPath: "inset(0 0 0 0)" }], T + 2300, 600);
+      // 4. Hand over: the real booklet lies exactly where this one is, and opens.
+      const handover = A(stage, [{ transform: "none" }, { transform: "none" }], T + 3200, 1, "linear");
+      handover?.finished.then(
         () => alive && done.current(false),
         () => {},
       );
     };
-    // The pull-back waits for the leather to fill the view, not for a clock that can run ahead of it.
-    grow?.finished.then(coverStage, () => {});
+    A(stage, [{ transform: "none" }, { transform: "none" }], 6300, 1, "linear")?.finished.then(setDown, () => {});
 
     return () => {
       alive = false;

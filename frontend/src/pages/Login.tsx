@@ -51,6 +51,12 @@ export default function Login() {
   // Every visit opens with the mark, except with reduced motion.
   const [intro, setIntro] = useState(playOpening);
   const [skipped, setSkipped] = useState(false);
+  const [arriving, setArriving] = useState(false);
+  useEffect(() => {
+    if (!arriving) return;
+    const t = window.setTimeout(() => setArriving(false), 900);
+    return () => window.clearTimeout(t);
+  }, [arriving]);
 
   if (user && token) return <Navigate to="/" replace />;
 
@@ -141,7 +147,7 @@ export default function Login() {
   );
 
   return (
-    <div className={`dk-room${narrow ? " is-narrow" : ""}`}>
+    <div className={`dk-room${narrow ? " is-narrow" : ""}${arriving ? " is-arriving" : ""}`}>
       <header className="dk-top">
         <BrandLockup />
         <button
@@ -164,6 +170,7 @@ export default function Login() {
           narrow={narrow}
           onDone={(skip) => {
             setIntro(false);
+            setArriving(true);
             if (skip) setSkipped(true);
           }}
         />
