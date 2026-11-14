@@ -1,235 +1,239 @@
 1
-00:00:00,000 --> 00:00:04,420
+00:00:00,000 --> 00:00:03,920
 This is InventDB Legal.
 
 2
-00:00:04,500 --> 00:00:11,920
+00:00:04,000 --> 00:00:10,920
 Practice management for law firms, built on InventDB SOAR.
 
 3
-00:00:12,000 --> 00:00:16,920
-Most firms keep matters, the docket, billing and client money in separate systems.
+00:00:11,000 --> 00:00:14,920
+A missed deadline can become a malpractice claim.
 
 4
-00:00:17,000 --> 00:00:20,920
-InventDB Legal keeps the whole practice in one place.
+00:00:15,000 --> 00:00:18,920
+A trust account error can become a State Bar complaint.
 
 5
-00:00:21,000 --> 00:00:25,920
-Sign in with your InventDB account.
+00:00:19,000 --> 00:00:22,420
+Unbilled time is a fee the firm never collects.
 
 6
-00:00:26,000 --> 00:00:29,420
-Each person lands on their own dashboard.
+00:00:22,500 --> 00:00:25,920
+InventDB Legal is built around all three.
 
 7
-00:00:29,500 --> 00:00:35,420
-Open matters, deadlines, hearings, unbilled work, receivables and the trust balance.
+00:00:26,000 --> 00:00:30,920
+Sign in with the firm's InventDB account.
 
 8
-00:00:35,500 --> 00:00:41,920
-And what is coming due, soonest first.
+00:00:31,000 --> 00:00:36,920
+The firm's day on one page: 730 open matters, 172 deadlines and 176 hearings in the next 30 days.
 
 9
-00:00:42,000 --> 00:00:45,920
-New business: an enquiry becomes a client.
+00:00:37,000 --> 00:00:42,920
+$300,640 of unbilled work, $778,109 owed, and $1.27 million held in trust.
 
 10
-00:00:46,000 --> 00:00:50,920
-Every enquiry is logged with where it came from and what it is about.
+00:00:43,000 --> 00:00:48,420
+Deadlines first. Missed deadlines are a common cause of malpractice claims.
 
 11
-00:00:51,000 --> 00:00:56,920
-A workflow runs the conflict check, then waits for a person to decide.
+00:00:48,500 --> 00:00:51,920
+The dashboard shows what falls due, soonest first.
 
 12
-00:00:57,000 --> 00:01:00,920
-Case management: one file for every matter.
+00:00:52,000 --> 00:00:57,920
+Each is counted from its rule: here, Rule 8.121(a), ten days from the notice of appeal.
 
 13
-00:01:01,000 --> 00:01:05,920
-The demo firm has 1,300 matters, shown as a docket or as a table.
+00:00:58,000 --> 00:01:02,420
+Every deadline has an owner, a priority and a count of the days remaining.
 
 14
-00:01:06,000 --> 00:01:09,920
-Each list can be sorted and paged like a spreadsheet.
+00:01:02,500 --> 00:01:07,420
+Every matter carries its statute of limitations date.
 
 15
-00:01:10,000 --> 00:01:14,920
-Search runs across the whole table in the database, not just the page on screen.
+00:01:07,500 --> 00:01:13,420
+Hearings, depositions and mediations share one court calendar.
 
 16
-00:01:15,000 --> 00:01:19,420
-A matter holds the court, judge, case number, fee terms and the team on it.
+00:01:13,500 --> 00:01:16,920
+Open a busy day to see every appearance.
 
 17
-00:01:19,500 --> 00:01:22,920
-Its trust balance sits beside it.
+00:01:17,000 --> 00:01:21,420
+The docket report lists all 172 deadlines due in the next 30 days.
 
 18
-00:01:23,000 --> 00:01:28,920
-Related shows everything that points at it: 93 time entries, costs, invoices and the trust ledger.
+00:01:21,500 --> 00:01:26,920
+And a workflow emails each attorney their critical deadlines every weekday morning.
 
 19
-00:01:29,000 --> 00:01:33,920
-Click any record, chart or report row, and a read-only panel opens it.
+00:01:27,000 --> 00:01:31,920
+Then client money: trust account errors are a common cause of State Bar discipline.
 
 20
-00:01:34,000 --> 00:01:38,920
-With its links and the papers filed under it.
+00:01:32,000 --> 00:01:36,920
+Each matter shows its trust balance against its retainer and replenish threshold.
 
 21
-00:01:39,000 --> 00:01:44,920
-Describe a new matter in plain English.
+00:01:37,000 --> 00:01:42,920
+Every deposit, earned-fee transfer and disbursement is entered on the client's own ledger,
 
 22
-00:01:45,000 --> 00:01:51,920
-The form fills itself. Nothing is saved until you check it and press Save.
+00:01:43,000 --> 00:01:47,920
+with a running balance for every matter, line by line.
 
 23
-00:01:52,000 --> 00:01:55,920
-Risk and deadlines: nothing missed.
+00:01:48,000 --> 00:01:54,920
+The monthly reconciliation shows bank clearance, and that no client ledger ever went below zero.
 
 24
-00:01:56,000 --> 00:02:02,920
-Hearings, depositions and mediations on one calendar, in court and out of court told apart.
+00:01:55,000 --> 00:02:02,920
+Settlements show the gross, the fee, costs, each lien negotiated down, and the net to the client.
 
 25
-00:02:03,000 --> 00:02:07,920
-Click a busy day to see all of it.
+00:02:03,000 --> 00:02:08,920
+When a trust balance runs low, a workflow asks a partner before requesting a top-up.
 
 26
-00:02:08,000 --> 00:02:13,920
-Every deadline carries its rule, trigger and owner. 172 fall due in the next 30 days.
+00:02:09,000 --> 00:02:12,920
+Billing: hours never recorded are fees never collected.
 
 27
-00:02:14,000 --> 00:02:17,920
-Documents: every paper in its place.
+00:02:13,000 --> 00:02:16,920
+Time is entered against the matter, as the work is done.
 
 28
-00:02:18,000 --> 00:02:25,920
-Files are kept by matter and folder, and found by name, by the text inside or by meaning.
+00:02:17,000 --> 00:02:23,920
+Each entry carries UTBMS phase, task and activity codes, the coding insurers and corporate clients ask for.
 
 29
-00:02:26,000 --> 00:02:29,920
-Profitability: every hour accounted for.
+00:02:24,000 --> 00:02:29,920
+Unbilled work is valued at standard rates: $300,640 across the firm.
 
 30
-00:02:30,000 --> 00:02:34,920
-Time is recorded against the matter, with UTBMS task and activity codes.
+00:02:30,000 --> 00:02:36,920
+Invoices show fees, write-downs, costs, payments applied from trust and the balance due.
 
 31
-00:02:35,000 --> 00:02:39,920
-Invoices show what was billed, what was paid and how late the rest is.
+00:02:37,000 --> 00:02:43,920
+Receivables are aged by client, so the $216,788 over 120 days gets chased first.
 
 32
-00:02:40,000 --> 00:02:46,920
-A live report lists unbilled work matter by matter, at standard rates.
+00:02:44,000 --> 00:02:48,920
+Change any report by describing the change. Each edit saves a new version.
 
 33
-00:02:47,000 --> 00:02:50,920
-Compliance: client money, by the book.
+00:02:49,000 --> 00:02:52,920
+Partners can ask the practice a question in plain English.
 
 34
-00:02:51,000 --> 00:02:56,920
-The trust ledger records every deposit, transfer and disbursement.
+00:02:53,000 --> 00:02:56,920
+Analyze plans the queries and answers with a chart.
 
 35
-00:02:57,000 --> 00:03:00,920
-Each matter shows its trust balance against its replenish threshold.
+00:02:57,000 --> 00:03:01,920
+Business Litigation holds the most unbilled work: $125,158.50.
 
 36
-00:03:01,000 --> 00:03:05,920
-Settlements record the gross, the fee, costs, liens and the net to the client.
+00:03:02,000 --> 00:03:06,920
+Every answer shows the SQL behind it, so the figure can be checked.
 
 37
-00:03:06,000 --> 00:03:10,920
-Analyze: ask the practice a question in plain English.
+00:03:07,000 --> 00:03:10,920
+It only reads. Changes come back as proposals to approve.
 
 38
-00:03:11,000 --> 00:03:14,920
-It plans, runs the queries, and answers with a chart.
+00:03:11,000 --> 00:03:15,920
+New business: every enquiry is logged with its source and claim type.
 
 39
-00:03:15,000 --> 00:03:19,920
-Business Litigation carries the most unbilled work: $125,158.50.
+00:03:16,000 --> 00:03:18,920
+Intake shows each enquiry, newest first.
 
 40
-00:03:20,000 --> 00:03:26,920
-Every answer shows the SQL behind it, so anyone can check it.
+00:03:19,000 --> 00:03:25,920
+The statute of limitations is worked out the day the enquiry arrives: here, 360 days to run.
 
 41
-00:03:27,000 --> 00:03:31,920
-Analyze only reads. A change comes back as a proposal for you to approve.
+00:03:26,000 --> 00:03:32,920
+A workflow runs the conflict check and waits for a person to clear it before anyone gives advice.
 
 42
-00:03:32,000 --> 00:03:36,920
-Live reports re-query the data every time they open.
+00:03:33,000 --> 00:03:37,420
+Every matter is one file, and every part of the firm reads from it.
 
 43
-00:03:37,000 --> 00:03:43,920
-Change one by describing the change. Every edit saves a new version.
+00:03:37,500 --> 00:03:40,420
+1,300 matters in the demo firm.
 
 44
-00:03:44,000 --> 00:03:48,420
-Workflows automate the routine: scheduled reports, alerts and approvals.
+00:03:40,500 --> 00:03:44,420
+Search runs across the whole database, not just the page on screen.
 
 45
-00:03:48,500 --> 00:03:52,420
-When a run needs a decision, it stops and asks.
+00:03:44,500 --> 00:03:50,420
+Court, judge, case number, fee terms, the team, and a Privileged mark on every matter.
 
 46
-00:03:52,500 --> 00:03:58,420
-Answering resumes that same run, and its trail shows every step it took.
+00:03:50,500 --> 00:03:55,420
+Open any record read-only, with its linked records and the papers filed under it.
 
 47
-00:03:58,500 --> 00:04:05,920
-Rehearse a workflow before it goes live. Every run is kept.
+00:03:55,500 --> 00:03:59,920
+Open a new matter by describing it in plain English.
 
 48
-00:04:06,000 --> 00:04:10,420
-Everyone lands on their own dashboard and sees only their part of the firm.
+00:04:00,000 --> 00:04:04,920
+The form fills itself, and nothing is saved until someone checks it.
 
 49
-00:04:10,500 --> 00:04:13,920
-Access is enforced by InventDB, by the API and by the app.
+00:04:05,000 --> 00:04:09,920
+Documents are filed by matter and found by name, by the text inside or by meaning.
 
 50
-00:04:14,000 --> 00:04:18,920
-Search the whole firm from anywhere.
+00:04:10,000 --> 00:04:14,920
+Confidentiality: each person sees only the parts of the firm their work needs.
 
 51
-00:04:19,000 --> 00:04:23,920
-Light or dark, to suit the room.
+00:04:15,000 --> 00:04:17,920
+Enforced by InventDB, the API and the app.
 
 52
-00:04:24,000 --> 00:04:31,920
-And the whole practice works on a phone.
+00:04:18,000 --> 00:04:24,920
+On a phone at the courthouse, the calendar and the matter are a tap away.
 
 53
-00:04:32,000 --> 00:04:36,920
-Under the hood: a React and TypeScript app, a thin Python API, and InventDB SOAR.
+00:04:25,000 --> 00:04:28,920
+Light or dark, on any screen.
 
 54
-00:04:37,000 --> 00:04:41,420
-InventDB is the database and the identity provider. No second datastore.
+00:04:29,000 --> 00:04:33,920
+The same practice and the same data, wherever the team works.
 
 55
-00:04:41,500 --> 00:04:45,420
-The API keeps no credentials and forwards each person's own token,
+00:04:34,000 --> 00:04:38,920
+Under the hood: a React and TypeScript app, a thin Python API, and InventDB SOAR.
 
 56
-00:04:45,500 --> 00:04:48,420
-so row-level security applies to every request.
+00:04:39,000 --> 00:04:43,420
+InventDB is the database and the identity provider. No second datastore.
 
 57
+00:04:43,500 --> 00:04:48,420
+The API keeps no credentials, so row-level security applies to every request.
+
+58
 00:04:48,500 --> 00:04:51,920
 Covered by 1,300+ backend tests and 600+ end-to-end tests.
 
-58
-00:04:52,000 --> 00:04:56,420
-InventDB Legal. The whole practice, in one place.
-
 59
+00:04:52,000 --> 00:04:56,420
+InventDB Legal: the docket, client trust and billing in one place.
+
+60
 00:04:56,500 --> 00:04:59,920
 Built on InventDB SOAR. inventdb.com

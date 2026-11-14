@@ -291,6 +291,8 @@ export function legalise() {
     { id: "rpt-docket", name: "Docket: next 30 days", description: "Every open deadline due in the next 30 days, soonest first.", category: "Docket", mode: "sql", version: 4, created_by: "m.alvarado" },
     { id: "rpt-wip", name: "Unbilled work by matter", description: "Billable time not yet invoiced, valued at standard rates.", category: "Financial", mode: "sql", version: 2, created_by: "m.alvarado" },
     { id: "rpt-trust", name: "Trust balances by matter", description: "Client trust account (CTA) balance per matter.", category: "Compliance", mode: "sql", version: 3, created_by: "r.nakashima" },
+    { id: "rpt-recon", name: "Trust account: monthly reconciliation", description: "Entries, bank clearance and balances by month, with the client-ledger check.", category: "Compliance", mode: "sql", version: 5, created_by: "r.nakashima" },
+    { id: "rpt-ar", name: "Receivables by age", description: "Unpaid balances by client and age, oldest money first.", category: "Financial", mode: "sql", version: 2, created_by: "r.nakashima" },
   ]);
   replaceObj(REPORT_DETAILS as Record<string, unknown>, {
     "rpt-docket": { id: "rpt-docket", name: "Docket: next 30 days", description: "Every open deadline due in the next 30 days, soonest first.", category: "Docket", mode: "sql", version: 4, parameters: [] },
@@ -299,6 +301,10 @@ export function legalise() {
       id: "rpt-trust", name: "Trust balances by matter", description: "Client trust account (CTA) balance per matter.", category: "Compliance", mode: "sql", version: 3,
       parameters: [{ name: "as_of", label: "As of", type: "date", required: false, default: "2026-08-19", options: [] }],
     },
+  });
+  Object.assign(REPORT_DETAILS, {
+    "rpt-recon": { id: "rpt-recon", name: "Trust account: monthly reconciliation", description: "Entries, bank clearance and balances by month, with the client-ledger check.", category: "Compliance", mode: "sql", version: 5, parameters: [] },
+    "rpt-ar": { id: "rpt-ar", name: "Receivables by age", description: "Unpaid balances by client and age, oldest money first.", category: "Financial", mode: "sql", version: 2, parameters: [] },
   });
   replace(REPORT_SNAPSHOTS as Record<string, unknown>[], [
     { record_id: "report_20260801_090000", attachment_id: "att-trust-july", name: "Trust reconciliation — July 2026", created_at: "2026-08-01T09:00:00Z", from_template: false },

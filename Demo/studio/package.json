@@ -6,7 +6,7 @@
   "description": "InventDB Legal demo films (3 and 5 minute cuts), rendered from code with Remotion.",
   "scripts": {
     "data": "python scripts/build_data.py",
-    "capture": "cd ../../frontend && npx playwright test --config ../Demo/studio/capture/playwright.config.mjs scenes intro",
+    "capture": "cd ../../frontend && npx playwright test --config ../Demo/studio/capture/playwright.config.mjs scenes law intro",
     "music": "python scripts/music.py 180 public/music-3min.wav && python scripts/music.py 300 public/music-5min.wav",
     "subtitles": "node scripts/subtitles.ts",
     "studio": "remotion studio",

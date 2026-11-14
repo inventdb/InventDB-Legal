@@ -10,6 +10,17 @@ Two demo films for LinkedIn and X, made entirely from code:
 1920×1080, 30 fps, H.264 + AAC. Subtitles are burned in (for muted autoplay)
 and also shipped as `.srt` files, generated from the same script.
 
+The films are made for law firms, in the order a firm weighs practice
+management software: **deadlines and statutes of limitation** (the rule,
+trigger and computation behind each deadline; the court calendar; the
+docket report and the morning docket email), **client trust money** (each
+matter's ledger and replenish threshold, the monthly reconciliation and its
+client-ledger check, settlement statements with liens), **billing** (UTBMS
+time, unbilled work, invoices paid partly from trust, aged receivables),
+then Analyze, **intake and conflict checks**, the matter file, confidentiality
+and devices, and the architecture. Every figure quoted is true of the demo
+dataset as of 19 Aug 2026.
+
 ## How they are made
 
 1. **Data** — `scripts/build_data.py` reads the repo's synthetic dataset
@@ -17,7 +28,7 @@ and also shipped as `.srt` files, generated from the same script.
    LLP) and computes the dashboard and report figures the way
    `backend/app/routers/dashboard.py` does, as of the dataset's own date
    (19 Aug 2026). No real data and no live InventDB instance are involved.
-2. **Footage** — `capture/*.capture.ts` drive the real React app with
+2. **Footage** — `capture/*.capture.ts` (`law.capture.ts` holds the records a firm checks) drive the real React app with
    Playwright against the E2E suite's mocked API, loaded with that dataset.
    `capture/legal-content.ts` swaps the mock's property-management fixtures
    (workflows, inbox, reports, files) for legal ones drawn from the dataset.

@@ -5,7 +5,7 @@
 import { AbsoluteFill, Audio, Easing, interpolate, staticFile, useCurrentFrame } from "remotion";
 
 import { MONO, SANS } from "./fonts";
-import { Arch, Card, Close, Pair, Phones } from "./parts/Boards";
+import { Arch, Close, Pair, Phones, Stakes } from "./parts/Boards";
 import { IntroView, MARKS } from "./parts/IntroView";
 import { Mark } from "./parts/Mark";
 import { ShotView } from "./parts/ShotView";
@@ -35,14 +35,14 @@ function Content({ seg, local, frames, w, h }: { seg: Seg; local: number; frames
       const base = seg.from === "start" ? (seg.skip ?? 0) * 1000 : MARKS.form - 700;
       return <IntroView ms={base + (local / FPS) * 1000} />;
     }
-    case "card":
-      return <Card f={local} />;
+    case "stakes":
+      return <Stakes f={local} at={seg.at} />;
     case "pair":
       return <Pair f={local} a={seg.a} b={seg.b} width={w} height={h} />;
     case "phones":
       return <Phones f={local} srcs={seg.srcs} width={w} height={h} />;
     case "arch":
-      return <Arch f={local} seconds={seg.s} />;
+      return <Arch f={local} testsAt={seg.testsAt} />;
     case "close":
       return <Close f={local} />;
   }
@@ -55,7 +55,7 @@ function Captions({ caps, frame }: { caps: { text: string; start: number; end: n
   const local = frame - c.start * FPS;
   const p = interpolate(local, [0, 9], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: 26, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 26, display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 1000 }}>
       <div style={{ overflow: "hidden", borderRadius: 14 }}>
         <div
           style={{
@@ -100,6 +100,7 @@ function TitleBar({ p, chapter, prevChapter, sinceChange, w }: { p: number; chap
         borderBottom: `1px solid ${C.line}`,
         borderRadius: "14px 14px 0 0",
         overflow: "hidden",
+        zIndex: 900,
       }}
     >
       <div style={{ position: "absolute", left: 18, top: 0, height: FRAME.title, display: "flex", alignItems: "center", gap: 10 }}>
@@ -158,7 +159,7 @@ export function Film({ cut }: { cut: "long" | "short" }) {
         />
       )}
 
-      <div style={{ position: "absolute", left: b.x, top: b.y, width: b.w, height: b.h, overflow: "hidden", borderRadius: `0 0 ${14 * p}px ${14 * p}px` }}>
+      <div style={{ position: "absolute", left: b.x, top: b.y, width: b.w, height: b.h, overflow: "hidden", borderRadius: `0 0 ${14 * p}px ${14 * p}px`, zIndex: 1, isolation: "isolate" }}>
         {placed.map((s: Placed & { f0: number; f1: number }, i) => {
           const next = placed[i + 1];
           const slideOut = next && !sameView(s.seg, next.seg) ? SLIDE : 0;

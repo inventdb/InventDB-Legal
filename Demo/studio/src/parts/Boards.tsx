@@ -35,35 +35,43 @@ const Paper = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const CHAPTERS = [
-  ["I", "New Business"],
-  ["II", "Case Management"],
-  ["III", "Risk & Deadlines"],
-  ["IV", "Documents"],
-  ["V", "Profitability"],
-  ["VI", "Compliance"],
+const STAKES = [
+  ["A missed deadline", "can become a malpractice claim."],
+  ["A trust account error", "can become a State Bar complaint."],
+  ["Unbilled time", "is a fee the firm never collects."],
 ];
 
-export function Card({ f }: { f: number }) {
-  const rule = prog(f, 22, 50);
+/** The three risks a firm carries, set one by one, then the answer. `at` is in seconds. */
+export function Stakes({ f, at }: { f: number; at: number[] }) {
+  const fps = 30;
+  const answer = at[3] * fps;
+  const rule = prog(f, answer - 6, answer + 20);
   return (
     <Paper>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 250, textAlign: "center" }}>
-        <Rise f={f} at={4}>
-          <div style={{ fontFamily: SERIF, fontSize: 92, fontWeight: 500, letterSpacing: -1 }}>
-            The whole practice, <span style={{ fontStyle: "italic", color: C.brand }}>in one place.</span>
-          </div>
-        </Rise>
-        <div style={{ margin: "34px auto 0", height: 2, width: 760 * rule, background: C.gold }} />
-        <div style={{ display: "flex", justifyContent: "center", gap: 46, marginTop: 56 }}>
-          {CHAPTERS.map(([n, name], i) => (
-            <Rise key={n} f={f} at={34 + i * 6}>
-              <div style={{ textAlign: "center", minWidth: 150 }}>
-                <div style={{ fontFamily: SERIF, fontSize: 34, color: C.gold, fontWeight: 500 }}>{n}</div>
-                <div style={{ fontSize: 23, fontWeight: 500, marginTop: 6, color: C.muted }}>{name}</div>
+      <div style={{ position: "absolute", left: 210, right: 210, top: 250 }}>
+        {STAKES.map(([risk, cost], i) => {
+          const s = at[i] * fps;
+          return (
+            <div key={risk} style={{ display: "flex", alignItems: "baseline", gap: 26, marginBottom: 34 }}>
+              <div style={{ width: 70, flexShrink: 0, textAlign: "right" }}>
+                <Rise f={f} at={s}>
+                  <span style={{ fontFamily: SERIF, fontSize: 52, color: C.gold, fontWeight: 500 }}>{["I", "II", "III"][i]}</span>
+                </Rise>
               </div>
-            </Rise>
-          ))}
+              <Rise f={f} at={s + 3}>
+                <span style={{ fontFamily: SERIF, fontSize: 54, lineHeight: 1.18, fontWeight: 600, color: C.ink }}>{risk} </span>
+                <span style={{ fontFamily: SERIF, fontSize: 54, lineHeight: 1.18, fontWeight: 400, color: C.muted }}>{cost}</span>
+              </Rise>
+            </div>
+          );
+        })}
+        <div style={{ height: 2, width: 1400 * rule, background: C.gold, margin: "14px 0 34px 96px" }} />
+        <div style={{ marginLeft: 96 }}>
+          <Rise f={f} at={answer}>
+            <span style={{ fontFamily: SERIF, fontSize: 64, fontWeight: 500 }}>
+              InventDB Legal is built around <span style={{ fontStyle: "italic", color: C.brand }}>all three.</span>
+            </span>
+          </Rise>
         </div>
       </div>
     </Paper>
@@ -202,10 +210,10 @@ function Arrow({ f, at, x1, x2, y, label, token }: { f: number; at: number; x1: 
   );
 }
 
-export function Arch({ f, seconds }: { f: number; seconds: number }) {
+export function Arch({ f, testsAt }: { f: number; testsAt: number }) {
   // Pace the build to the captions: the boxes first, then the token, then tests.
   const fps = 30;
-  const tests = Math.round(seconds * fps * 0.8);
+  const tests = Math.round(testsAt * fps);
   const tp = prog(f, tests, tests + 22);
   return (
     <Paper>

@@ -2,6 +2,12 @@
 // the subtitles, in one place. The 5-minute and 3-minute cuts share the beats
 // and differ in which shots they keep and how long each holds.
 //
+// The order follows what a law firm weighs first when it chooses practice
+// management software: deadlines (malpractice), client trust money (the State
+// Bar), getting paid, intake and conflicts, and then the matter file itself,
+// confidentiality and the platform. Every figure quoted is true of the demo
+// dataset (the fictional Alvarado & Sung LLP) as of 19 August 2026.
+//
 // Coordinates are CSS pixels of the captured page (1600 x 900). A camera key
 // is [at, x, y, w]: at `at` (0..1 through the shot) the window shows the
 // 16:9 region starting at (x, y), `w` wide. Highlights are drawn outlines,
@@ -16,10 +22,10 @@ export type Mark = [number, number, number, number, number];
 export type Seg =
   | { kind: "shot"; src: string; s: number; cam?: Cam[]; marks?: Mark[] }
   | { kind: "intro"; s: number; from: "start" | "form"; skip?: number }
-  | { kind: "card"; s: number }
+  | { kind: "stakes"; s: number; at: number[] }
   | { kind: "pair"; s: number; a: string; b: string }
   | { kind: "phones"; s: number; srcs: string[] }
-  | { kind: "arch"; s: number }
+  | { kind: "arch"; s: number; testsAt: number }
   | { kind: "close"; s: number };
 
 export type Cut = { segs: Seg[]; caps: [string, number][] };
@@ -28,251 +34,195 @@ export type Beat = { id: string; chapter?: string; long: Cut; short?: Cut };
 const FULL: Cam = [0, 0, 0, 1600];
 const shot = (src: string, s: number, cam?: Cam[], marks?: Mark[]): Seg => ({ kind: "shot", src, s, cam, marks });
 const book = (n: number, s: number): Seg => shot(`book-ch${n}`, s, [FULL, [1, 120, 40, 1360]]);
+/** A record opened in the right-hand panel: the whole page, then the panel, then down it. */
+const panel = (src: string, s: number, downTo: number): Seg =>
+  shot(src, s, [FULL, [0.18, 840, 40, 760], [0.45, 840, 40, 760], [0.75, 840, downTo, 760], [1, 840, downTo, 760]]);
 
 export const BEATS: Beat[] = [
   {
     id: "open",
     long: {
-      segs: [{ kind: "intro", s: 12, from: "start" }],
+      segs: [{ kind: "intro", s: 11, from: "start" }],
       caps: [
-        ["This is InventDB Legal.", 4.5],
-        ["Practice management for law firms, built on InventDB SOAR.", 7.5],
+        ["This is InventDB Legal.", 4],
+        ["Practice management for law firms, built on InventDB SOAR.", 7],
       ],
     },
     short: {
       segs: [{ kind: "intro", s: 9, from: "start", skip: 1.2 }],
       caps: [
-        ["This is InventDB Legal.", 3.5],
-        ["Practice management for law firms, built on InventDB SOAR.", 5.5],
+        ["This is InventDB Legal.", 3],
+        ["Practice management for law firms, built on InventDB SOAR.", 6],
       ],
     },
   },
   {
-    id: "promise",
+    id: "stakes",
     long: {
-      segs: [{ kind: "card", s: 9 }],
+      segs: [{ kind: "stakes", s: 15, at: [0, 4, 8, 11.5] }],
       caps: [
-        ["Most firms keep matters, the docket, billing and client money in separate systems.", 5],
-        ["InventDB Legal keeps the whole practice in one place.", 4],
+        ["A missed deadline can become a malpractice claim.", 4],
+        ["A trust account error can become a State Bar complaint.", 4],
+        ["Unbilled time is a fee the firm never collects.", 3.5],
+        ["InventDB Legal is built around all three.", 3.5],
       ],
     },
     short: {
-      segs: [{ kind: "card", s: 6 }],
-      caps: [["One place for the whole practice: matters, the docket, time, billing and client money.", 6]],
+      segs: [{ kind: "stakes", s: 12, at: [0, 3, 6.5, 9.5] }],
+      caps: [
+        ["A missed deadline can become a malpractice claim.", 3],
+        ["A trust account error can become a State Bar complaint.", 3.5],
+        ["Unbilled time is a fee the firm never collects.", 3],
+        ["InventDB Legal is built around all three.", 2.5],
+      ],
     },
   },
   {
     id: "dashboard",
+    chapter: "Dashboard",
     long: {
       segs: [
         { kind: "intro", s: 5, from: "form" },
-        shot("dash-1", 16, [FULL, [0.25, 260, 70, 1340], [0.62, 260, 70, 1340], [0.85, 890, 400, 720], [1, 890, 400, 720]]),
+        shot("dash-1", 12, [FULL, [0.2, 260, 70, 1340], [1, 260, 70, 1300]]),
       ],
       caps: [
-        ["Sign in with your InventDB account.", 5],
-        ["Each person lands on their own dashboard.", 3.5],
-        ["Open matters, deadlines, hearings, unbilled work, receivables and the trust balance.", 6],
-        ["And what is coming due, soonest first.", 6.5],
+        ["Sign in with the firm's InventDB account.", 5],
+        ["The firm's day on one page: 730 open matters, 172 deadlines and 176 hearings in the next 30 days.", 6],
+        ["$300,640 of unbilled work, $778,109 owed, and $1.27 million held in trust.", 6],
       ],
     },
     short: {
       segs: [
-        { kind: "intro", s: 4, from: "form" },
-        shot("dash-1", 10, [FULL, [0.3, 260, 70, 1340], [1, 260, 70, 1340]]),
+        { kind: "intro", s: 3.5, from: "form" },
+        shot("dash-1", 7.5, [FULL, [0.25, 260, 70, 1340], [1, 260, 70, 1300]]),
       ],
       caps: [
-        ["Sign in, and each person lands on their own dashboard.", 5],
-        ["The whole practice at a glance: matters, deadlines, hearings and the money.", 9],
-      ],
-    },
-  },
-  {
-    id: "new-business",
-    chapter: "I · New Business",
-    long: {
-      segs: [
-        book(1, 4),
-        shot("intake-1", 5, [FULL, [1, 270, 110, 1150]]),
-        shot("wf-3", 6, [[0, 600, 190, 1000], [0.55, 600, 190, 1000], [1, 600, 480, 1000]]),
-      ],
-      caps: [
-        ["New business: an enquiry becomes a client.", 4],
-        ["Every enquiry is logged with where it came from and what it is about.", 5],
-        ["A workflow runs the conflict check, then waits for a person to decide.", 6],
-      ],
-    },
-    short: {
-      segs: [book(1, 2.5), shot("wf-3", 6.5, [[0, 600, 190, 1000], [1, 600, 300, 1000]])],
-      caps: [
-        ["New business: an enquiry becomes a client.", 2.5],
-        ["A workflow runs the conflict check, then waits for a person to decide.", 6.5],
-      ],
-    },
-  },
-  {
-    id: "case",
-    chapter: "II · Case Management",
-    long: {
-      segs: [
-        book(2, 4),
-        shot("matters-1", 5, [FULL, [1, 270, 150, 1050]], [[0.4, 1040, 200, 120, 26]]),
-        shot("matters-2", 4, [[0, 250, 140, 1350], [1, 250, 140, 1250]]),
-        shot("matters-3", 5, [[0, 270, 150, 1050], [1, 270, 150, 1000]], [[0.2, 430, 196, 420, 40]]),
-        shot("matter-1", 8, [FULL, [0.3, 280, 140, 900], [0.6, 280, 140, 900], [0.85, 1000, 330, 620], [1, 1000, 330, 620]]),
-        shot("matter-3", 6, [[0, 280, 330, 1050], [1, 280, 330, 980]]),
-        shot("drill-1", 5, [FULL, [0.4, 800, 0, 800], [1, 800, 0, 800]]),
-        shot("drill-2", 5, [[0, 800, 330, 800], [1, 800, 380, 800]]),
-      ],
-      caps: [
-        ["Case management: one file for every matter.", 4],
-        ["The demo firm has 1,300 matters, shown as a docket or as a table.", 5],
-        ["Each list can be sorted and paged like a spreadsheet.", 4],
-        ["Search runs across the whole table in the database, not just the page on screen.", 5],
-        ["A matter holds the court, judge, case number, fee terms and the team on it.", 4.5],
-        ["Its trust balance sits beside it.", 3.5],
-        ["Related shows everything that points at it: 93 time entries, costs, invoices and the trust ledger.", 6],
-        ["Click any record, chart or report row, and a read-only panel opens it.", 5],
-        ["With its links and the papers filed under it.", 5],
-      ],
-    },
-    short: {
-      segs: [
-        book(2, 3),
-        shot("matters-1", 4, [FULL, [1, 270, 150, 1050]], [[0.35, 1040, 200, 120, 26]]),
-        shot("matter-1", 6, [FULL, [0.4, 280, 140, 900], [1, 1000, 330, 620]]),
-        shot("matter-3", 5, [[0, 280, 330, 1050], [1, 280, 330, 980]]),
-        shot("drill-1", 5, [FULL, [0.45, 800, 0, 800], [1, 800, 0, 800]]),
-      ],
-      caps: [
-        ["Case management: one file for every matter.", 3],
-        ["The demo firm has 1,300 matters, shown as a docket or as a table.", 4],
-        ["A matter holds the court, judge, case number, fee terms and its trust balance.", 6],
-        ["Related shows everything that points at it: time, costs, invoices, trust.", 5],
-        ["Click any record, and a read-only panel opens it with its links and files.", 5],
-      ],
-    },
-  },
-  {
-    id: "describe",
-    chapter: "II · Case Management",
-    long: {
-      segs: [
-        shot("describe-2", 6, [[0, 930, 0, 670], [1, 930, 10, 670]]),
-        shot("describe-3", 7, [[0, 930, 0, 670], [0.45, 930, 0, 670], [1, 930, 260, 670]]),
-      ],
-      caps: [
-        ["Describe a new matter in plain English.", 6],
-        ["The form fills itself. Nothing is saved until you check it and press Save.", 7],
-      ],
-    },
-    short: {
-      segs: [
-        shot("describe-2", 4, [[0, 930, 0, 670], [1, 930, 10, 670]]),
-        shot("describe-3", 5, [[0, 930, 0, 670], [1, 930, 200, 670]]),
-      ],
-      caps: [
-        ["Describe a new matter in plain English.", 4],
-        ["The form fills itself. Nothing saves until you press Save.", 5],
+        ["Sign in, and the firm's day is on one page:", 3.5],
+        ["730 open matters, 172 deadlines due in 30 days, $1.27 million in trust.", 7.5],
       ],
     },
   },
   {
     id: "deadlines",
-    chapter: "III · Risk & Deadlines",
+    chapter: "Deadlines & SOL",
     long: {
       segs: [
         book(3, 4),
-        shot("cal-1", 7, [FULL, [0.5, 430, 330, 1000], [1, 430, 330, 1000]]),
-        shot("cal-2", 5, [[0, 820, 0, 780], [1, 820, 0, 780]]),
-        shot("reports-1", 6, [[0, 520, 220, 960], [1, 520, 260, 900]]),
+        shot("dash-1", 5, [[0, 260, 70, 1340], [0.6, 900, 400, 760], [1, 900, 400, 760]]),
+        panel("dl-1", 10, 200),
+        shot("drill-2", 5, [[0, 820, 0, 780], [1, 820, 20, 740]]),
+        shot("cal-1", 6, [FULL, [0.6, 430, 330, 1000], [1, 430, 330, 1000]]),
+        shot("cal-2", 3.5, [[0, 820, 0, 780], [1, 820, 0, 760]]),
+        shot("reports-1", 4.5, [[0, 520, 220, 960], [1, 520, 260, 900]]),
+        shot("wf-4", 6, [[0, 540, 0, 1060], [1, 560, 40, 960]]),
       ],
       caps: [
-        ["Risk and deadlines: nothing missed.", 4],
-        ["Hearings, depositions and mediations on one calendar, in court and out of court told apart.", 7],
-        ["Click a busy day to see all of it.", 5],
-        ["Every deadline carries its rule, trigger and owner. 172 fall due in the next 30 days.", 6],
+        ["Deadlines first. Missed deadlines are a common cause of malpractice claims.", 5.5],
+        ["The dashboard shows what falls due, soonest first.", 3.5],
+        ["Each is counted from its rule: here, Rule 8.121(a), ten days from the notice of appeal.", 6],
+        ["Every deadline has an owner, a priority and a count of the days remaining.", 4.5],
+        ["Every matter carries its statute of limitations date.", 5],
+        ["Hearings, depositions and mediations share one court calendar.", 6],
+        ["Open a busy day to see every appearance.", 3.5],
+        ["The docket report lists all 172 deadlines due in the next 30 days.", 4.5],
+        ["And a workflow emails each attorney their critical deadlines every weekday morning.", 5.5],
       ],
     },
     short: {
       segs: [
         book(3, 2.5),
-        shot("cal-1", 5, [FULL, [1, 430, 330, 1000]]),
+        panel("dl-1", 8, 200),
+        shot("drill-2", 3, [[0, 820, 0, 780], [1, 820, 20, 740]]),
+        shot("cal-1", 5, [FULL, [0.6, 430, 330, 1000], [1, 430, 330, 1000]]),
         shot("reports-1", 4.5, [[0, 520, 220, 960], [1, 520, 260, 900]]),
+        shot("wf-4", 4, [[0, 540, 0, 1060], [1, 560, 40, 960]]),
       ],
       caps: [
-        ["Risk and deadlines: nothing missed.", 2.5],
-        ["Hearings, depositions and mediations on one calendar.", 5],
-        ["Every deadline carries its rule, trigger and owner.", 4.5],
+        ["Deadlines first. Missed deadlines are a common cause of malpractice claims.", 5],
+        ["Each is counted from its rule: here, Rule 8.121(a), ten days from the notice of appeal.", 5.5],
+        ["Limitation dates are tracked on every matter.", 3],
+        ["Hearings, depositions and mediations share one court calendar.", 5],
+        ["The docket report lists everything due in the next 30 days.", 4.5],
+        ["A workflow emails each attorney their critical deadlines.", 4],
       ],
     },
   },
   {
-    id: "documents",
-    chapter: "IV · Documents",
-    long: {
-      segs: [book(4, 4), shot("files-1", 8, [FULL, [1, 260, 120, 1300]])],
-      caps: [
-        ["Documents: every paper in its place.", 4],
-        ["Files are kept by matter and folder, and found by name, by the text inside or by meaning.", 8],
-      ],
-    },
-    short: {
-      segs: [book(4, 2.5), shot("files-1", 3.5, [FULL, [1, 260, 120, 1300]])],
-      caps: [
-        ["Documents: every paper in its place,", 2.5],
-        ["found by name, by the text inside or by meaning.", 3.5],
-      ],
-    },
-  },
-  {
-    id: "profit",
-    chapter: "V · Profitability",
-    long: {
-      segs: [
-        book(5, 4),
-        shot("time-1", 5, [FULL, [1, 270, 110, 1150]]),
-        shot("invoices-1", 5, [FULL, [1, 270, 110, 1150]]),
-        shot("reports-2", 7, [[0, 520, 200, 960], [1, 520, 260, 880]]),
-      ],
-      caps: [
-        ["Profitability: every hour accounted for.", 4],
-        ["Time is recorded against the matter, with UTBMS task and activity codes.", 5],
-        ["Invoices show what was billed, what was paid and how late the rest is.", 5],
-        ["A live report lists unbilled work matter by matter, at standard rates.", 7],
-      ],
-    },
-    short: {
-      segs: [book(5, 2.5), shot("time-1", 4, [FULL, [1, 270, 110, 1150]]), shot("reports-2", 4.5, [[0, 520, 200, 960], [1, 520, 260, 880]])],
-      caps: [
-        ["Profitability: every hour accounted for.", 2.5],
-        ["Time is recorded against the matter, with UTBMS codes.", 4],
-        ["A live report lists unbilled work, matter by matter.", 4.5],
-      ],
-    },
-  },
-  {
-    id: "compliance",
-    chapter: "VI · Compliance",
+    id: "trust",
+    chapter: "Client Trust",
     long: {
       segs: [
         book(6, 4),
-        shot("trust-1", 6, [[0, 250, 130, 1350], [1, 250, 130, 1200]]),
-        shot("matter-1", 4, [[0, 1000, 330, 620], [1, 1040, 360, 560]]),
-        shot("settle-1", 5, [FULL, [1, 270, 110, 1150]]),
+        shot("matter-1", 5, [[0, 600, 200, 1000], [0.5, 1000, 330, 620], [1, 1020, 340, 580]]),
+        shot("mtrust-1", 6, [FULL, [0.3, 840, 0, 760], [1, 840, 0, 760]]),
+        shot("trust-1", 5, [[0, 250, 130, 1350], [1, 600, 130, 1000]]),
+        shot("rpt-recon", 7, [[0, 540, 230, 1000], [0.5, 560, 330, 720], [1, 560, 330, 720]]),
+        panel("set-1", 8, 330),
+        shot("wf-1", 7, [FULL, [0.35, 640, 230, 940], [1, 640, 230, 940]]),
       ],
       caps: [
-        ["Compliance: client money, by the book.", 4],
-        ["The trust ledger records every deposit, transfer and disbursement.", 6],
-        ["Each matter shows its trust balance against its replenish threshold.", 4],
-        ["Settlements record the gross, the fee, costs, liens and the net to the client.", 5],
+        ["Then client money: trust account errors are a common cause of State Bar discipline.", 5],
+        ["Each matter shows its trust balance against its retainer and replenish threshold.", 5],
+        ["Every deposit, earned-fee transfer and disbursement is entered on the client's own ledger,", 6],
+        ["with a running balance for every matter, line by line.", 5],
+        ["The monthly reconciliation shows bank clearance, and that no client ledger ever went below zero.", 7],
+        ["Settlements show the gross, the fee, costs, each lien negotiated down, and the net to the client.", 8],
+        ["When a trust balance runs low, a workflow asks a partner before requesting a top-up.", 6],
       ],
     },
     short: {
-      segs: [book(6, 2.5), shot("trust-1", 4, [[0, 250, 130, 1350], [1, 250, 130, 1200]]), shot("settle-1", 3.5, [FULL, [1, 270, 110, 1150]])],
+      segs: [
+        book(6, 2.5),
+        shot("matter-1", 4, [[0, 600, 200, 1000], [0.5, 1000, 330, 620], [1, 1020, 340, 580]]),
+        shot("mtrust-1", 4.5, [[0, 600, 0, 1000], [0.4, 840, 0, 760], [1, 840, 0, 760]]),
+        shot("rpt-recon", 6, [[0, 540, 230, 1000], [0.5, 560, 330, 720], [1, 560, 330, 720]]),
+        panel("set-1", 8, 330),
+      ],
       caps: [
-        ["Compliance: client money, by the book.", 2.5],
-        ["Every trust deposit, transfer and disbursement is recorded,", 4],
-        ["through to settlements and the net to the client.", 3.5],
+        ["Then client money: trust errors are a common cause of State Bar discipline.", 5],
+        ["Every deposit, transfer and disbursement is entered on the client's own ledger.", 6],
+        ["The monthly reconciliation shows no client ledger ever went below zero.", 6],
+        ["Settlements show the gross, the fee, costs, each lien and the net to the client.", 8],
+      ],
+    },
+  },
+  {
+    id: "billing",
+    chapter: "Billing",
+    long: {
+      segs: [
+        book(5, 4),
+        shot("time-1", 4, [FULL, [1, 270, 110, 1150]]),
+        panel("te-1", 7, 300),
+        shot("reports-2", 6, [[0, 520, 200, 960], [1, 520, 260, 880]]),
+        panel("inv-1", 7, 260),
+        shot("rpt-ar", 7, [[0, 540, 230, 1000], [0.5, 560, 260, 860], [1, 560, 260, 860]]),
+        shot("reports-4", 5, [FULL, [0.5, 880, 140, 720], [1, 880, 140, 720]]),
+      ],
+      caps: [
+        ["Billing: hours never recorded are fees never collected.", 4],
+        ["Time is entered against the matter, as the work is done.", 4],
+        ["Each entry carries UTBMS phase, task and activity codes, the coding insurers and corporate clients ask for.", 7],
+        ["Unbilled work is valued at standard rates: $300,640 across the firm.", 6],
+        ["Invoices show fees, write-downs, costs, payments applied from trust and the balance due.", 7],
+        ["Receivables are aged by client, so the $216,788 over 120 days gets chased first.", 7],
+        ["Change any report by describing the change. Each edit saves a new version.", 5],
+      ],
+    },
+    short: {
+      segs: [
+        book(5, 2.5),
+        panel("te-1", 6, 300),
+        shot("reports-2", 4.5, [[0, 520, 200, 960], [1, 520, 260, 880]]),
+        panel("inv-1", 5, 260),
+        shot("rpt-ar", 5, [[0, 540, 230, 1000], [0.5, 560, 260, 860], [1, 560, 260, 860]]),
+      ],
+      caps: [
+        ["Billing: every hour counts.", 2.5],
+        ["Time carries UTBMS phase, task and activity codes, the coding insurers ask for.", 6],
+        ["Unbilled work: $300,640 at standard rates.", 4.5],
+        ["Invoices show write-downs, trust applied and the balance due.", 5],
+        ["Receivables are aged, so the oldest money gets chased first.", 5],
       ],
     },
   },
@@ -281,102 +231,126 @@ export const BEATS: Beat[] = [
     chapter: "Analyze",
     long: {
       segs: [
-        shot("analyze-1", 5, [[0, 270, 100, 1100], [1, 270, 100, 1000]]),
-        shot("analyze-2", 9, [[0, 520, 100, 1080], [0.5, 520, 100, 1080], [1, 520, 330, 1080]]),
-        shot("analyze-4", 7, [[0, 560, 100, 1040], [0.4, 560, 100, 1040], [1, 560, 420, 1040]], [[0.55, 618, 630, 930, 56]]),
-        shot("analyze-4", 5, [[0, 560, 420, 1040], [1, 560, 440, 1000]]),
-      ],
-      caps: [
-        ["Analyze: ask the practice a question in plain English.", 5],
-        ["It plans, runs the queries, and answers with a chart.", 4],
-        ["Business Litigation carries the most unbilled work: $125,158.50.", 5],
-        ["Every answer shows the SQL behind it, so anyone can check it.", 7],
-        ["Analyze only reads. A change comes back as a proposal for you to approve.", 5],
-      ],
-    },
-    short: {
-      segs: [
         shot("analyze-1", 4, [[0, 270, 100, 1100], [1, 270, 100, 1000]]),
-        shot("analyze-2", 7, [[0, 520, 100, 1080], [1, 520, 300, 1080]]),
-        shot("analyze-4", 7, [[0, 560, 300, 1040], [1, 560, 420, 1040]], [[0.3, 618, 630, 930, 56]]),
+        shot("analyze-2", 9, [[0, 520, 100, 1080], [0.5, 520, 100, 1080], [1, 520, 330, 1080]]),
+        shot("analyze-4", 9, [[0, 560, 100, 1040], [0.4, 560, 420, 1040], [1, 560, 440, 1000]], [[0.45, 618, 630, 930, 56]]),
       ],
       caps: [
-        ["Analyze: ask the practice a question in plain English.", 4],
-        ["It runs the queries and answers with a chart.", 3],
-        ["Business Litigation carries the most unbilled work: $125,158.50.", 4],
-        ["Every answer shows its SQL. Analyze only reads; changes come back as proposals.", 7],
-      ],
-    },
-  },
-  {
-    id: "reports",
-    chapter: "Reports",
-    long: {
-      segs: [shot("reports-3", 5, [[0, 520, 200, 960], [1, 520, 240, 900]]), shot("reports-4", 7, [FULL, [0.5, 880, 140, 720], [1, 880, 140, 720]])],
-      caps: [
-        ["Live reports re-query the data every time they open.", 5],
-        ["Change one by describing the change. Every edit saves a new version.", 7],
+        ["Partners can ask the practice a question in plain English.", 4],
+        ["Analyze plans the queries and answers with a chart.", 4],
+        ["Business Litigation holds the most unbilled work: $125,158.50.", 5],
+        ["Every answer shows the SQL behind it, so the figure can be checked.", 5],
+        ["It only reads. Changes come back as proposals to approve.", 4],
       ],
     },
     short: {
-      segs: [shot("reports-4", 7, [FULL, [0.5, 880, 140, 720], [1, 880, 140, 720]])],
-      caps: [["Live reports re-query on open. Edit one by describing the change.", 7]],
+      segs: [
+        shot("analyze-1", 3, [[0, 270, 100, 1100], [1, 270, 100, 1000]]),
+        shot("analyze-2", 5.5, [[0, 520, 100, 1080], [1, 520, 300, 1080]]),
+        shot("analyze-4", 5.5, [[0, 560, 300, 1040], [1, 560, 420, 1040]], [[0.3, 618, 630, 930, 56]]),
+      ],
+      caps: [
+        ["Ask the practice a question in plain English.", 3],
+        ["Business Litigation holds the most unbilled work: $125,158.50.", 5.5],
+        ["Every answer shows its SQL. Analyze only reads.", 5.5],
+      ],
     },
   },
   {
-    id: "workflows",
-    chapter: "Workflows",
+    id: "intake",
+    chapter: "Intake & Conflicts",
     long: {
       segs: [
-        shot("wf-1", 8, [FULL, [0.45, 640, 230, 940], [1, 640, 230, 940]]),
-        shot("wf-3", 6, [[0, 600, 400, 1000], [1, 600, 480, 1000]]),
-        shot("wf-4", 8, [[0, 540, 0, 1060], [1, 560, 40, 960]]),
+        book(1, 3.5),
+        shot("intake-1", 4.5, [FULL, [1, 270, 110, 1150]]),
+        panel("lead-1", 7, 230),
+        shot("wf-3", 7, [[0, 600, 190, 1000], [0.5, 600, 190, 1000], [1, 600, 400, 1000]]),
       ],
       caps: [
-        ["Workflows automate the routine: scheduled reports, alerts and approvals.", 4.5],
-        ["When a run needs a decision, it stops and asks.", 4],
-        ["Answering resumes that same run, and its trail shows every step it took.", 6],
-        ["Rehearse a workflow before it goes live. Every run is kept.", 7.5],
+        ["New business: every enquiry is logged with its source and claim type.", 5],
+        ["Intake shows each enquiry, newest first.", 3],
+        ["The statute of limitations is worked out the day the enquiry arrives: here, 360 days to run.", 7],
+        ["A workflow runs the conflict check and waits for a person to clear it before anyone gives advice.", 7],
       ],
     },
     short: {
-      segs: [shot("wf-1", 6, [FULL, [0.5, 640, 230, 940], [1, 640, 230, 940]]), shot("wf-4", 5.5, [[0, 540, 0, 1060], [1, 560, 40, 960]])],
+      segs: [book(1, 2), panel("lead-1", 5.5, 230), shot("wf-3", 5.5, [[0, 600, 190, 1000], [1, 600, 300, 1000]])],
       caps: [
-        ["Workflows automate the routine. When one needs a decision, it stops and asks.", 6],
-        ["Rehearse before going live. Every run is kept.", 5.5],
+        ["New business.", 2],
+        ["The statute of limitations is worked out the day an enquiry arrives.", 5.5],
+        ["A conflict check runs, and a person clears it before anyone gives advice.", 5.5],
       ],
     },
   },
   {
-    id: "platform",
-    chapter: "The Platform",
+    id: "matters",
+    chapter: "Matters",
+    long: {
+      segs: [
+        book(2, 3),
+        shot("matters-1", 4.5, [FULL, [1, 270, 150, 1050]], [[0.4, 1040, 200, 120, 26]]),
+        shot("matters-3", 4, [[0, 270, 150, 1050], [1, 270, 150, 1000]], [[0.2, 430, 196, 420, 40]]),
+        shot("matter-1", 6, [FULL, [0.35, 280, 140, 900], [1, 280, 140, 880]]),
+        shot("drill-2", 5, [[0, 800, 330, 800], [1, 800, 380, 800]]),
+        shot("describe-2", 4.5, [[0, 930, 0, 670], [1, 930, 10, 670]]),
+        shot("describe-3", 5, [[0, 930, 0, 670], [1, 930, 220, 670]]),
+        shot("files-1", 5, [FULL, [1, 260, 120, 1300]]),
+      ],
+      caps: [
+        ["Every matter is one file, and every part of the firm reads from it.", 4.5],
+        ["1,300 matters in the demo firm.", 3],
+        ["Search runs across the whole database, not just the page on screen.", 4],
+        ["Court, judge, case number, fee terms, the team, and a Privileged mark on every matter.", 6],
+        ["Open any record read-only, with its linked records and the papers filed under it.", 5],
+        ["Open a new matter by describing it in plain English.", 4.5],
+        ["The form fills itself, and nothing is saved until someone checks it.", 5],
+        ["Documents are filed by matter and found by name, by the text inside or by meaning.", 5],
+      ],
+    },
+    short: {
+      segs: [
+        book(2, 2),
+        shot("matters-1", 3.5, [FULL, [1, 270, 150, 1050]], [[0.35, 1040, 200, 120, 26]]),
+        shot("matter-1", 5, [FULL, [0.4, 280, 140, 900], [1, 280, 140, 880]]),
+        shot("drill-2", 3.5, [[0, 800, 330, 800], [1, 800, 380, 800]]),
+        shot("describe-3", 4, [[0, 930, 0, 670], [1, 930, 200, 670]]),
+      ],
+      caps: [
+        ["Every matter is one file: 1,300 of them in the demo firm.", 5.5],
+        ["Court, judge, case number, fee terms, the team, marked Privileged.", 5],
+        ["Its papers are filed with it.", 3.5],
+        ["New matters can be described in plain English.", 4],
+      ],
+    },
+  },
+  {
+    id: "access",
+    chapter: "Confidentiality",
     long: {
       segs: [
         { kind: "pair", s: 8, a: "dash-1", b: "role-paralegal" },
-        shot("search-1", 5, [[0, 160, 0, 960], [1, 160, 0, 900]]),
-        shot("dark-1", 5, [FULL, [1, 270, 90, 1250]]),
-        { kind: "phones", s: 8, srcs: ["phone-1", "phone-2", "phone-3"] },
+        { kind: "phones", s: 7, srcs: ["phone-1", "phone-2", "phone-3"] },
+        shot("dark-1", 4, [FULL, [1, 270, 90, 1250]]),
+        shot("dark-2", 5, [FULL, [1, 270, 90, 1300]]),
       ],
       caps: [
-        ["Everyone lands on their own dashboard and sees only their part of the firm.", 4.5],
-        ["Access is enforced by InventDB, by the API and by the app.", 3.5],
-        ["Search the whole firm from anywhere.", 5],
-        ["Light or dark, to suit the room.", 5],
-        ["And the whole practice works on a phone.", 8],
+        ["Confidentiality: each person sees only the parts of the firm their work needs.", 5],
+        ["Enforced by InventDB, the API and the app.", 3],
+        ["On a phone at the courthouse, the calendar and the matter are a tap away.", 7],
+        ["Light or dark, on any screen.", 4],
+        ["The same practice and the same data, wherever the team works.", 5],
       ],
     },
     short: {
       segs: [
         { kind: "pair", s: 6, a: "dash-1", b: "role-paralegal" },
-        shot("search-1", 3.5, [[0, 160, 0, 960], [1, 160, 0, 900]]),
-        shot("dark-1", 3, [FULL, [1, 270, 90, 1250]]),
         { kind: "phones", s: 4, srcs: ["phone-1", "phone-2", "phone-3"] },
+        shot("dark-1", 3, [FULL, [1, 270, 90, 1250]]),
       ],
       caps: [
-        ["Everyone sees only their part of the firm, enforced by InventDB, the API and the app.", 6],
-        ["Search the whole firm from anywhere.", 3.5],
-        ["Light or dark,", 3],
-        ["and it works on a phone.", 4],
+        ["Each person sees only the parts of the firm their work needs.", 6],
+        ["It works on a phone at the courthouse,", 4],
+        ["in light or dark.", 3],
       ],
     },
   },
@@ -384,21 +358,19 @@ export const BEATS: Beat[] = [
     id: "tech",
     chapter: "Under the Hood",
     long: {
-      segs: [{ kind: "arch", s: 20 }],
+      segs: [{ kind: "arch", s: 18, testsAt: 14.5 }],
       caps: [
         ["Under the hood: a React and TypeScript app, a thin Python API, and InventDB SOAR.", 5],
         ["InventDB is the database and the identity provider. No second datastore.", 4.5],
-        ["The API keeps no credentials and forwards each person's own token,", 4],
-        ["so row-level security applies to every request.", 3],
+        ["The API keeps no credentials, so row-level security applies to every request.", 5],
         ["Covered by 1,300+ backend tests and 600+ end-to-end tests.", 3.5],
       ],
     },
     short: {
-      segs: [{ kind: "arch", s: 12 }],
+      segs: [{ kind: "arch", s: 9, testsAt: 5.5 }],
       caps: [
-        ["Under the hood: React and TypeScript, a thin Python API, and InventDB SOAR.", 4.5],
-        ["InventDB is the database and the identity provider. No second datastore.", 4.5],
-        ["Row-level security applies to every request.", 3],
+        ["Built on InventDB SOAR: one database, its sign-in, and row-level security on every request.", 5.5],
+        ["Covered by 1,300+ backend and 600+ end-to-end tests.", 3.5],
       ],
     },
   },
@@ -407,15 +379,15 @@ export const BEATS: Beat[] = [
     long: {
       segs: [{ kind: "close", s: 8 }],
       caps: [
-        ["InventDB Legal. The whole practice, in one place.", 4.5],
+        ["InventDB Legal: the docket, client trust and billing in one place.", 4.5],
         ["Built on InventDB SOAR. inventdb.com", 3.5],
       ],
     },
     short: {
       segs: [{ kind: "close", s: 6 }],
       caps: [
-        ["InventDB Legal. The whole practice, in one place.", 3.5],
-        ["Built on InventDB SOAR. inventdb.com", 2.5],
+        ["InventDB Legal: the docket, client trust and billing in one place.", 4],
+        ["inventdb.com", 2],
       ],
     },
   },

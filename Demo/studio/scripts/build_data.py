@@ -299,7 +299,57 @@ def report_pages(s: dict[str, list[dict]]) -> dict[str, str]:
                  ["Matter", "Client", "Deposits", "Disbursements", "Balance"],
                  [[k, v[0], money(v[1]), money(v[2]), money(v[1] - v[2])] for k, v in held[:14]],
                  ["", "Whole account", "", "", money(total_b)])
-    return {"rpt-docket": docket, "rpt-wip": wip, "rpt-trust": trust}
+    # Receivables by age, per client, oldest money first.
+    buckets = ["Current (not yet due)", "1-30 days", "31-60 days", "61-90 days", "91-120 days", "Over 120 days"]
+    owed: dict[str, dict[str, float]] = {}
+    for r in s["invoices"]:
+        if low(r.get("status")) == "paid" or num(r.get("balance_due")) <= 0:
+            continue
+        row = owed.setdefault(r.get("client_name", ""), {b: 0.0 for b in buckets})
+        if r.get("aging_bucket") in row:
+            row[r["aging_bucket"]] += num(r.get("balance_due"))
+    oldest = sorted(owed.items(), key=lambda kv: (-(kv[1]["Over 120 days"] + kv[1]["91-120 days"]), -sum(kv[1].values())))
+    col_tot = {b: sum(v[b] for v in owed.values()) for b in buckets}
+    # Five columns, so the table fits the report pane without scrolling.
+    groups = [("Current", ["Current (not yet due)"]), ("1-60 days", ["1-30 days", "31-60 days"]),
+              ("61-120 days", ["61-90 days", "91-120 days"]), ("Over 120", ["Over 120 days"])]
+    cell = lambda v, bs: money(sum(v[b] for b in bs)) if sum(v[b] for b in bs) else ""
+    ar = page("Receivables by age", f"Unpaid balances by client as of {TODAY:%b %d, %Y}, oldest money first. "
+              f"{money(sum(col_tot.values()))} outstanding; {money(col_tot['Over 120 days'])} over 120 days.",
+              ["Client", *[g for g, _ in groups], "Total"],
+              [[k, *[cell(v, bs) for _, bs in groups], money(sum(v.values()))] for k, v in oldest[:13]],
+              ["All clients", *[cell(col_tot, bs) for _, bs in groups], money(sum(col_tot.values()))])
+
+    # The trust account month by month, and the ledger check behind it.
+    ledgers: dict[str, list] = {}
+    for r in s["trust_ledger_cta"]:
+        ledgers.setdefault(r["matter_id"], []).append(r)
+    below = 0
+    for rows in ledgers.values():
+        bal = 0.0
+        for r in sorted(rows, key=lambda r: (str(r["date"]), str(r.get("transaction_id")))):
+            bal += num(r.get("amount_in")) - num(r.get("amount_out"))
+            if bal < -0.005:
+                below += 1
+                break
+    months: dict[str, list] = {}
+    for r in sorted(s["trust_ledger_cta"], key=lambda r: (str(r["date"]), str(r.get("transaction_id")))):
+        m = str(r.get("reconciliation_month") or r["date"])[:7]
+        mm = months.setdefault(m, [0, 0.0, 0.0, 0.0, 0])
+        mm[0] += 1
+        mm[1] += num(r.get("amount_in"))
+        mm[2] += num(r.get("amount_out"))
+        mm[3] = num(r.get("trust_account_balance"))
+        mm[4] += 1 if r.get("bank_cleared_date") else 0
+    recent = sorted(months.items())[-12:][::-1]
+    recon = page("Trust account: monthly reconciliation",
+                 f"IOLTA x4417. {len(ledgers)} client ledgers checked: "
+                 f"{'none has ever gone below zero' if below == 0 else f'{below} went below zero'}.",
+                 ["Month", "Entries", "Cleared by bank", "Deposits", "Disbursements", "Closing balance"],
+                 [[datetime.strptime(k, "%Y-%m").strftime("%b %Y"), f"{v[0]:,}", f"{v[4]:,}", money(v[1]), money(v[2]), money(v[3])]
+                  for k, v in recent])
+    print(f"trust check: {len(ledgers)} ledgers, {below} below zero")
+    return {"rpt-docket": docket, "rpt-wip": wip, "rpt-trust": trust, "rpt-ar": ar, "rpt-recon": recon}
 
 
 if __name__ == "__main__":
